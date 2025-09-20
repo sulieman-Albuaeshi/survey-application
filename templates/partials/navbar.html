@@ -13,13 +13,13 @@
             <ul tabindex="0"
                 class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
                 <li>
-                    <a href="{% url 'MySurvey' %}">My Survey</a>
+                    <a href="{% url 'mysurvey:Dashboard' %}">My Survey</a>
                 </li>
                 <li>
-                    <a>Create Survey</a>
+                    <a href="{% url 'survey:CreateSurvey' %}">Create Survey</a>
                 </li>
                 <li>
-                    <a>Responses</a>
+                    <a href="{% url 'respone:Responses' %}">Responses</a>
                 </li>
             </ul>
         </div>
@@ -29,13 +29,13 @@
     <div class="navbar-center hidden lg:flex">
         <ul class="menu menu-horizontal px-1">
             <li>
-                <a href="{% url 'MySurvey' %}">My Survey</a>
+                <a href="{% url 'mysurvey:Dashboard' %}">My Survey</a>
             </li>
             <li>
-                <a>Create Survey</a>
+                <a href="{% url 'survey:CreateSurvey' %}">Create Survey</a>
             </li>
             <li>
-                <a>Responses</a>
+                <a href="{% url 'respone:Responses' %}">Responses</a>
             </li>
         </ul>
     </div>
