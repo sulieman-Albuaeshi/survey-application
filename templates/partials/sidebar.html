@@ -1,0 +1,36 @@
+{% load static %}
+<div class="drawer lg:drawer-open">
+    <input id="my-drawer-2" type="checkbox" class="drawer-toggle " />
+    <div class="drawer-content flex flex-col items-center">
+        <!-- Page content here -->
+        <p>kokk</p>
+    </div>
+    <div class="drawer-side">
+        <label for="my-drawer-2" aria-label="close sidebar" class="drawer-overlay"></label>
+        <ul class="menu bg-base-200 text-base-content min-h-full min-w-60 w-max p-4">
+            <!-- Sidebar content here -->
+            <li>
+                <div id="folder"
+                     class="menu-title flex items-center justify-between gap-2">
+                    <img src="{% static 'folder.svg' %}"
+                         alt="folder Icon"
+                         width="30"
+                         height="30">
+                    <!-- Label text -->
+                    <label class="text-stone-700">Folder</label>
+                    <button onclick="my_modal_1.showModal()">
+                        <img src="{% static 'plus.svg' %}"
+                             class="hover:cursor-pointer hover:bg-stone-700 rounded-full"
+                             alt="plus"
+                             width="30"
+                             height="30">
+                        {% comment %} hx-get="{% url 'CreateSubFile' %}" hx-target="#subfile" hx-trigger='click' hx-swap="outerHTML">
+                        {% endcomment %}
+                    </button>
+                </div>
+            </li>
+            <div id="Folder"></div>
+        </ul>
+    </div>
+</div>
+{% include "partials/Modalfile.html" %}
