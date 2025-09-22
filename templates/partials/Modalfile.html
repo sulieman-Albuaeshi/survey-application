@@ -13,8 +13,8 @@
                     hx-post="{% url 'CreateSubFile' %}"
                     hx-target="#Folder"
                     hx-include="#input"
-                    hx-trigger="click"
                     hx-swap="outerHTML"
+                    hx-on::after-request="if(event.detail.successful) document.getElementById('input').value = ''"
                     onclick="my_modal_1.close()">Save</button>
             <button class="btn" onclick="my_modal_1.close()">Close</button>
         </div>

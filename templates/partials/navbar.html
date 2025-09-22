@@ -13,33 +13,33 @@
             <ul tabindex="0"
                 class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
                 <li>
-                    <a href="{% url 'mysurvey:Dashboard' %}">My Survey</a>
+                    <a href="{% url 'Dashboard' %}">My Survey</a>
                 </li>
                 <li>
-                    <a href="{% url 'mysurvey:CreateSurvey' %}">Create Survey</a>
+                    <a href="{% url 'CreateSurvey' %}">Create Survey</a>
                 </li>
                 <li>
-                    <a href="{% url 'mysurvey:Responses' %}">Responses</a>
+                    <a href="{% url 'Responses' %}">Responses</a>
                 </li>
             </ul>
         </div>
         <a class="btn btn-ghost text-xl hover:cursor-pointer"
-           href="{% url 'mysurvey:Dashboard' %}">daisyUI</a>
+           href="{% url 'Dashboard' %}">daisyUI</a>
     </div>
     <div class="navbar-center hidden lg:flex">
         <ul class="menu menu-horizontal px-1">
             <li>
-                <a href="{% url 'mysurvey:Dashboard' %}">My Survey</a>
+                <a href="{% url 'Dashboard' %}">My Survey</a>
             </li>
             <li>
-                <a href="{% url 'mysurvey:CreateSurvey' %}">Create Survey</a>
+                <a href="{% url 'CreateSurvey' %}">Create Survey</a>
             </li>
             <li>
-                <a href="{% url 'mysurvey:Responses' %}">Responses</a>
+                <a href="{% url 'Responses' %}">Responses</a>
             </li>
         </ul>
     </div>
     <div class="navbar-end">
-        <a class="btn btn-primary" href="{% url 'mysurvey:CreateSurvey' %}">Create New Survey</a>
+        <a class="btn btn-primary" href="{% url 'CreateSurvey' %}">Create New Survey</a>
     </div>
 </div>
