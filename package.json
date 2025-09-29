@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "@tailwindcss/cli": "^4.1.13",
+    "flowbite": "^3.1.2",
+    "tailwindcss": "^4.1.13"
+  },
+  "devDependencies": {
+    "@tailwindcss/line-clamp": "^0.4.4",
+    "daisyui": "^5.1.23"
+  },
+  "scripts": {
+    "build:css": "npx @tailwindcss/cli -i ./survey/static/survey/input.css -o ./survey/static/survey/output.css  --watch"
+  }
+}
