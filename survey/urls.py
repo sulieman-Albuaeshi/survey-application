@@ -7,8 +7,8 @@ urlpatterns = [
     path('__debug__/', include('debug_toolbar.urls')),
     path('', views.Index, name='Dashboard'),
     # the views need to be Change
-    path('CreateSurvey', views.Index, name='CreateSurvey'),
-    path('responses', views.Index, name='Responses'),
+    path('CreateSurvey', views.CreateSurvey, name='CreateSurvey'),
+    path('responses', views.Responses, name='Responses'),
 
 ]
 

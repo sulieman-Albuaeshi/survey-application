@@ -10,7 +10,7 @@ def Responses(request):
     return render(request, 'Responses.html')
 
 def CreateSurvey(request):
-    pass
+    return render(request, 'CreateSurvey.html')
 
 def CallTheModal(request):
     return render(request, 'partials/Modalfile.html')
