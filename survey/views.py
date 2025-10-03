@@ -1,6 +1,8 @@
+import time
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_http_methods
+from django.db.models import Q      
 
 from .models import Survey
 
@@ -29,6 +31,19 @@ def DeleteSurvey(request, pk):
     return HttpResponse(status=405)
 
 
+def SearchSurveys(request):
+    query = request.GET.get('search', '').strip()
+    time.sleep(3)
+    if query:
+        result = Survey.objects.filter(
+            Q( title__icontains=query) |
+            Q( description__icontains=query)
+        )
+    else:
+        result = Survey.objects.all()
+
+    
+    return render(request, 'partials/tableContent.html', {'surveys': result})
 
 def CallTheModal(request):
     return render(request, 'partials/Modalfile.html')

@@ -32,3 +32,11 @@
   background-color: rgb(243 244 246); /* hover:bg-gray-100 */
   color: rgb(55 65 81);
 }
+
+.survey-table-body {
+  transition: opacity 300ms ease-in-out;
+}
+
+.survey-table-body.htmx-request {
+  opacity: 0.2;
+}
