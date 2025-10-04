@@ -19,7 +19,7 @@
                         </div>
                         <input type="text"
                                name="search"
-                               hx-get="{% url 'SearchSurveys' %}"
+                               hx-get="{% url 'Dashboard' %}"
                                hx-trigger="keyup changed delay:500ms "
                                hx-target=".survey-table-body"
                                hx-indicator="#htmx-spinner"
@@ -102,7 +102,7 @@
                         <th scope="col" class="px-4 py-3 w-[8%] ">Actions</th>
                     </tr>
                 </thead>
-                <tbody id="htmx-spinner" class="survey-table-body">
+                <tbody id="htmx-spinner survey-table-body" class="survey-table-body">
                     {% include "partials/tableContent.html" %}
                 </tbody>
             </table>
@@ -116,128 +116,8 @@
                 of
                 <span class="font-semibold text-gray-900">1000</span>
             </span>
-            <ul class="inline-flex items-stretch -space-x-px">
-                <li>
-                    <a href="#"
-                       class="flex items-center justify-center h-full py-1.5 px-3 ml-0 text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700">
-                        <span class="sr-only">Previous</span>
-                        <svg class="w-5 h-5"
-                             aria-hidden="true"
-                             fill="currentColor"
-                             viewbox="0 0 20 20"
-                             xmlns="http://www.w3.org/2000/svg">
-                            <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
-                        </svg>
-                    </a>
-                </li>
-                <li>
-                    <a href="#" class="Pagination primary">1</a>
-                </li>
-                <li>
-                    <a href="#" class="Pagination">2</a>
-                </li>
-                <li>
-                    <a href="#" aria-current="page" class="Pagination">3</a>
-                </li>
-                <li>
-                    <a href="#" class="Pagination">...</a>
-                </li>
-                <li>
-                    <a href="#" class="Pagination">10</a>
-                </li>
-                <li>
-                    <a href="#"
-                       class="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 ">
-                        <span class="sr-only">Next</span>
-                        <svg class="w-5 h-5"
-                             aria-hidden="true"
-                             fill="currentColor"
-                             viewbox="0 0 20 20"
-                             xmlns="http://www.w3.org/2000/svg">
-                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                        </svg>
-                    </a>
-                </li>
-            </ul>
+            {% include "partials/pagination.html" %}
         </nav>
     </div>
+    <div id="koko" class="w-full h-fit"></div>
 </div>
-{% comment %} Requires Flowbite JS
-Table with products#
-This responsive table component can be used to show a list of products with images, categories, sales generated, and ratings in your e-commerce platform.
-Get Figma file
-Show code
-Inter
-Requires Flowbite JS
-Table with expandable rows#
-Use this example to expand a table row when clicking on it and show more details about a given data entry such as images, descriptions, and more.
-Get Figma file
-Unlock the code
-Inter
-Requires Flowbite JS
-Project management table (user tasks)#
-Use this example to show a list of tasks (to-do items) with checkboxes, filter elements and user avatars inside a responsive table component.
-Get Figma file
-Unlock the code
-Inter
-Requires Flowbite JS
-User management table (CRUD)#
-Use this example to show all the users from an application inside a row where you can show the avatar, role, status, social profiles, and CRUD actions.
-Get Figma file
-Unlock the code
-Inter
-Requires Flowbite JS
-Comparison table#
-This example can be used to compare multiple data sets such as products inside a table showing the differences in specifications based on rows and columns.
-Get Figma file
-Unlock the code
-Inter
-Requires Flowbite JS
-Table with sortable rows#
-Use this example of a responsive table to show sortable rows and a lift of products with details such as category, price, sales, and status.
-Get Figma file
-Unlock the code
-Inter
-Explore other blocks
-Check out some of the other recommended blocks from Flowbite to get started building your website faster with Tailwind CSS.
-View all blocks
-Product Categories
-6 components
-E-commerce UI
-Product Categories thumbnail dark mode
-FAQ Sections
-5 components
-Marketing UI
-FAQ Sections thumbnail dark mode
-Delete Confirm (CRUD)
-6 components
-Application UI
-Delete Confirm (CRUD) thumbnail dark mode
-Sign up for our newsletter
-Do you want to get notified when a new component is added to Flowbite? Sign up for our newsletter and you will be among the first to find out about new features, components, versions, and tools.
-Enter your email
-By subscribing, you agree with ConvertKit's Terms of Service and Privacy Policy.
-Flowbite Logo
-Flowbite
-Flowbite is an ecosystem built on top of Tailwind CSS including a component library, block sections, a Figma design system and other resources.
-Resources
-Documentation
-Flowbite Blocks
-Flowbite Icons
-Flowbite Figma
-Flowbite GPT
-Pro version
-Help & support
-Contact us
-Support center
-Hire us
-Follow us
-Discord
-Github
-Twitter
-Legal
-License (EULA)
-Privacy policy
-Terms & conditions
-Brand guideline
-© 2019-2025 Flowbite™ is a registered trademark. All Rights Reserved. {% endcomment %}

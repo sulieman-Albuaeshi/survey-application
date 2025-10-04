@@ -1,5 +1,5 @@
-<div class="grid grid-cols-1 md:grid-cols-2 md:max-2xl:grid-cols-2  xl:grid-cols-4 gap-6 p-4">
-    {% for survey in surveys|slice:":4" %}
+<div class="grid grid-cols-1 w-full md:grid-cols-2 md:max-2xl:grid-cols-2  xl:grid-cols-4 gap-6 p-4">
+    {% for survey in recent_surveys %}
         {% include "partials/surveyRecntCard.html" with title=survey.title description=survey.description created_by=survey.created_by last_updated=survey.last_updated %}
     {% endfor %}
 </div>
