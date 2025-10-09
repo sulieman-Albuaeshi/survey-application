@@ -32,7 +32,7 @@ def Index(request, page_number=1):
     is_htmx = request.headers.get('HX-Request') == 'true'
 
     if is_htmx:
-        return render(request, 'partials/table_with_oob_pagination.html', context)
+        return render(request, 'partials/Dashboard/table_with_oob_pagination.html', context)
 
     # For initial page loads, add any extra context needed.
     context['recent_surveys'] = survey_list[:4]

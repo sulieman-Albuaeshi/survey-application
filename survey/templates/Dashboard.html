@@ -10,4 +10,6 @@
         {% include "partials/Dashboard/surveyRecntCard.html" with title=survey.title description=survey.description created_by=survey.created_by last_updated=survey.last_updated %}
     {% endfor %}
 </div>
-<div class="flex flex-row gap-4 w-full items-start  justify-center">{% include "partials/tableSurvey.html" %}</div>
+<div class="flex flex-row gap-4 w-full items-start  justify-center">
+    {% include "partials/Dashboard/tableSurvey.html" %}
+</div>

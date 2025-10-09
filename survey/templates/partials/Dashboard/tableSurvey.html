@@ -113,7 +113,7 @@
                     <!-- to use the get_surveys filter -->
                     {% load survey_extras %}
                     {% for survey in page|get_surveys %}
-                        {% include "partials/tableRow.html" with survey=survey %}
+                        {% include "partials/Dashboard/tableRow.html" with survey=survey %}
                     {% endfor %}
                 </tbody>
             </table>
@@ -122,7 +122,7 @@
         <nav aria-label="Table navigation"
              id="pagination-controls"
              hx-swap-oob="true">
-            {% include "partials/pagination.html" %}
+            {% include "partials/Dashboard/pagination.html" %}
         </nav>
     </div>
     <div id="koko" class="w-full h-fit"></div>

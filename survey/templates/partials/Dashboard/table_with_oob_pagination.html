@@ -1,6 +1,6 @@
 <!-- to use the get_surveys filter -->
 {% load survey_extras %}
 {% for survey in page|get_surveys %}
-    {% include "partials/tableRow.html" with survey=survey %}
+    {% include "partials/Dashboard/tableRow.html" with survey=survey %}
 {% endfor %}
-{% include "partials/pagination.html" with page=page %}
+{% include "partials/Dashboard/pagination.html" with page=page %}
