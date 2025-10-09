@@ -101,12 +101,12 @@
             <table class="w-full text-sm text-left text-gray-500 table-fixed">
                 <thead class="text-xs text-gray-700 uppercase bg-gray-50">
                     <tr>
-                        <th scope="col" class="px-4 py-3 w-[20%]">Title</th>
-                        <th scope="col" class="px-4 py-3 w-[40%]">Description</th>
-                        <th scope="col" class="px-4 py-3 w-[15%]">Status</th>
-                        <th scope="col" class="px-4 py-3 w-[15%]">Responses</th>
+                        <th scope="col" class="px-4 py-3 w-[18%]">Title</th>
+                        <th scope="col" class="px-4 py-3 w-[35%]">Description</th>
+                        <th scope="col" class="px-4 py-3 w-[10%]">Status</th>
+                        <th scope="col" class="px-4 py-3 w-[12%]">Responses</th>
                         <th scope="col" class="px-4 py-3 w-[15%]">Last Updated</th>
-                        <th scope="col" class="px-4 py-3 w-[8%] ">Actions</th>
+                        <th scope="col" class="px-4 py-3 w-[10%] ">Actions</th>
                     </tr>
                 </thead>
                 <tbody id="htmx-spinner survey-table-body" class="survey-table-body">
@@ -119,14 +119,9 @@
             </table>
         </div>
         <!-- Footer -->
-        <nav class="flex flex-col md:flex-row justify-between items-start md:items-center space-y-3 md:space-y-0 p-4"
-             aria-label="Table navigation">
-            <span class="text-sm font-normal text-gray-500">
-                Showing
-                <span class="font-semibold text-gray-900">1-10</span>
-                of
-                <span class="font-semibold text-gray-900">1000</span>
-            </span>
+        <nav aria-label="Table navigation"
+             id="pagination-controls"
+             hx-swap-oob="true">
             {% include "partials/pagination.html" %}
         </nav>
     </div>

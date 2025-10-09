@@ -1,3 +1,4 @@
+{% extends "base.html" %}
 {% comment %} 
     context = {
         'page': page,
@@ -5,7 +6,6 @@
         'recently_viewed': recently_viewed, # list of recently viewed items
     }
 {% endcomment %}
-{% extends "base.html" %}
 {% block content %}
     {% include "partials/sidebar.html" %}
 {% endblock content %}
