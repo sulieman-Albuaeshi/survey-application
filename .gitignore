@@ -22,3 +22,5 @@ staticfiles/
 # System files
 .DS_Store
 Thumbs.db
+
+survey/management/

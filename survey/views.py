@@ -1,9 +1,10 @@
 import time
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
-from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_POST
 from django.db.models import Q      
 from django.core.paginator import Paginator
+from .models import Question as que
 
 from .models import Survey
 
@@ -43,20 +44,17 @@ def Responses(request):
     return render(request, 'Responses.html')
 
 def CreateSurvey(request):
-    return render(request, 'CreateSurvey.html')
-
-
-
+    context = {
+                'question_library': que.get_available_type_names()  
+    }
+    return render(request, 'CreateSurvey.html', context)
 
 # HTMX 
-
-@require_http_methods(["DELETE"])
-def DeleteSurvey(request, pk):
-    if(request.method == 'DELETE'):
-        item = get_object_or_404(Survey, pk=pk)
-        item.delete()
-        return HttpResponse(status=200)
-    return HttpResponse(status=405)
+@require_POST
+def DeleteSurvey(request, uuid):
+    item = get_object_or_404(Survey, uuid=uuid)
+    item.delete()
+    return HttpResponse(status=200)
 
 def CallTheModal(request):
     return render(request, 'partials/Modalfile.html')

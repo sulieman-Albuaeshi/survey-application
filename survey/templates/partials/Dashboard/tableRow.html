@@ -38,8 +38,8 @@
                 <li>
                     <a class="text-red-500"
                         href="#"  {# Use href="#" to keep it looking like a link #}
-                        hx-delete="/surveys/{{ survey.id }}/delete"
-                        hx-confirm="Are you sure you want to delete this survey? {{ survey.id }}"
+                        hx-post="/surveys/{{ survey.uuid }}/delete"
+                        hx-confirm="Are you sure you want to delete this survey? {{ survey.title }} will be permanently deleted."
                         hx-target="closest tr"
                     hx-swap="outerHTML">Delete</a>
                 </li>

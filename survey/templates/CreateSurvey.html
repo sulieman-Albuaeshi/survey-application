@@ -1,4 +1,12 @@
 {% extends "base.html" %}
 {% block content %}
-    <h1>Create Survey</h1>
+    <div class="flex flex-row">
+        <div class="flex flex-col gap-4 m-4 mr-2 rounded-b-lg md:w-[40%] lg:w-[25%]">
+            <div>{% include "partials/Create_survey/create_Survey_card.html" %}</div>
+            <div>{% include "partials/Create_survey/question_Library_card.html" %}</div>
+        </div>
+        <div class="gap-4 m-4 ml-2 md:w-[60%] lg:w-[75%]">
+            {% include "partials/Create_survey/question_container_card.html" %}
+        </div>
+    </div>
 {% endblock content %}
