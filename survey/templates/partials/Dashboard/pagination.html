@@ -30,7 +30,12 @@
                    hx-get="{% url 'Dashboard_Page' page_number %}{% if query %}?search={{ query }}{% endif %}"
                    hx-swap="innerHTML"
                    hx-target="previous .survey-table-body"
-                   class="Pagination cursor-pointer {% if page_number == page.number %}primary{% endif %}">{{ page_number }}</a>
+                   class="flex items-center justify-center px-3 h-full leading-tight border border-gray-300
+                             {% if page_number == page.number %}
+                                bg-primary text-primary-content
+                            {% else %}
+                                bg-white text-gray-500 hover:bg-gray-100 hover:text-gray-700
+                            {% endif %}">{{ page_number }}</a>
             </li>
         {% endfor %}
         <li>

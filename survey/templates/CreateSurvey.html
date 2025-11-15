@@ -1,12 +1,52 @@
 {% extends "base.html" %}
 {% block content %}
-    <div class="flex flex-row">
-        <div class="flex flex-col gap-4 m-4 mr-2 rounded-b-lg md:w-[40%] lg:w-[25%]">
-            <div>{% include "partials/Create_survey/create_Survey_card.html" %}</div>
+    {% comment %} post request in the viwe i use  "request.POST.get('question_count')" {% endcomment %}
+    <form class="flex flex-row gap-4" method="POST" action="{% url 'CreateSurvey' %}"
+          x-data="questionManager()"
+          @question-deleted.window="handleDeletion($event)"
+          @keydown.enter.prevent>
+        {% csrf_token %}
+        {{ multi_formset.management_form }}
+        {% comment %} Hidden input to track question count for formset prefixing, bound to Alpine.js state {% endcomment %}
+        <div class="sticky top-6 self-start flex flex-col gap-4 m-4 rounded-b-lg  w-[20%]">
+            <div class="bg-white shadow-md border card border-gray-200 w-full ">
+                <div class="card-body">
+                    <h2 class="text-2xl"> Create new survey</h2>
+                    <label for="{{ form.title.id_for_label }}" class="text-gray-500">survey name</label>
+                    {{ form.title }}
+                    <label for="{{ form.description.id_for_label }}" class="text-gray-500 mt-2.5 ">Description</label>
+                    {{ form.description }}
+                </div>
+            </div>
             <div>{% include "partials/Create_survey/question_Library_card.html" %}</div>
         </div>
-        <div class="gap-4 m-4 ml-2 md:w-[60%] lg:w-[75%]">
+        {% comment %} middle Survey questions th adrag and drop machnism {% endcomment %}
+        <div class="flex flex-col gap-4 m-4 mx-0 md:w-[60%] lg:w-[75%]" id="question_container" x-auto-animate>
+            {# This is where HTMX will add NEW questions #}
+            {% for form in multi_formset %}
+                {% include "partials/Create_survey/Questions/Multi-Choice_Question.html" with form=form%}
+            {% endfor %}
+            <div id="target_question" hidden class="flex flex-col gap-3 p-4"></div>
+
             {% include "partials/Create_survey/question_container_card.html" %}
         </div>
-    </div>
+        {% comment %} right side  settings {% endcomment %}
+        <div class="sticky top-6 self-start flex flex-col gap-4 m-4 rounded-b-lg  w-[20%] h-fit">
+            <div class="bg-white shadow-md border card border-gray-200">
+                <div class="card-body">
+                    <p class="font-medium text-base">Settings</p>
+                    <div class="flex flex-row gap-2 ml-1.5">
+                        <p>Shuffle questions</p>
+                        {{ form.shuffle_questions }}
+                    </div>
+                    <div class="flex flex-row gap-2 ml-1.5">
+                        <p>anonymous responses</p>
+                        {{ form.anonymous_responses }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <input type="submit" id="save-survey" class="right-4 bottom-4 btn btn-primary fixed" value="Save Survey">
+    </form>
 {% endblock content %}
+{% include "partials/navbar.html" %}

@@ -10,17 +10,15 @@
         <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.7/dist/htmx.min.js"
                 integrity="sha384-ZBXiYtYQ6hJ2Y0ZNoYuI+Nq5MqWBr+chMrS/RkXpNzQCApHEhOt2aY8EJgqwHLkJ"
                 crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@marcreichel/alpine-auto-animate@latest/dist/alpine-auto-animate.min.js"
+                defer></script>
         <script defer
                 src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
         <link rel="stylesheet" href="{% static 'survey/output.css' %}">
+        <script src="{% static 'survey/script.js' %}"></script>
         <title>Document</title>
     </head>
-    <body>
-        <script>
-            htmx.on('htmx:configRequest', function(evt) {
-                evt.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
-            });
-        </script>
+    <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
         {% include "partials/navbar.html" %}
         {% block content %}
         {% endblock content %}

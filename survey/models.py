@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from polymorphic.models import PolymorphicModel
 
 import uuid
 
@@ -22,7 +23,9 @@ class Survey(models.Model):
     last_updated = models.DateTimeField(auto_now=True)
     state = models.CharField(max_length=20, choices=STATE_CHOICES, default="draft")
     created_by =  models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='surveys')
-    questions = models.ManyToManyField('Question', blank=False)
+    question_count = models.IntegerField(default=0)
+    shuffle_questions = models.BooleanField(default=False)
+    anonymous_responses = models.BooleanField(default=False)
 
     @property
     def status_badge_class(self):
@@ -36,7 +39,8 @@ class Survey(models.Model):
     
 
 
-class Question(models.Model):
+class Question(PolymorphicModel):
+    survey = models.ForeignKey(Survey, on_delete=models.CASCADE, related_name='questions')
     label = models.TextField()
     helper_text = models.TextField(null=True, blank=True)
     required = models.BooleanField(default=False)
@@ -75,10 +79,11 @@ class LikertQuestion(Question):
     scale_min = models.IntegerField(default=1)
     scale_max = models.IntegerField(default=5)
     scale_labels = models.JSONField(null=True, blank=True)
-    NAME = "Likert Question"    
+    NAME = "Likert Question"
 
     def set_Scale_Labels(self, labels):
         if len(labels) != (self.scale_max - self.scale_min + 1):
             raise ValueError("Number of labels must match the scale range.")
         self.scale_labels = labels
         self.save()
+

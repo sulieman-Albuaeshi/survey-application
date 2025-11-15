@@ -1,12 +1,22 @@
 {% load static %}
-<div class="bg-white shadow-xs card border-gray-200 w-full border-3 border-dashed ">
-    <div class="card-body p-10 flex items-center justify-center space-y-4">
-        <img src="{% static 'radio-plus.svg' %}"
-             width="50px"
-             height="50px"
-             alt="radio icon plus" />
-        <h2 class="text-3xl">Drag Question Here To Start Building Your Survey</h2>
-        <p class="text-gray-500">Your survey questions will appear here as you add them from the library.</p>
-        <button class="btn btn-primary">Add Question</button>
-    </div>
+<div class="bg-white shadow-xs card border-gray-200 w-full border-3 border-dashed"
+     id="question_container_add"
+     :class="{ 'border-primary': isDragging }">
+     <div class="card-body p-10 flex items-center justify-center space-y-4"
+          @dragover.prevent
+          :class="{ 'opacity-50': isDragging }"
+          hx-post="{% url 'add_question' %}"
+          hx-trigger="add-Question"
+          @drop.prevent=" $el._questionId = event.dataTransfer.getData('text/plain');  incrementTotalForms($el._questionId); question_count++; $el._questionCount = question_count; htmx.trigger($el, 'add-Question');"
+          hx-target="#target_question"
+          hx-swap="beforebegin"
+          hx-vals="js:{ question_type: this._questionId, question_count: this._questionCount }">
+          <img src="{% static 'radio-plus.svg' %}"
+               width="50px"
+               height="50px"
+               alt="radio icon plus" />
+          <h2 class="text-3xl">Drag Question Here To Start Building Your Survey</h2>
+          <p class="text-gray-500">Your survey questions will appear here as you add them from the library.</p>
+          <button class="btn btn-primary" disabled>Add Question</button>
+     </div>
 </div>

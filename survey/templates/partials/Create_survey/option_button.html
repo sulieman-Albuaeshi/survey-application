@@ -1,0 +1,35 @@
+{% load static %}
+<template x-for="(option, index) in options" :key="option">
+    <li class="flex items-center justify-between w-2/5 gap-3 mb-3"
+        x-transition:leave="transition ease-in duration-300"
+        x-transition:leave-start="opacity-100 transform scale-100"
+        x-transition:leave-end="opacity-0 transform scale-90">
+        <span x-text="option" class="w-full p-2 input input-primary border-0"></span>
+        <button type="button"
+                @click="swap(options, index, index - 1)"
+                class="hover:cursor-pointer hover:bg-stone-700 rounded-full">
+            <img src="{% static 'up_arrow.svg' %}"
+                 alt="up_arrow"
+                 width="30"
+                 height="30">
+        </button>
+        <button type="button"
+                @click="swap(options, index, index + 1)"
+                class="text-red-500 hover:text-red-700 text-sm font-semibold">
+            <img src="{% static 'down_arrow.svg' %}"
+                 class="hover:cursor-pointer hover:bg-stone-700 rounded-full"
+                 alt="down_arrow"
+                 width="30"
+                 height="30">
+        </button>
+        <button type="button"
+                @click="options.splice(index, 1)"
+                class="text-red-500 hover:text-red-700 text-sm font-semibold">
+            <img src="{% static 'delete.svg' %}"
+                 class="hover:cursor-pointer hover:bg-stone-700 rounded-full"
+                 alt="delete"
+                 width="30"
+                 height="30">
+        </button>
+    </li>
+</template>

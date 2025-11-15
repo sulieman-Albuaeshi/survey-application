@@ -1,0 +1,48 @@
+{% load static %}
+<div class="bg-white shadow-md border card border-gray-200 w-full question-card"
+     id="question-{{ question_count }}">
+    {# This is the fix: Add a hidden input for the question's position #}
+    <input type="hidden" name="{{ form.prefix }}-position" value="{{ question_count }}">
+    <div class="card-body relative">
+        {% include "partials/Create_survey/Questions/question_header_card.html" %}
+        <div class="flex justify-between items-start pr-8">
+            <div class="flex flex-row gap-2 items-center flex-grow">
+                <span class="text-lg font-semibold question-number">{{ question_count }}.</span>
+                {# form.label renders the input field for the question's label #}
+                {{ form.label }}
+                {{ form.label.errors }}
+            </div>
+        </div>
+        {% if form.label.errors %}
+            <div class="mt-1 text-sm text-red-600">
+                {% for error in form.label.errors %}{{ error }}{% endfor %}
+            </div>
+        {% endif %}
+        <div>
+            <p class="block text-sm font-medium text-gray-700"> helep text : </p>{{ form.helper_text }}
+        </div>
+        <div x-data="optionsManager('{{ form.prefix }}')"
+             class="flex flex-col justify-between divide-y divide-gray-200">
+            {# This is the crucial fix: Render the hidden input for options #}
+            {{ form.options }}
+            <div class="pb-3">
+                <ul class="list-disc pl-3 mt-4" x-auto-animate>
+                    <label class="block text-sm font-medium text-gray-700">Options :</label>
+                    {% include "partials/Create_survey/option_button.html" %}
+                </ul>
+                <!-- The UI for adding a new option -->
+                <div class="flex items-center gap-2 mt-1">
+                    <input type="text"
+                           x-model="newOption"
+                           @keydown.enter.prevent="addOption"
+                           class="input input-bordered input-primary input-sm w-2/5"
+                           placeholder="Type an option and click Add">
+                    <button type="button" @click="addOption" class="btn btn-sm btn-primary ">Add</button>
+                </div>
+            </div>
+            <div class="block px-2 py-2">
+                {% include "partials/Create_survey/question_footer_card.html" with is_choosable=True %}
+            </div>
+        </div>
+    </div>
+</div>

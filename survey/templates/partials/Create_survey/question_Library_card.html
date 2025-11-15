@@ -2,8 +2,15 @@
     <div class="card-body">
         <h2 class="text-2xl">Question Library</h2>
         <h6 class="text-md text-gray-500">Define the basic details for your survey</h6>
-        {% for question in question_library %}
-            <button class="rounded-lg p-2 bg-gray-100  hover:bg-gray-200 cursor-pointer text-gray-800">{{ question }}</button>
+        {% for question in question_type_list %}
+            <button id="{{ question }}"
+                    type="button"
+                    draggable="true"
+                    x-on:dragstart="$event.dataTransfer.setData('text/plain', '{{ question }}'); console.log('dragstart:', '{{ question }}')"
+                    x-on:dragend="isDragging = false"
+                    class="rounded-lg p-2 bg-gray-100  hover:bg-gray-200 cursor-pointer text-gray-800">
+                {{ question }}
+            </button>
         {% endfor %}
     </div>
 </div>

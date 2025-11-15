@@ -1,0 +1,27 @@
+<div class="flex flex-row justify-between">
+    <div>
+        <p>core relation :</p>
+    </div>
+    <div class="flex flex-row gap-4">
+        <div class="form-control">
+            <label class="cursor-pointer label gap-2">
+                <span class="label-text">Required</span>
+                {{ form.required }}
+            </label>
+        </div>
+        {% if is_choosable %}
+            <div class="form-control">
+                <label class="cursor-pointer label gap-2">
+                    <span class="label-text">Multiple answers</span>
+                    {{ form.allow_multiple }}
+                </label>
+            </div>
+        {% endif %}
+        <div class="form-control">
+            <label class="cursor-pointer label gap-2">
+                <span class="label-text">Randomize</span>
+                {{ form.randomize_options }}
+            </label>
+        </div>
+    </div>
+</div>

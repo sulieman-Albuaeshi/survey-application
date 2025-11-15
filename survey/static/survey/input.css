@@ -40,3 +40,7 @@
 .survey-table-body.htmx-request {
   opacity: 0.2;
 }
+
+.position-fixed {
+  position: fixed;
+}

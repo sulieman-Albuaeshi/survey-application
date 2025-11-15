@@ -1,0 +1,24 @@
+* [33m448aef9[m[33m ([m[1;36mHEAD -> [m[1;32msulieman-timeline/create_Survey[m[33m, [m[1;31morigin/sulieman-timeline/create_Survey[m[33m, [m[1;32mmain[m[33m)[m Added some survey creation components UI and update context for question library
+* [33mb663415[m feat: implement UUID for surveys and update related models and views
+* [33m3447387[m[33m ([m[1;31morigin/main[m[33m)[m refactor: update template to includes  directory structure
+* [33mfba2763[m refactor: move existing files into new folders to improve organization
+* [33m00c9657[m update paginattion to to show "Showing of" and update table width
+* [33m7370685[m Add context comments for page,
+* [33me0a39cf[m Refactor dashboard to implement pagination and search functionality in the same time; remove unused table content template
+* [33m831ef64[m Implement search functionality for surveys; add loading indicator
+* [33m13bbc00[m Add pagination styles and dropdown functionality; implement survey deletion via HTMX
+* [33m3ae66b5[m link template "Responses" and "CreateSurvey" views with the urls
+* [33mb23cc5b[m rename the survey to dashboard and update the sidebar and navbar
+* [33m8441494[m Stop tracking output.css
+* [33m691fb5b[m Update .gitignore to include output.css
+* [33m14540f9[m Refactor survey display to make it responsize
+* [33m7018b95[m Refactor survey table structure and styles
+* [33m5f2ea4b[m Add Tailwind CSS and Flowbite configuration
+* [33m1f7f8b1[m Refactor survey app: rename fields, update views and templates, added surveycard and remove unused files
+* [33m5a7c2ff[m Refactor project structure: remove core and mysurvey apps, introduce survey app with user model and survey management features. Update templates and URLs accordingly.
+* [33m432aceb[m Add Debug Toolbar middleware and update URL configuration for debugging
+* [33m6287c6b[m Refactor URL patterns and views for mysurvey app; update navbar links to use namespaced URLs
+* [33me3e3030[m Update navbar links to use namespaced URL patterns
+* [33m4ddb21e[m Refactor Mysurvey app to mysurvey
+* [33md39c63d[m Add initial Django app structure with views, URLs, and templates
+* [33m52f98fa[m Initialize Django project structure
