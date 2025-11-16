@@ -37,6 +37,26 @@ class Survey(models.Model):
             return 'bg-red-200 text-black'
         return 'bg-gray-100 text-black'
     
+    @property
+    def response_count(self):
+        return self.responses.count()
+    
+    def get_response_stats(self):
+        """Get statistics about responses for this survey"""
+        return {
+            'total_responses': self.response_count,
+            'completion_rate': self.get_completion_rate(),
+            'avg_response_time': self.get_avg_response_time(),
+        }
+    
+    def get_completion_rate(self):
+        """Calculate completion rate (placeholder)"""
+        return 100 if self.response_count > 0 else 0
+    
+    def get_avg_response_time(self):
+        """Calculate average response time (placeholder)"""
+        return "N/A"
+    
 
 
 class Question(PolymorphicModel):
@@ -75,6 +95,21 @@ class MultiChoiceQuestion(Question):
             self.options.remove(option)
             self.save()
 
+    def get_answer_distribution(self):
+        """Get distribution of answers for this question"""
+        answers = Answer.objects.filter(question=self)
+        distribution = {}
+        
+        for answer in answers:
+            answer_data = answer.answer_data
+            if isinstance(answer_data, list):
+                for item in answer_data:
+                    distribution[item] = distribution.get(item, 0) + 1
+            else:
+                distribution[answer_data] = distribution.get(answer_data, 0) + 1
+        
+        return distribution
+
 class LikertQuestion(Question):
     scale_min = models.IntegerField(default=1)
     scale_max = models.IntegerField(default=5)
@@ -87,3 +122,47 @@ class LikertQuestion(Question):
         self.scale_labels = labels
         self.save()
 
+    def get_average_rating(self):
+        """Calculate average rating for this question"""
+        answers = Answer.objects.filter(question=self)
+        if not answers.exists():
+            return 0
+        
+        total = sum(float(answer.answer_data) for answer in answers)
+        return round(total / answers.count(), 2)
+    
+    def get_rating_distribution(self):
+        """Get distribution of ratings"""
+        answers = Answer.objects.filter(question=self)
+        distribution = {}
+        
+        for i in range(self.scale_min, self.scale_max + 1):
+            distribution[i] = 0
+        
+        for answer in answers:
+            rating = int(float(answer.answer_data))
+            distribution[rating] = distribution.get(rating, 0) + 1
+        
+        return distribution
+
+
+class Response(models.Model):
+    survey = models.ForeignKey(Survey, on_delete=models.CASCADE, related_name='responses')
+    respondent = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    completed = models.BooleanField(default=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"Response to {self.survey.title} at {self.created_at}"
+
+
+class Answer(models.Model):
+    response = models.ForeignKey(Response, on_delete=models.CASCADE, related_name='answers')
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    answer_data = models.JSONField(null=True, blank=True)
+    
+    def __str__(self):
+        return f"Answer for {self.question.label[:30]}: {self.answer_data}"

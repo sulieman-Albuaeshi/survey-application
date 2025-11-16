@@ -1,0 +1,82 @@
+<div class="container mx-auto p-6">
+    <!-- Header -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-800">Survey Responses</h1>
+    </div>
+
+    
+
+    <!-- Recent Surveys with Responses -->
+    <div class="mb-10">
+        <h2 class="text-xl font-semibold mb-4">Recent Surveys with Responses</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+            {% for survey in recent_surveys %}
+                {% include "partials/Responses/survey_response_card.html" with survey=survey %}
+            {% empty %}
+                <div class="col-span-full text-center py-8 text-gray-500">
+                    No surveys with responses yet
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Search Bar -->
+        <div class="p-6 bg-gray-50 mt-4">
+            <div class="flex items-center gap-4">
+                <div class="flex-1">
+                    <label for="search-responses" class="sr-only">Search</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                            <svg class="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        <input type="text" 
+                               id="search-responses"
+                               name="search"
+                               hx-get="{% url 'Responses' %}"
+                               hx-trigger="keyup changed delay:500ms"
+                               hx-target="#responses-table-body"
+                               hx-indicator="#search-spinner"
+                               class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 p-2.5"
+                               placeholder="Search surveys...">
+                    </div>
+                </div>
+                <span id="search-spinner" class="htmx-indicator loading loading-spinner text-primary"></span>
+            </div>
+        </div>
+
+    <!-- All Surveys Table -->
+    <div class="bg-white shadow-lg border border-gray-200 rounded-lg overflow-hidden mt-4">
+        
+
+        <!-- Table -->
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left text-gray-500" >
+                <thead class="text-xs text-gray-700 uppercase bg-gray-100 pb-7">
+                    <tr>
+                        <th scope="col" class="mb-3">Survey Title</th>
+                        <th scope="col">Description</th>
+                        <th scope="col" class="text-center">Total Responses</th>
+                        <th scope="col">Last Response</th>
+                        <th scope="col" class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="responses-table-body" class="divide-y divide-gray-200">
+                    {% for survey in page.object_list %}
+                        {% include "partials/Responses/responses_table_row.html" with survey=survey %}
+                    {% empty %}
+                        <tr>
+                            <td colspan="5" class="px-6 py-8 text-center text-gray-500 mx-4">
+                                No surveys found
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% include "partials/Responses/responses_pagination.html" %}
+    </div>
+</div>

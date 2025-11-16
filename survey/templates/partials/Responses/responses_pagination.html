@@ -1,0 +1,38 @@
+<div class="flex flex-col md:flex-row justify-between items-center p-4 bg-gray-50">
+    <span class="text-sm text-gray-700 mb-3 md:mb-0">
+        Showing 
+        <span class="font-semibold">{{ page.start_index }}</span>
+        to 
+        <span class="font-semibold">{{ page.end_index }}</span>
+        of 
+        <span class="font-semibold">{{ page.paginator.count }}</span>
+        surveys
+    </span>
+    
+    <div class="flex gap-2">
+        {% if page.has_previous %}
+            <a href="{% url 'Responses_Page' page.previous_page_number %}"
+               class="btn btn-sm btn-outline">
+                Previous
+            </a>
+        {% endif %}
+        
+        {% for num in page.paginator.page_range %}
+            {% if page.number == num %}
+                <button class="btn btn-sm btn-primary">{{ num }}</button>
+            {% elif num > page.number|add:'-3' and num < page.number|add:'3' %}
+                <a href="{% url 'Responses_Page' num %}"
+                   class="btn btn-sm btn-outline">
+                    {{ num }}
+                </a>
+            {% endif %}
+        {% endfor %}
+        
+        {% if page.has_next %}
+            <a href="{% url 'Responses_Page' page.next_page_number %}"
+               class="btn btn-sm btn-outline">
+                Next
+            </a>
+        {% endif %}
+    </div>
+</div>

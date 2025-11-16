@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mx-auto p-4">
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <div class="flex items-center gap-3 mb-2">
+                <a href="{% url 'Responses' %}" class="btn btn-sm btn-ghost">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"/>
+                    </svg>
+                    Back
+                </a>
+                <h1 class="text-3xl font-bold text-gray-800">{{ survey.title }}</h1>
+            </div>
+            <p class="text-gray-600">{{ survey.description }}</p>
+        </div>
+        <a href="{% url 'SurveyAnalytics' survey.uuid %}" 
+           class="btn btn-primary">
+            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/>
+            </svg>
+            View Analytics
+        </a>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div class="card bg-white shadow-md border border-gray-200">
+            <div class="card-body">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm">Total Responses</p>
+                        <p class="text-3xl font-bold text-gray-800">{{ total_responses }}</p>
+                    </div>
+                    <div class="p-3 bg-primary rounded-full">
+                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                            <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card bg-white shadow-md border border-gray-200">
+            <div class="card-body">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm">Questions</p>
+                        <p class="text-3xl font-bold text-gray-800">{{ survey.questions.count }}</p>
+                    </div>
+                    <div class="p-3 bg-green-500 rounded-full">
+                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card bg-white shadow-md border border-gray-200">
+            <div class="card-body">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm">Status</p>
+                        <p class="text-xl font-semibold">
+                            <span class="badge {{ survey.status_badge_class }} badge-lg">{{ survey.state|title }}</span>
+                        </p>
+                    </div>
+                    <div class="p-3 bg-yellow-500 rounded-full">
+                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Responses List -->
+    <div class="card bg-white shadow-md border border-gray-200">
+        <div class="card-body">
+            <h2 class="text-xl font-semibold mb-4">Individual Responses</h2>
+            
+            <div class="overflow-x-auto">
+                <table class="table w-full">
+                    <thead>
+                        <tr class="border-b-2">
+                            <th class="text-left">#</th>
+                            <th class="text-left">Respondent</th>
+                            <th class="text-left">Submitted At</th>
+                            <th class="text-left">Status</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for response in responses %}
+                        <tr class="hover:bg-gray-50 border-b">
+                            <td class="font-medium">{{ forloop.counter }}</td>
+                            <td>
+                                {% if response.respondent %}
+                                    {{ response.respondent.username }}
+                                {% else %}
+                                    Anonymous
+                                {% endif %}
+                            </td>
+                            <td>{{ response.created_at|date:"M d, Y H:i" }}</td>
+                            <td>
+                                <span class="badge {% if response.completed %}badge-success{% else %}badge-warning{% endif %}">
+                                    {% if response.completed %}Completed{% else %}Incomplete{% endif %}
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <button class="btn btn-sm btn-ghost"
+                                        onclick="viewResponse{{ response.id }}.showModal()">
+                                    View Details
+                                </button>
+                                
+                                <!-- Modal for response details -->
+                                <dialog id="viewResponse{{ response.id }}" class="modal">
+                                    <div class="modal-box max-w-2xl">
+                                        <h3 class="font-bold text-lg mb-4">Response Details</h3>
+                                        <div class="space-y-4">
+                                            {% for answer in response.answers.all %}
+                                                <div class="border-b pb-3">
+                                                    <p class="font-semibold text-gray-700 mb-2">
+                                                        {{ answer.question.label }}
+                                                    </p>
+                                                    <p class="text-gray-600">
+                                                        {% if answer.answer_data is not None %}
+                                                            {{ answer.answer_data }}
+                                                        {% else %}
+                                                            No answer provided
+                                                        {% endif %}
+                                                    </p>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                        <div class="modal-action">
+                                            <button class="btn" onclick="viewResponse{{ response.id }}.close()">Close</button>
+                                        </div>
+                                    </div>
+                                    <form method="dialog" class="modal-backdrop">
+                                        <button>close</button>
+                                    </form>
+                                </dialog>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center py-8 text-gray-500">
+                                No responses yet
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            {% if responses.has_other_pages %}
+            <div class="flex justify-center mt-6">
+                <div class="btn-group">
+                    {% if responses.has_previous %}
+                        <a href="?page={{ responses.previous_page_number }}" class="btn btn-sm">«</a>
+                    {% endif %}
+                    
+                    {% for num in responses.paginator.page_range %}
+                        {% if responses.number == num %}
+                            <button class="btn btn-sm btn-active">{{ num }}</button>
+                        {% elif num > responses.number|add:'-3' and num < responses.number|add:'3' %}
+                            <a href="?page={{ num }}" class="btn btn-sm">{{ num }}</a>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if responses.has_next %}
+                        <a href="?page={{ responses.next_page_number }}" class="btn btn-sm">»</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock content %}

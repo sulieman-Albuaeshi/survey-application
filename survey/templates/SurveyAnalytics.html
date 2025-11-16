@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mx-auto p-4">
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <div class="flex items-center gap-3 mb-2">
+                <a href="{% url 'SurveyResponseDetail' survey.uuid %}" class="btn btn-sm btn-ghost">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"/>
+                    </svg>
+                    Back to Responses
+                </a>
+                <h1 class="text-3xl font-bold text-gray-800">Analytics: {{ survey.title }}</h1>
+            </div>
+            <p class="text-gray-600">Detailed analysis and visualizations</p>
+        </div>
+        <button onclick="window.print()" class="btn btn-outline">
+            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M5 4v3H4a2 2 0 00-2 2v3a2 2 0 002 2h1v2a2 2 0 002 2h6a2 2 0 002-2v-2h1a2 2 0 002-2V9a2 2 0 00-2-2h-1V4a2 2 0 00-2-2H7a2 2 0 00-2 2zm8 0H7v3h6V4zm0 8H7v4h6v-4z" clip-rule="evenodd"/>
+            </svg>
+            Export Report
+        </button>
+    </div>
+
+    <!-- Summary Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <div class="card bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-lg">
+            <div class="card-body">
+                <p class="text-sm opacity-90">Total Responses</p>
+                <p class="text-4xl font-bold">{{ total_responses }}</p>
+            </div>
+        </div>
+        
+        <div class="card bg-gradient-to-br from-green-500 to-green-600 text-white shadow-lg">
+            <div class="card-body">
+                <p class="text-sm opacity-90">Questions</p>
+                <p class="text-4xl font-bold">{{ survey.questions.count }}</p>
+            </div>
+        </div>
+        
+        <div class="card bg-gradient-to-br from-purple-500 to-purple-600 text-white shadow-lg">
+            <div class="card-body">
+                <p class="text-sm opacity-90">Completion Rate</p>
+                <p class="text-4xl font-bold">
+                    {% if total_responses > 0 %}100%{% else %}0%{% endif %}
+                </p>
+            </div>
+        </div>
+        
+        <div class="card bg-gradient-to-br from-orange-500 to-orange-600 text-white shadow-lg">
+            <div class="card-body">
+                <p class="text-sm opacity-90">Last Response</p>
+                <p class="text-lg font-semibold">
+                    {% if survey.responses.first %}
+                        {{ survey.responses.first.created_at|date:"M d, Y" }}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Question Analytics -->
+    <div class="space-y-6">
+        {% for data in analytics_data %}
+        <div class="card bg-white shadow-lg border border-gray-200">
+            <div class="card-body">
+                <h3 class="text-xl font-semibold mb-4">{{ data.question.label }}</h3>
+                
+                {% if data.type == "LikertQuestion" %}
+                    <!-- Likert Scale Analytics -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div>
+                            <div class="stat">
+                                <div class="stat-title">Average Rating</div>
+                                <div class="stat-value text-primary">{{ data.average }}</div>
+                                <div class="stat-desc">out of {{ data.question.scale_max }}</div>
+                            </div>
+                            
+                            <div class="mt-4 space-y-2">
+                                <h4 class="font-semibold text-gray-700">Rating Distribution</h4>
+                                {% for rating, count in data.distribution.items %}
+                                <div class="flex items-center gap-3">
+                                    <span class="w-12 text-sm font-medium">{{ rating }}</span>
+                                    <div class="flex-1">
+                                        <div class="w-full bg-gray-200 rounded-full h-6">
+                                            <div class="bg-primary h-6 rounded-full flex items-center justify-end pr-2 text-white text-xs font-semibold"
+                                                 style="width: {% if total_responses > 0 %}{{ count|add:0 }}00|divideby:{{ total_responses }}{% else %}0{% endif %}%">
+                                                {{ count }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <canvas id="chart-{{ data.question.id }}" 
+                                    data-question-id="{{ data.question.id }}"
+                                    data-survey-uuid="{{ survey.uuid }}"
+                                    class="w-full h-64"></canvas>
+                        </div>
+                    </div>
+                    
+                {% elif data.type == "MultiChoiceQuestion" %}
+                    <!-- Multiple Choice Analytics -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="font-semibold text-gray-700 mb-3">Response Distribution</h4>
+                            <div class="space-y-2">
+                                {% for option, count in data.distribution.items %}
+                                <div class="flex items-center gap-3">
+                                    <span class="w-32 text-sm font-medium truncate">{{ option }}</span>
+                                    <div class="flex-1">
+                                        <div class="w-full bg-gray-200 rounded-full h-6">
+                                            <div class="bg-green-500 h-6 rounded-full flex items-center justify-end pr-2 text-white text-xs font-semibold"
+                                                 style="width: {% if total_responses > 0 %}{{ count|add:0 }}00|divideby:{{ total_responses }}{% else %}0{% endif %}%">
+                                                {{ count }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <span class="w-12 text-sm text-gray-600">{{ count }}</span>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <canvas id="chart-{{ data.question.id }}"
+                                    data-question-id="{{ data.question.id }}"
+                                    data-survey-uuid="{{ survey.uuid }}"
+                                    class="w-full h-64"></canvas>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize all charts
+    document.querySelectorAll('canvas[data-question-id]').forEach(canvas => {
+        const questionId = canvas.dataset.questionId;
+        const surveyUuid = canvas.dataset.surveyUuid;
+        
+        // Fetch chart data
+        fetch(`/api/survey/${surveyUuid}/question/${questionId}/chart-data`)
+            .then(response => response.json())
+            .then(data => {
+                const ctx = canvas.getContext('2d');
+                
+                // Generate colors
+                const backgroundColors = generateColors(data.labels.length);
+                
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            label: 'Responses',
+                            data: data.values,
+                            backgroundColor: backgroundColors,
+                            borderColor: backgroundColors.map(color => color.replace('0.6', '1')),
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            title: {
+                                display: true,
+                                text: data.question_label,
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1
+                                }
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error loading chart:', error));
+    });
+    
+    function generateColors(count) {
+        const colors = [
+            'rgba(59, 130, 246, 0.6)',   // blue
+            'rgba(16, 185, 129, 0.6)',   // green
+            'rgba(251, 146, 60, 0.6)',   // orange
+            'rgba(139, 92, 246, 0.6)',   // purple
+            'rgba(236, 72, 153, 0.6)',   // pink
+            'rgba(234, 179, 8, 0.6)',    // yellow
+            'rgba(239, 68, 68, 0.6)',    // red
+            'rgba(6, 182, 212, 0.6)',    // cyan
+        ];
+        
+        const result = [];
+        for (let i = 0; i < count; i++) {
+            result.push(colors[i % colors.length]);
+        }
+        return result;
+    }
+});
+</script>
+{% endblock content %}
