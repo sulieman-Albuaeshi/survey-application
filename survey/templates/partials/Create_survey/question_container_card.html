@@ -6,11 +6,17 @@
           @dragover.prevent
           :class="{ 'opacity-50': isDragging }"
           hx-post="{% url 'add_question' %}"
-          hx-trigger="add-Question"
-          @drop.prevent=" $el._questionId = event.dataTransfer.getData('text/plain');  incrementTotalForms($el._questionId); question_count++; $el._questionCount = question_count; htmx.trigger($el, 'add-Question');"
+          hx-trigger="add-question"
+          @drop.prevent="$el._questionType = event.dataTransfer.getData('text/plain');
+                         $el._typeCount = _getFormCount($el._questionType); 
+                         incrementTotalForms($el._questionType); 
+                         question_count++;
+                         $el._questionCount = question_count;
+                         htmx.trigger($el, 'add-question')"
+
           hx-target="#target_question"
           hx-swap="beforebegin"
-          hx-vals="js:{ question_type: this._questionId, question_count: this._questionCount }">
+          hx-vals="js:{ question_type: this._questionType, question_count: this._questionCount, type_count: this._typeCount}">
           <img src="{% static 'radio-plus.svg' %}"
                width="50px"
                height="50px"

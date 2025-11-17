@@ -7,6 +7,7 @@
           @keydown.enter.prevent>
         {% csrf_token %}
         {{ multi_formset.management_form }}
+        {{ likert_formset.management_form }}
         {% comment %} Hidden input to track question count for formset prefixing, bound to Alpine.js state {% endcomment %}
         <div class="sticky top-6 self-start flex flex-col gap-4 m-4 rounded-b-lg  w-[20%]">
             <div class="bg-white shadow-md border card border-gray-200 w-full ">
@@ -25,6 +26,9 @@
             {# This is where HTMX will add NEW questions #}
             {% for form in multi_formset %}
                 {% include "partials/Create_survey/Questions/Multi-Choice_Question.html" with form=form%}
+            {% endfor %}
+            {% for form in likert_formset %}
+                {% include "partials/Create_survey/Questions/Likert_Question.html" with form=form%}
             {% endfor %}
             <div id="target_question" hidden class="flex flex-col gap-3 p-4"></div>
 

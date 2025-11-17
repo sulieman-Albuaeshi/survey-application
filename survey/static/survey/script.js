@@ -19,6 +19,7 @@ document.addEventListener("alpine:init", () => {
       // 2. Set up the permanent "spy" on the options array.
       this.$watch("options", () => {
         // This function will now run AUTOMATICALLY whenever options change.
+        console.log(" this.hiddenInput whach changed", this.hiddenInput);
         this.hiddenInput.value = JSON.stringify(this.options);
       });
     },
@@ -53,7 +54,32 @@ document.addEventListener("alpine:init", () => {
     // Map question types to their Django formset prefixes.
     formsetPrefixes: {
       "Multi-Choice Question": "multi",
-      // "Likert Question": "likert",
+      "Likert Question": "likert",
+    },
+
+    // TO HANDEL NUMMBARING THE RENUMBERING QUSTIONS IN FORM RELOAD WITH ERRORS
+    init() {
+      setTimeout(() => {
+        // Get all the *remaining* question cards
+        const remainingQuestions = document.querySelectorAll(".question-card");
+        // Loop through and re-number them
+        remainingQuestions.forEach((question, index) => {
+          const numberSpan = question.querySelector(".question-number");
+          if (numberSpan) numberSpan.innerText = `${index + 1}.`;
+          this.question_count++;
+        });
+        console.log(remainingQuestions);
+        // console.log(allQuestions);
+      }, 400);
+    }, // A timeout of 0 is all that's needed.
+
+    _getFormCount(questionType) {
+      const prefix = this.formsetPrefixes[questionType];
+      if (!prefix) return 0;
+      const totalFormsInput = document.querySelector(
+        `#id_${prefix}-TOTAL_FORMS`
+      );
+      return totalFormsInput ? parseInt(totalFormsInput.value) : 0;
     },
 
     /**

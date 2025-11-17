@@ -4,13 +4,11 @@ from django.views.decorators.http import require_POST
 from django.db.models import Q, Count, Avg
 from django.db import transaction
 from django.core.paginator import Paginator
-from .models import Question as que, Survey, Response, Answer, MultiChoiceQuestion, LikertQuestion, CustomUser
-from .forms import MultiChoiceQuestionForm, SurveyForm, MultiFormset
+from .models import Question as que, Survey, Response, Answer, MultiChoiceQuestion, LikertQuestion, CustomUser, Question
+from .forms import MultiChoiceQuestionForm, SurveyForm, MultiFormset, LikertQuestionForm, LikertFormset
 from django.views import View
 from django.views.generic import CreateView, UpdateView, DeleteView, DetailView
 from django.shortcuts import redirect
-import json
-import time
 
 # Create your views here.
 class SurveyCreateView(CreateView):
@@ -23,40 +21,67 @@ class SurveyCreateView(CreateView):
         context = super().get_context_data(**kwargs)
         context['question_type_list'] = que.get_available_type_names()
         context['question_count'] = 0 
-        print(self.request.POST)
+
         if self.request.POST:
             context["multi_formset"] = MultiFormset(self.request.POST, prefix="multi")
-            # context["likert_formset"] = LikertFormset(self.request.POST, prefix="likert")
+            context["likert_formset"] = LikertFormset(self.request.POST, prefix="likert")
+            
+            MultiFS = MultiFormset(self.request.POST, prefix="multi")
+            LikertFS = LikertFormset(self.request.POST, prefix="likert")
+
+            if MultiFS.is_valid() and LikertFS.is_valid():
+                # save multichoice
+                for form in MultiFS:
+                    if form.cleaned_data:
+                        data = form.cleaned_data
+                        # create question model
+                        ...
+
+                # save likert
+                for form in LikertFS:
+                    if form.cleaned_data:
+                        data = form.cleaned_data
+                        # create question model
+                ...
+
         else:
+            # For a GET request, create empty formsets
             context["multi_formset"] = MultiFormset(prefix="multi")
-            # context["likert_formset"] = LikertFormset(prefix="likert")
+            context["likert_formset"] = LikertFormset(prefix="likert")
 
         return context
 
     def form_valid(self, form):
-        context = self.get_context_data()
-        # print("context",context)
-        multi_formset = context["multi_formset"]
-        # likert_formset = context["likert_formset"]
+        # This method is called when the main survey form is valid.
+        # We also need to validate our formsets here.
+        multi_formset = MultiFormset(self.request.POST, prefix="multi")
+        likert_formset = LikertFormset(self.request.POST, prefix="likert")
 
-        if not multi_formset.is_valid():
-            print("errors : ",multi_formset.errors)
+        if multi_formset.is_valid() and likert_formset.is_valid():
+            with transaction.atomic():
+                self.object = form.save(commit=False)
+                
+                # TODO : Get the logged in user
+                self.object.created_by = CustomUser.objects.first() 
+                self.object.question_count = len(multi_formset) + len(likert_formset)
+                self.object.save()
+
+                for multi_form in multi_formset:
+                    if multi_form.cleaned_data:
+                        question = multi_form.save(commit=False)
+                        question.survey = self.object
+                        question.save()
+                    
+                for likert_form in likert_formset:
+                    if likert_form.cleaned_data:
+                        question = likert_form.save(commit=False)
+                        question.survey = self.object
+                        question.save()
+
+            return redirect(self.get_success_url())
+        else:
+            # If formsets are not valid, re-render the form with errors
             return self.form_invalid(form)
-
-        with transaction.atomic():
-            self.object = form.save(commit=False)
-            self.object.created_by = CustomUser.objects.first()
-            self.object.question_count = len(multi_formset)
-            self.object.save()
-
-            for form in multi_formset:
-                if form.cleaned_data:
-                    question = form.save(commit=False)
-                    question.survey = self.object
-                    question.save()
-        
-        print(context['multi_formset'].errors)
-        return redirect('Dashboard')
 
 
         
@@ -68,24 +93,28 @@ class AddQuestionFormView(View):
         # and will be used as the index for the new formset prefix.
         question_index_str = request.POST.get('question_count')
         question_index = int(question_index_str) if question_index_str else 0
-        print("koko : ", request.POST)
-        print(f"Received question_count from frontend: {question_index}")
+        type_count_str = request.POST.get('type_count')
+        type_count = int(type_count_str) if type_count_str else 0
 
         question_type_name = request.POST.get('question_type')
 
-        # Map question type names to their respective form classes
-        form_map = {
-            "Multi-Choice Question": MultiChoiceQuestionForm(prefix=f"multi-{question_index - 1}"),
-            # "Likert Question": forms.LikertQuestionForm, # Now that LikertQuestionForm is defined
-        }
-        
-        if question_type_name not in [MultiChoiceQuestion.NAME, LikertQuestion.NAME]:
+        if question_type_name not in Question.get_available_type_names():
             return HttpResponse("Invalid question type provided.", status=400)
+        
+        # Map question type names to their form classes and formset prefixes
+        form_map = {
+            "Multi-Choice Question": (MultiChoiceQuestionForm, "multi"),
+            "Likert Question": (LikertQuestionForm, "likert"),
+        }
+
+        FormClass, prefix = form_map[question_type_name]
+        # The new form will have an index equal to the current count.
+        form_instance = FormClass(prefix=f"{prefix}-{type_count}")
 
         template_name = question_type_name.replace(' ', '_')
         context = {
-            'form': form_map[question_type_name],
             'question_count': question_index, # Pass the index back if the partial needs it, though not strictly for the prefix
+            'form': form_instance,
             'question_type_name': question_type_name, # Also pass this for potential frontend logic
 
         }

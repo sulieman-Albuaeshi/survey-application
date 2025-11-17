@@ -77,11 +77,12 @@ class Question(PolymorphicModel):
 
 
 class MultiChoiceQuestion(Question):
-    options = models.JSONField()
+    options = models.JSONField(default=list)
     allow_multiple = models.BooleanField(default=True)
     randomize_options = models.BooleanField(default=False)
     show_as_dropdown = models.BooleanField(default=False)
     show_as_rank_Question = models.BooleanField(default=False)
+    the_minimum_number_of_options_to_be_selected = models.IntegerField(default=1)
     NAME = "Multi-Choice Question"
 
     def add_Option(self, option):
@@ -111,16 +112,15 @@ class MultiChoiceQuestion(Question):
         return distribution
 
 class LikertQuestion(Question):
-    scale_min = models.IntegerField(default=1)
-    scale_max = models.IntegerField(default=5)
-    scale_labels = models.JSONField(null=True, blank=True)
+    scale_max = models.IntegerField(
+        default=3,
+        help_text="Max value must be positive (min is always 1)."
+    )
+    options = models.JSONField(default=list)
+
     NAME = "Likert Question"
 
-    def set_Scale_Labels(self, labels):
-        if len(labels) != (self.scale_max - self.scale_min + 1):
-            raise ValueError("Number of labels must match the scale range.")
-        self.scale_labels = labels
-        self.save()
+
 
     def get_average_rating(self):
         """Calculate average rating for this question"""
@@ -136,11 +136,12 @@ class LikertQuestion(Question):
         answers = Answer.objects.filter(question=self)
         distribution = {}
         
-        for i in range(self.scale_min, self.scale_max + 1):
+        # TODO NEED TO CHICK IF IT WORKS
+        for i in range(1, self.scale_max):
             distribution[i] = 0
         
         for answer in answers:
-            rating = int(float(answer.answer_data))
+            rating = int(float(answer.answer_data['position']))
             distribution[rating] = distribution.get(rating, 0) + 1
         
         return distribution

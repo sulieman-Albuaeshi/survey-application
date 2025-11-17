@@ -17,7 +17,7 @@ class SurveyForm(forms.ModelForm):
 class MultiChoiceQuestionForm(forms.ModelForm):
     class Meta:
         model = models.MultiChoiceQuestion
-        fields = ['label', 'helper_text', 'required' ,'options', 'allow_multiple', 'position','randomize_options', 'show_as_dropdown', 'show_as_rank_Question']
+        fields = ['label', 'helper_text', 'required' ,'options', 'allow_multiple', 'position', 'randomize_options', 'the_minimum_number_of_options_to_be_selected']
         widgets = {
             'label': forms.TextInput(attrs={'class': 'input input-md input-primary w-full', 'placeholder': 'Enter the label of the question'}),
             'helper_text': forms.TextInput(attrs={'class': 'input input-sm input-info focus:ring-0 focus:ring-offset-0', 'placeholder': 'Enter the helper text of the question'}),
