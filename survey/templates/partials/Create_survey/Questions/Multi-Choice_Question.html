@@ -5,7 +5,8 @@
     <input type="hidden" name="{{ form.prefix }}-position" value="{{ question_count }}">
     <div class="card-body relative">
         {% include "partials/Create_survey/Questions/question_header_card.html" %}
-        <div class="flex justify-between items-start pr-8">
+        <h1 class="textarea-xl font-medium text-gray-950 text-center p-1">Multi-Choice Question</h1>
+        <div class="flex justify-between items-start">
             <div class="flex flex-row gap-2 items-center flex-grow">
                 <span class="text-lg font-semibold question-number">{{ question_count }}.</span>
                 {# form.label renders the input field for the question's label #}
@@ -18,10 +19,22 @@
                 {% for error in form.label.errors %}{{ error }}{% endfor %}
             </div>
         {% endif %}
-        <div>
-            <p class="block text-sm font-medium text-gray-700"> helep text : </p>{{ form.helper_text }}
+        <div class="mt-4 flex flex-col lg:flex-row lg:items-center gap-y-3 gap-x-4">
+            <div class="flex flex-auto items-center gap-2">
+                <p class="text-md font-medium text-gray-700 whitespace-nowrap">Help text:</p>
+                {{ form.helper_text }}
+            </div>
+            <div class="flex flex-auto items-center gap-2 md:justify-end">
+                <p class="text-md font-medium text-gray-700 whitespace-nowrap">Min options to select:</p>
+                {{ form.the_minimum_number_of_options_to_be_selected }}
+            </div>
         </div>
-        <div x-data="optionsManager('{{ form.prefix }}')"
+        {% if form.the_minimum_number_of_options_to_be_selected.errors %}
+            <div class="mt-1 text-sm text-red-600 text-right">
+                {% for error in form.the_minimum_number_of_options_to_be_selected.errors %}{{ error }}{% endfor %}
+            </div>
+        {% endif %}
+        <div x-data="optionsManager('{{ form.prefix }}', {{ form.options.value|default:'[]' }})"
              class="flex flex-col justify-between divide-y divide-gray-200">
             {# This is the crucial fix: Render the hidden input for options #}
             {{ form.options }}
@@ -39,9 +52,12 @@
                            placeholder="Type an option and click Add">
                     <button type="button" @click="addOption" class="btn btn-sm btn-primary ">Add</button>
                 </div>
+                <div class="mt-1 text-sm text-red-600">
+                    {{form.options.errors}}
+                </div>
             </div>
             <div class="block px-2 py-2">
-                {% include "partials/Create_survey/question_footer_card.html" with is_choosable=True %}
+                {% include "partials/Create_survey/question_footer_card.html" with is_multi=True %}
             </div>
         </div>
     </div>
