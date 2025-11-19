@@ -22,7 +22,7 @@ class SurveyCreateView(CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['question_type_list'] = que.get_available_type_names()
-        context['question_count'] = 0 
+        context['question_count'] = 0
         print(self.request.POST)
         if self.request.POST:
             context["multi_formset"] = MultiFormset(self.request.POST, prefix="multi")
@@ -123,10 +123,12 @@ def Responses(request, page_number=1):
     """Main responses view showing all surveys with response counts"""
     query = request.GET.get('search', '').strip()
     
-    # Get surveys with response counts
-    surveys = Survey.objects.annotate(
+    # Base queryset with response counts
+    base_surveys = Survey.objects.annotate(
         responses_count=Count('responses')
     ).filter(state='published')
+    
+    surveys = base_surveys
     
     if query:
         surveys = surveys.filter(
@@ -136,8 +138,8 @@ def Responses(request, page_number=1):
     
     surveys = surveys.order_by('-last_updated')
     
-    # Get recent surveys with responses
-    recent_surveys_with_responses = surveys.filter(responses_count__gt=0)[:10]
+    # Get recent surveys with responses (not affected by search filters)
+    recent_surveys_with_responses = base_surveys.filter(responses_count__gt=0).order_by('-last_updated')[:4]
     
     # Pagination
     paginator = Paginator(surveys, 10)
@@ -152,7 +154,7 @@ def Responses(request, page_number=1):
     is_htmx = request.headers.get('HX-Request') == 'true'
     
     if is_htmx:
-        return render(request, 'partials/Responses/responses_table_body.html', context)
+        return render(request, 'partials/Responses/responses_table_with_oob.html', context)
     
     return render(request, 'Responses.html', context)
 

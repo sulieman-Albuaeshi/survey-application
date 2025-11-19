@@ -1,9 +1,76 @@
-{% for survey in page.object_list %}
-    {% include "partials/Responses/responses_table_row.html" with survey=survey %}
-{% empty %}
-    <tr>
-        <td colspan="5" class="px-6 py-8 text-center text-gray-500">
-            No surveys found
-        </td>
-    </tr>
-{% endfor %}
+<div
+  class="bg-white shadow-lg border border-gray-200 relative sm:rounded-lg overflow-hidden w-full"
+>
+  <!-- searh bar-->
+  <div
+    class="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4"
+  >
+    <div class="w-full md:w-1/2 flex">
+      <form class="w-3/4 flex items-center">
+        <label for="simple-search" class="sr-only">Search</label>
+        <div class="relative w-full">
+          <div
+            class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none"
+          >
+            <svg
+              aria-hidden="true"
+              class="w-5 h-5 text-gray-500"
+              fill="currentColor"
+              viewbox="0 0 20 20"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </div>
+          <input
+            type="text"
+            name="search"
+            value="{{ query|default:'' }}"
+            hx-get="{% url 'Responses' %}"
+            hx-trigger="keyup changed delay:500ms"
+            hx-target="#responses-table-body"
+            hx-indicator="#htmx-spinner"
+            id="simple-search"
+            class="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 p-2"
+            placeholder="Search"
+            autocomplete="off"
+          />
+        </div>
+      </form>
+      <span
+        id="htmx-spinner"
+        class="htmx-indicator loading loading-spinner text-primary loading-lg"
+      ></span>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm text-left text-gray-500">
+      <thead class="text-xs text-gray-700 uppercase bg-gray-100 pb-7">
+        <tr>
+          <th scope="col" class="px-4 py-3 w-[18%]">Survey Title</th>
+          <th scope="col" class="px-4 py-3 w-[32%]">Description</th>
+          <th scope="col" class="px-4 py-3 w-[15%] text-center">
+            Total Responses
+          </th>
+          <th scope="col" class="px-4 py-3">Last Response</th>
+          <th scope="col" class="text-center">Actions</th>
+        </tr>
+      </thead>
+      <tbody
+        id="responses-table-body"
+        class="responses-table-body divide-y divide-gray-200"
+      >
+        {% include "partials/Responses/responses_table_with_oob.html" %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Pagination -->
+{% include "partials/Responses/responses_pagination.html" %}
