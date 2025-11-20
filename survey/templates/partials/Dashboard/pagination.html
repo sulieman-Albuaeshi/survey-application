@@ -1,58 +1,67 @@
-<div class="flex flex-col md:flex-row justify-between items-start md:items-center space-y-3 md:space-y-0 p-4"
+<nav aria-label="Table navigation"
      id="pagination-controls"
      hx-swap-oob="true">
-    <span class="text-sm font-normal text-gray-500">
-        Showing
-        <span class="font-semibold text-gray-900">1-5</span>
-        of
-        <span class="font-semibold text-gray-900">{{ page.paginator.count }}</span>
-    </span>
-    <ul class="inline-flex items-stretch -space-x-px">
-        <li>
-            <button {% if not page.has_previous %}disabled{% endif %}
-                    hx-get="{% url 'Dashboard_Page' page.number|add:-1 %}{% if query %}?search={{ query }}{% endif %}"
-                    hx-push-url="true"
-                    hx-trigger="click"
-                    class="flex items-center justify-center h-full py-1.5 px-3 ml-0 text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 {% if not page.has_previous %}cursor-not-allowed {% else %} cursor-pointer {% endif %}">
-                <span class="sr-only">Previous</span>
-                <svg class="w-5 h-5"
-                     aria-hidden="true"
-                     fill="currentColor"
-                     viewbox="0 0 20 20"
-                     xmlns="http://www.w3.org/2000/svg">
-                    <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
-                </svg>
-            </button>
-        </li>
-        {% for page_number in page.paginator.page_range %}
+    <div class="flex flex-col md:flex-row justify-between items-center p-4 bg-gray-50">
+        <span class="text-sm text-gray-700 mb-3 md:mb-0">
+            Showing
+            <span class="font-semibold">{{ page.start_index }}</span>
+            to
+            <span class="font-semibold">{{ page.end_index }}</span>
+            of
+            <span class="font-semibold">{{ page.paginator.count }}</span>
+            surveys
+        </span>
+        <ul class="inline-flex items-stretch -space-x-px">
             <li>
-                <a href="{% url 'Dashboard_Page' page_number %}"
-                   hx-get="{% url 'Dashboard_Page' page_number %}{% if query %}?search={{ query }}{% endif %}"
-                   hx-swap="innerHTML"
-                   hx-target="previous .survey-table-body"
-                   class="flex items-center justify-center px-3 h-full leading-tight border border-gray-300
-                             {% if page_number == page.number %}
-                                bg-primary text-primary-content
-                            {% else %}
-                                bg-white text-gray-500 hover:bg-gray-100 hover:text-gray-700
-                            {% endif %}">{{ page_number }}</a>
+                <button {% if not page.has_previous %}disabled{% endif %}
+                        {% if page.has_previous %}
+                        hx-get="{% url 'Dashboard_Page' page.number|add:-1 %}{% if query %}?search={{ query }}{% endif %}"
+                        hx-push-url="true"
+                        hx-target=".survey-table-body"
+                        hx-swap="innerHTML"
+                        {% endif %}
+                        class="flex items-center justify-center h-full py-1.5 px-3 ml-0 text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 {% if not page.has_previous %}cursor-not-allowed {% else %} cursor-pointer {% endif %}">
+                    <span class="sr-only">Previous</span>
+                    <svg class="w-5 h-5"
+                         aria-hidden="true"
+                         fill="currentColor"
+                         viewbox="0 0 20 20"
+                         xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                    </svg>
+                </button>
             </li>
-        {% endfor %}
-        <li>
-            <a {% if not page.has_next %}disabled{% endif %}
-               hx-get="{% url 'Dashboard_Page' page.number|add:1 %}{% if query %}?search={{ query }}{% endif %}"
-               hx-disable="{{ page.has_next }}"
-               hx-push-url="true"
-               class=" flex items-center justify-center h-full py-1.5 px-3 leading-tight text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 {% if not page.has_next %}cursor-not-allowed {% else %} cursor-pointer {% endif %}">
-                <span class="sr-only">Next</span>
-                <svg class="w-5 h-5"
-                     aria-hidden="true"
-                     fill="currentColor"
-                     viewbox="0 0 20 20"
-                     xmlns="http://www.w3.org/2000/svg">
-                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                </svg>
-            </a>
-        </li>
-    </ul>
-</div>
+            {% for page_number in page.paginator.page_range %}
+            <li>
+                <button
+                    hx-get="{% url 'Dashboard_Page' page_number %}{% if query %}?search={{ query }}{% endif %}"
+                    hx-push-url="true"
+                    hx-target=".survey-table-body"
+                    hx-swap="innerHTML"
+                    class="flex items-center justify-center px-3 h-full leading-tight border border-gray-300 {% if page_number == page.number %} bg-primary text-primary-content cursor-not-allowed {% else %} bg-white text-gray-500 hover:bg-gray-100 hover:text-gray-700 cursor-pointer {% endif %}">
+                    {{ page_number }}
+                </button>
+            </li>
+            {% endfor %}
+            <li>
+                <button {% if not page.has_next %}disabled{% endif %}
+                        {% if page.has_next %}
+                        hx-get="{% url 'Dashboard_Page' page.number|add:1 %}{% if query %}?search={{ query }}{% endif %}"
+                        hx-push-url="true"
+                        hx-target=".survey-table-body"
+                        hx-swap="innerHTML"
+                        {% endif %}
+                        class="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 {% if not page.has_next %}cursor-not-allowed {% else %} cursor-pointer {% endif %}">
+                    <span class="sr-only">Next</span>
+                    <svg class="w-5 h-5"
+                         aria-hidden="true"
+                         fill="currentColor"
+                         viewbox="0 0 20 20"
+                         xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+            </li>
+        </ul>
+    </div>
+</nav>
