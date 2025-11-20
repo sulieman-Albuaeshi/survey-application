@@ -154,6 +154,8 @@ def Responses(request, page_number=1):
     is_htmx = request.headers.get('HX-Request') == 'true'
     
     if is_htmx:
+        if request.headers.get('HX-Target') == 'responses-content':
+            return render(request, 'partials/Responses/responses_content.html', context)
         # عند طلب htmx، نرسل فقط الجزء الذي يحتاج إلى التحديث، وهو الجدول وشريط التنقل
         # هذا الملف هو الذي يحتوي على الحاوية (#responses-table-and-pagination-container)
         return render(request, 'partials/Responses/responses_table_body.html', context)

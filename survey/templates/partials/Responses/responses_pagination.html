@@ -14,17 +14,10 @@
   <ul class="inline-flex items-stretch -space-x-px">
     <li>
       <button
-        {%
-        if
-        not
-        page.has_previous
-        %}disabled{%
-        endif
-        %}
+        {% if not page.has_previous %}disabled{% endif %}
         {% if page.has_previous %}
         hx-get="{% url 'Responses_Page' page.number|add:-1 %}{% if query %}?search={{ query }}{% endif %}"
         hx-push-url="true"
-        hx-trigger="click"
         hx-target="#responses-table-and-pagination-container"
         hx-swap="outerHTML"
         {% endif %}
@@ -51,7 +44,6 @@
       <button
         hx-get="{% url 'Responses_Page' page_number %}{% if query %}?search={{ query }}{% endif %}"
         hx-push-url="true"
-        hx-trigger="click"
         hx-target="#responses-table-and-pagination-container"
         hx-swap="outerHTML"
         class="flex items-center justify-center px-3 h-full leading-tight border border-gray-300 {% if page_number == page.number %} bg-primary text-primary-content cursor-not-allowed {% else %} bg-white text-gray-500 hover:bg-gray-100 hover:text-gray-700 cursor-pointer {% endif %}"
@@ -62,13 +54,7 @@
     {% endfor %}
     <li>
       <button
-        {%
-        if
-        not
-        page.has_next
-        %}disabled{%
-        endif
-        %}
+        {% if not page.has_next %}disabled{% endif %}
         {% if page.has_next %}
         hx-get="{% url 'Responses_Page' page.number|add:1 %}{% if query %}?search={{ query }}{% endif %}"
         hx-push-url="true"

@@ -1,12 +1,12 @@
 {% load static %}
 <div class="card bg-white shadow-lg border border-gray-200">
     <div class="card-body">
-        <h3 class="text-xl font-semibold mb-6">{{ data.question.label }}</h3>
+        <h3 class="text-xl font-semibold mb-6 text-center">{{ data.question.label }}</h3>
         
         <!-- Likert Scale Analytics -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div>
-                <div class="stat">
+                <div >
                     <div class="stat-title">Average Rating</div>
                     <div class="stat-value text-primary">{{ data.average }}</div>
                     <div class="stat-desc">out of {{ data.question.scale_max }}</div>
@@ -26,6 +26,7 @@
                                 </div>
                             </div>
                         </div>
+                        <span class="w-12 text-sm text-gray-600">{{ count }}</span>
                     </div>
                     {% endfor %}
                 </div>
