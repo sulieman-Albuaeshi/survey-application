@@ -103,7 +103,7 @@ class MultiChoiceQuestion(Question):
 
 class LikertQuestion(Question):
     options = models.JSONField(default=list)
-
+    scale_max = models.IntegerField(default=5)
     NAME = "Likert Question"
 
     def get_average_rating(self):
