@@ -10,6 +10,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.views import View
 from django.views.generic import CreateView, UpdateView, DeleteView, DetailView
 from django.shortcuts import redirect
+from .utility import normalize_formset_indexes
+
 
 # Create your views here.
 class SurveyCreateView(CreateView):
@@ -24,7 +26,6 @@ class SurveyCreateView(CreateView):
         """
         context = super().get_context_data(**kwargs)
         context['question_type_list'] = que.get_available_type_names()
-        context['question_count'] = 0 
 
         if self.request.POST:
             # If submitting, bind Context to the formset
@@ -37,6 +38,16 @@ class SurveyCreateView(CreateView):
 
         return context
 
+    def post(self, request, *args, **kwargs):
+        data = request.POST.copy()  # make POST mutable
+
+        data = normalize_formset_indexes(data, prefix="questions")
+
+        # Replace the request.POST with cleaned data
+        request._post = data
+
+        return super().post(request, *args, **kwargs)
+    
     def form_valid(self, form):
         """
             Called if the SurveyForm is valid. 
@@ -72,16 +83,15 @@ class AddQuestionFormView(View):
         # and will be used as the index for the new formset prefix.
         question_count_position = request.POST.get('question_count_position')
 
-        # to get the count of the question even if there question been deleted 
+        # to get the count of the question even if there question been deled 
         question_index_str = request.POST.get('question_count')
+
         question_index = int(question_index_str) if question_index_str else 0
-        type_count_str = request.POST.get('type_count')
-        type_count = int(type_count_str) if type_count_str else 0
 
-        question_type_name = request.POST.get('question_type')
-
+        question_type_name = request.POST.get('question_type')      
+  
         if question_type_name not in Question.get_available_type_names():
-            return HttpResponse("Invalid question type provided.", status=400)
+            return HttpResponse(status=400)
         
         # Map question type names to their corresponding Model and Form classes
         ModelFormMap = {
@@ -173,7 +183,6 @@ def Responses(request, page_number=1):
     
     return render(request, 'Responses.html', context)
 
-
 def SurveyResponseDetail(request, uuid):
     """Detailed view of responses for a specific survey"""
     survey = get_object_or_404(Survey, uuid=uuid)
@@ -195,7 +204,6 @@ def SurveyResponseDetail(request, uuid):
     }
     
     return render(request, 'SurveyResponseDetail.html', context)
-
 
 def SurveyAnalytics(request, uuid):
     """Analytics and charts for a specific survey"""
@@ -236,7 +244,6 @@ def SurveyAnalytics(request, uuid):
     }
     
     return render(request, 'SurveyAnalytics.html', context)
-
 
 def GetChartData(request, uuid, question_id):
     """API endpoint to get chart data for a specific question"""

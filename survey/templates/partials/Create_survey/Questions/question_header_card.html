@@ -1,7 +1,7 @@
 {% load static %}
 <button class="absolute top-2 right-2 p-1 rounded-full hover:cursor-pointer hover:bg-red-100"
         type="button"
-        @click="$dispatch('question-deleted', { id: {{ question_count }}, question_type: '{{question_type_name}}' }); $el.closest('.question-card').remove()">
+        @click="$dispatch('question-deleted'); $el.closest('.question-card').remove()">
     <img src="{% static 'close-circle.svg' %}"
          alt="Delete"
          width="25"

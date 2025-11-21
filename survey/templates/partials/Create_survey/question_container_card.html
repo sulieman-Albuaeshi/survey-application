@@ -8,15 +8,16 @@
           hx-post="{% url 'add_question' %}"
           hx-trigger="add-question"
           @drop.prevent="$el._questionType = event.dataTransfer.getData('text/plain');
-                         $el._typeCount = _getFormCount($el._questionType); 
-                         incrementTotalForms($el._questionType); 
+                         incrementTotalForms(); 
                          question_count++;
-                         $el._questionCount = question_count;
+                         $el._question_count = question_count;
+                         question_count_position++;
+                         $el._questionCountPosition = question_count_position;
                          htmx.trigger($el, 'add-question')"
 
           hx-target="#target_question"
           hx-swap="beforebegin"
-          hx-vals="js:{ question_type: this._questionType, question_count: this._questionCount, type_count: this._typeCount}">
+          hx-vals="js:{ question_type: this._questionType, question_count_position  : this._questionCountPosition, question_count: this._question_count++ }">
           <img src="{% static 'radio-plus.svg' %}"
                width="50px"
                height="50px"

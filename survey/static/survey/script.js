@@ -50,76 +50,42 @@ document.addEventListener("alpine:init", () => {
   Alpine.data("questionManager", () => ({
     isDragging: false,
     question_count: 0,
+    question_count_position: 0,
     questionID: null,
-    // Map question types to their Django formset prefixes.
-    formsetPrefixes: {
-      "Multi-Choice Question": "multi",
-      "Likert Question": "likert",
-    },
-
-    // TO HANDEL NUMMBARING THE RENUMBERING QUSTIONS IN FORM RELOAD WITH ERRORS
-    init() {
-      setTimeout(() => {
-        // Get all the *remaining* question cards
-        const remainingQuestions = document.querySelectorAll(".question-card");
-        // Loop through and re-number them
-        remainingQuestions.forEach((question, index) => {
-          const numberSpan = question.querySelector(".question-number");
-          if (numberSpan) numberSpan.innerText = `${index + 1}.`;
-          this.question_count++;
-        });
-        console.log(remainingQuestions);
-        // console.log(allQuestions);
-      }, 400);
-    }, // A timeout of 0 is all that's needed.
-
-    _getFormCount(questionType) {
-      const prefix = this.formsetPrefixes[questionType];
-      if (!prefix) return 0;
-      const totalFormsInput = document.querySelector(
-        `#id_${prefix}-TOTAL_FORMS`
-      );
-      return totalFormsInput ? parseInt(totalFormsInput.value) : 0;
-    },
 
     /**
      * Updates the hidden TOTAL_FORMS input for a given Django formset.
-     * @param {string} questionType - The type of question (e.g., "Multi-Choice Question").
      * @param {number} delta - The amount to change the count by (+1 or -1).
      */
-    _updateTotalForms(questionType, delta) {
-      const prefix = this.formsetPrefixes[questionType];
-      if (!prefix) {
-        console.error(
-          `No formset prefix found for question type: ${questionType}`
-        );
-        return;
-      }
-
+    _updateTotalForms(delta) {
       const totalFormsInput = document.querySelector(
-        `#id_${prefix}-TOTAL_FORMS`
+        `#id_questions-TOTAL_FORMS`
       );
       if (!totalFormsInput) {
-        console.error(`TOTAL_FORMS input not found for prefix: ${prefix}`);
+        console.error(`TOTAL_FORMS input not found `);
         return;
       }
 
-      totalFormsInput.value = parseInt(totalFormsInput.value) + delta;
+      totalFormsInput.value =
+        totalFormsInput.value == "NaN"
+          ? 0
+          : parseInt(totalFormsInput.value) + delta;
+      console.log("totalFormsInput.value", totalFormsInput.value);
     },
 
-    incrementTotalForms(type) {
-      this._updateTotalForms(type, 1);
+    incrementTotalForms() {
+      this._updateTotalForms(1);
     },
 
-    decrementTotalForms(type) {
-      this._updateTotalForms(type, -1);
+    decrementTotalForms() {
+      this._updateTotalForms(-1);
     },
 
     handleDeletion(event) {
       console.log("Renumbering questions...");
-      if (this.question_count > 0) {
-        this.question_count--;
-        this.decrementTotalForms(event.detail.question_type);
+      if (this.question_count_position > 0) {
+        this.question_count_position--;
+        this.decrementTotalForms();
       }
 
       setTimeout(() => {
@@ -130,8 +96,6 @@ document.addEventListener("alpine:init", () => {
           const numberSpan = question.querySelector(".question-number");
           if (numberSpan) numberSpan.innerText = `${index + 1}.`;
         });
-        console.log(remainingQuestions);
-
         // console.log(allQuestions);
       }, 500); // A timeout of 0 is all that's needed.
     },
