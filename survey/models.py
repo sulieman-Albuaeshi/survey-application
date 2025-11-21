@@ -146,7 +146,7 @@ class Response(models.Model):
 
 class Answer(models.Model):
     response = models.ForeignKey(Response, on_delete=models.CASCADE, related_name='answers')
-    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='answers')
     answer_data = models.JSONField(null=True, blank=True)
     
     def __str__(self):

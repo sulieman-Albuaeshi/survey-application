@@ -1,0 +1,37 @@
+{% load static %}
+<div class="card bg-white shadow-lg border border-gray-200">
+    <div class="card-body">
+        <h3 class="text-xl font-semibold mb-6 text-center">{{ data.question.label }}</h3>
+        
+        <!-- Multiple Choice Analytics -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div>
+                <h4 class="font-semibold text-gray-700 mb-3">Response Distribution</h4>
+                <div class="space-y-2">
+                    {% for option, count in data.distribution.items %}
+                    {% widthratio count total_responses 100 as percentage %}
+                    <div class="flex items-center gap-3">
+                        <span class="w-32 text-sm font-medium truncate">{{ option }}</span>
+                        <div class="flex-1">
+                            <div class="w-full bg-gray-200 rounded-full h-6">
+                                <div class="bg-green-500 h-6 rounded-full flex items-center justify-end pr-2 text-white text-xs font-semibold"
+                                     style="width: {{ percentage }}%">
+                                     {{ count }}
+                                </div>
+                            </div>
+                        </div>
+                        <span class="w-12 text-sm text-gray-600">{{ count }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div>
+                <canvas id="chart-{{ data.question.id }}"
+                        data-question-id="{{ data.question.id }}"
+                        data-survey-uuid="{{ survey.uuid }}"
+                        class="w-full" style="max-height: 300px;"></canvas>
+            </div>
+        </div>
+    </div>
+</div>

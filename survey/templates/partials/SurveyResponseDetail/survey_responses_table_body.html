@@ -1,0 +1,59 @@
+{% for response in responses %}
+<tr class="hover:bg-gray-50 border-b">
+    <td class="font-medium">{{ forloop.counter | add:responses.start_index | add:-1 }}</td>
+    <td>
+        {% if response.respondent %}
+            {{ response.respondent.username }}
+        {% else %}
+            Anonymous
+        {% endif %}
+    </td>
+    <td>{{ response.created_at|date:"M d, Y H:i" }}</td>
+    <td>
+        <span class="badge {% if response.completed %}badge-success{% else %}badge-warning{% endif %}">
+            {% if response.completed %}Completed{% else %}Incomplete{% endif %}
+        </span>
+    </td>
+    <td class="text-center">
+        <button class="btn btn-sm btn-ghost"
+                onclick="viewResponse{{ response.id }}.showModal()">
+            View Details
+        </button>
+        
+        <!-- Modal for response details -->
+        <dialog id="viewResponse{{ response.id }}" class="modal">
+            <div class="modal-box max-w-2xl">
+                <h3 class="font-bold text-lg mb-4">Response Details</h3>
+                <div class="space-y-4">
+                    {% for answer in response.answers.all %}
+                        <div class="border-b pb-3">
+                            <p class="font-semibold text-gray-700 mb-2">
+                                {{ answer.question.label }}
+                            </p>
+                            <p class="text-gray-600">
+                                {% if answer.answer_data is not None %}
+                                    {{ answer.answer_data }}
+                                {% else %}
+                                    No answer provided
+                                {% endif %}
+                            </p>
+                        </div>
+                    {% endfor %}
+                </div>
+                <div class="modal-action">
+                    <button class="btn" onclick="viewResponse{{ response.id }}.close()">Close</button>
+                </div>
+            </div>
+            <form method="dialog" class="modal-backdrop">
+                <button>close</button>
+            </form>
+        </dialog>
+    </td>
+</tr>
+{% empty %}
+<tr>
+    <td colspan="5" class="text-center py-8 text-gray-500">
+        No responses yet
+    </td>
+</tr>
+{% endfor %}

@@ -5,7 +5,7 @@
     <div class="flex items-center justify-between mb-6">
         <div>
             <div class="flex items-center gap-3 mb-2">
-                <a href="{% url 'SurveyResponseDetail' survey.uuid %}" class="btn btn-sm btn-ghost">
+                <a href="{% url 'Responses' %}" class="btn btn-sm btn-ghost">
                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"/>
                     </svg>
@@ -63,83 +63,7 @@
     </div>
 
     <!-- Question Analytics -->
-    <div class="space-y-6">
-        {% for data in analytics_data %}
-        <div class="card bg-white shadow-lg border border-gray-200">
-            <div class="card-body">
-                <h3 class="text-xl font-semibold mb-4">{{ data.question.label }}</h3>
-                
-                {% if data.type == "LikertQuestion" %}
-                    <!-- Likert Scale Analytics -->
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div>
-                            <div class="stat">
-                                <div class="stat-title">Average Rating</div>
-                                <div class="stat-value text-primary">{{ data.average }}</div>
-                                <div class="stat-desc">out of {{ data.question.scale_max }}</div>
-                            </div>
-                            
-                            <div class="mt-4 space-y-2">
-                                <h4 class="font-semibold text-gray-700">Rating Distribution</h4>
-                                {% for rating, count in data.distribution.items %}
-                                <div class="flex items-center gap-3">
-                                    <span class="w-12 text-sm font-medium">{{ rating }}</span>
-                                    <div class="flex-1">
-                                        <div class="w-full bg-gray-200 rounded-full h-6">
-                                            <div class="bg-primary h-6 rounded-full flex items-center justify-end pr-2 text-white text-xs font-semibold"
-                                                 style="width: {% if total_responses > 0 %}{{ count|add:0 }}00|divideby:{{ total_responses }}{% else %}0{% endif %}%">
-                                                {{ count }}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                {% endfor %}
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <canvas id="chart-{{ data.question.id }}" 
-                                    data-question-id="{{ data.question.id }}"
-                                    data-survey-uuid="{{ survey.uuid }}"
-                                    class="w-full h-64"></canvas>
-                        </div>
-                    </div>
-                    
-                {% elif data.type == "MultiChoiceQuestion" %}
-                    <!-- Multiple Choice Analytics -->
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div>
-                            <h4 class="font-semibold text-gray-700 mb-3">Response Distribution</h4>
-                            <div class="space-y-2">
-                                {% for option, count in data.distribution.items %}
-                                <div class="flex items-center gap-3">
-                                    <span class="w-32 text-sm font-medium truncate">{{ option }}</span>
-                                    <div class="flex-1">
-                                        <div class="w-full bg-gray-200 rounded-full h-6">
-                                            <div class="bg-green-500 h-6 rounded-full flex items-center justify-end pr-2 text-white text-xs font-semibold"
-                                                 style="width: {% if total_responses > 0 %}{{ count|add:0 }}00|divideby:{{ total_responses }}{% else %}0{% endif %}%">
-                                                {{ count }}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <span class="w-12 text-sm text-gray-600">{{ count }}</span>
-                                </div>
-                                {% endfor %}
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <canvas id="chart-{{ data.question.id }}"
-                                    data-question-id="{{ data.question.id }}"
-                                    data-survey-uuid="{{ survey.uuid }}"
-                                    class="w-full h-64"></canvas>
-                        </div>
-                    </div>
-                {% endif %}
-            </div>
-        </div>
-        {% endfor %}
-    </div>
+    {% include "partials/SurveyAnalytics/all_question_analytics.html" %}
 </div>
 
 <!-- Chart.js -->
@@ -180,7 +104,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 display: false
                             },
                             title: {
-                                display: true,
+                                display: false,
                                 text: data.question_label,
                                 font: {
                                     size: 14

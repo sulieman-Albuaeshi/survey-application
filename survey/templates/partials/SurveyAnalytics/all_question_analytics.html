@@ -1,0 +1,16 @@
+<div class="space-y-6">
+    {% for data in analytics_data %}
+        {% if data.type == "LikertQuestion" %}
+            {% include "partials/SurveyAnalytics/likert_question_analytics.html" with data=data survey=survey total_responses=total_responses %}
+        {% elif data.type == "MultiChoiceQuestion" %}
+            {% include "partials/SurveyAnalytics/multichoice_question_analytics.html" with data=data survey=survey total_responses=total_responses %}
+        {% else %}
+            <div class="card bg-white shadow-lg border border-gray-200">
+                <div class="card-body">
+                    <h3 class="text-xl font-semibold mb-4">{{ data.question.label }}</h3>
+                    <p class="text-gray-500">Analytics not available for this question type ({{ data.type }}).</p>
+                </div>
+            </div>
+        {% endif %}
+    {% endfor %}
+</div>

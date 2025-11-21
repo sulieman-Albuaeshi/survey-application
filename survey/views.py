@@ -7,6 +7,8 @@ from django.core.paginator import Paginator
 from .models import Question as que, Survey, Response, Answer, MultiChoiceQuestion, LikertQuestion, CustomUser, Question
 from .forms import MultiChoiceQuestionForm, SurveyForm,  LikertQuestionForm,  QuestionFormSet
 from django.contrib.contenttypes.models import ContentType
+from django.utils import timezone
+from datetime import timedelta
 from django.views import View
 from django.views.generic import CreateView, UpdateView, DeleteView, DetailView
 from django.shortcuts import redirect
@@ -29,8 +31,6 @@ class SurveyCreateView(CreateView):
 
         if self.request.POST:
             # If submitting, bind Context to the formset
-
-
             context['Question_formset'] = QuestionFormSet(self.request.POST)
         else:
             # If GET, create an empty formset
@@ -133,7 +133,6 @@ def Index(request, page_number=1):
     context = {
         'page': page,
         'query': query, # Add this
-        'is_responses_page': False, # Explicitly set for Dashboard
     }
 
     is_htmx = request.headers.get('HX-Request') == 'true'
@@ -146,14 +145,41 @@ def Index(request, page_number=1):
     return render(request, 'index.html', context)
 
 def Responses(request, page_number=1):
-    """Main responses view showing all surveys with response counts"""
-    query = request.GET.get('search', '').strip()
+    """Main responses view showing all surveys with response counts and filters"""
     
-    # Get surveys with response counts
+    # Get filters and search query
+    query = request.GET.get('search', '').strip()
+    state_filter = request.GET.get('state_filter', '').strip()
+    responses_filter = request.GET.get('responses_filter', '').strip()
+    date_filter = request.GET.get('date_filter', '').strip()
+    
+    # Base queryset with response counts
     surveys = Survey.objects.annotate(
         responses_count=Count('responses')
-    ).filter(state='published')
+    )
     
+    # 0. Apply Date Filter (based on last_updated)
+    from datetime import timedelta
+    from django.utils import timezone
+    
+    if date_filter == 'last_7_days':
+        surveys = surveys.filter(last_updated__gte=timezone.now() - timedelta(days=7))
+    elif date_filter == 'last_30_days':
+        surveys = surveys.filter(last_updated__gte=timezone.now() - timedelta(days=30))
+    elif date_filter == 'last_90_days':
+        surveys = surveys.filter(last_updated__gte=timezone.now() - timedelta(days=90))
+    
+    # 1. Apply State Filter
+    if state_filter in ['published', 'draft', 'closed']:
+        surveys = surveys.filter(state=state_filter)
+    
+    # 2. Apply Responses Count Filter
+    if responses_filter == 'has_responses':
+        surveys = surveys.filter(responses_count__gt=0)
+    elif responses_filter == 'no_responses':
+        surveys = surveys.filter(responses_count=0)
+    
+    # 3. Apply Search Query
     if query:
         surveys = surveys.filter(
             Q(title__icontains=query) |
@@ -162,8 +188,10 @@ def Responses(request, page_number=1):
     
     surveys = surveys.order_by('-last_updated')
     
-    # Get recent surveys with responses
-    recent_surveys_with_responses = surveys.filter(responses_count__gt=0)[:10]
+    # Get recent surveys with responses (not affected by search/filters for the card section)
+    recent_surveys_with_responses = Survey.objects.annotate(
+        responses_count=Count('responses')
+    ).filter(responses_count__gt=0).order_by('-last_updated')[:4]
     
     # Pagination
     paginator = Paginator(surveys, 10)
@@ -172,13 +200,17 @@ def Responses(request, page_number=1):
     context = {
         'page': page,
         'query': query,
+        'state_filter': state_filter,
+        'responses_filter': responses_filter,
+        'date_filter': date_filter,
         'recent_surveys': recent_surveys_with_responses,
-        'is_responses_page': True, # Added for sidebar consistency
     }
     
     is_htmx = request.headers.get('HX-Request') == 'true'
     
     if is_htmx:
+        # عند طلب htmx، نرسل فقط الجزء الذي يحتاج إلى التحديث، وهو الجدول وشريط التنقل
+        # هذا الملف هو الذي يحتوي على الحاوية (#responses-table-and-pagination-container)
         return render(request, 'partials/Responses/responses_table_body.html', context)
     
     return render(request, 'Responses.html', context)
@@ -202,6 +234,12 @@ def SurveyResponseDetail(request, uuid):
         'total_responses': total_responses,
         'page': page,
     }
+    
+    is_htmx = request.headers.get('HX-Request') == 'true'
+    
+    if is_htmx:
+        # عند طلب htmx، نرسل فقط الجزء الذي يحتاج إلى التحديث (الجدول وشريط التنقل)
+        return render(request, 'partials/SurveyResponseDetail/survey_responses_table_and_pagination.html', context)
     
     return render(request, 'SurveyResponseDetail.html', context)
 

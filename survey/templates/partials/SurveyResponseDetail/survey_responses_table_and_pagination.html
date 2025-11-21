@@ -1,0 +1,25 @@
+<div id="survey-responses-container">
+    <div class="card-body">
+        <h2 class="text-xl font-semibold mb-4">Individual Responses</h2>
+        
+        <div class="overflow-x-auto">
+            <table class="table w-full">
+                <thead>
+                    <tr class="border-b-2">
+                        <th class="text-left">#</th>
+                        <th class="text-left">Respondent</th>
+                        <th class="text-left">Submitted At</th>
+                        <th class="text-left">Status</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="responses-table-body">
+                    {% include "partials/SurveyResponseDetail/survey_responses_table_body.html" %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% include "partials/SurveyResponseDetail/survey_responses_pagination.html" %}
+    </div>
+</div>
