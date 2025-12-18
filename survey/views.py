@@ -5,10 +5,10 @@ from django.db.models import Q, Count, Avg
 from django.db import transaction
 from django.core.paginator import Paginator
 from .models import Question as que, Survey, Response, Answer, MultiChoiceQuestion, LikertQuestion, CustomUser, Question
-from .forms import MultiChoiceQuestionForm, SurveyForm,  LikertQuestionForm,  QuestionFormSet
+from .forms import MultiChoiceQuestionForm, SurveyForm, LikertQuestionForm, QuestionFormSet
 from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
-from datetime import timedelta
+from datetime import timedelta, datetime
 from django.views import View
 from django.views.generic import CreateView, UpdateView, DeleteView, DetailView
 from django.shortcuts import redirect
@@ -151,23 +151,33 @@ def Responses(request, page_number=1):
     query = request.GET.get('search', '').strip()
     state_filter = request.GET.get('state_filter', '').strip()
     responses_filter = request.GET.get('responses_filter', '').strip()
-    date_filter = request.GET.get('date_filter', '').strip()
+    start_date = request.GET.get('start_date', '').strip()
+    end_date = request.GET.get('end_date', '').strip()
     
+    print(f"DEBUG: query='{query}', state='{state_filter}', responses='{responses_filter}'")
+
     # Base queryset with response counts
     surveys = Survey.objects.annotate(
         responses_count=Count('responses')
     )
     
     # 0. Apply Date Filter (based on last_updated)
-    from datetime import timedelta
-    from django.utils import timezone
+    from datetime import datetime
     
-    if date_filter == 'last_7_days':
-        surveys = surveys.filter(last_updated__gte=timezone.now() - timedelta(days=7))
-    elif date_filter == 'last_30_days':
-        surveys = surveys.filter(last_updated__gte=timezone.now() - timedelta(days=30))
-    elif date_filter == 'last_90_days':
-        surveys = surveys.filter(last_updated__gte=timezone.now() - timedelta(days=90))
+    if start_date:
+        try:
+            start_date_obj = datetime.strptime(start_date, '%Y-%m-%d').date()
+            surveys = surveys.filter(last_updated__date__gte=start_date_obj)
+        except ValueError:
+            pass # Ignore invalid date format
+            
+    if end_date:
+        try:
+            end_date_obj = datetime.strptime(end_date, '%Y-%m-%d').date()
+            # Add one day to include the end date itself
+            surveys = surveys.filter(last_updated__date__lte=end_date_obj)
+        except ValueError:
+            pass # Ignore invalid date format
     
     # 1. Apply State Filter
     if state_filter in ['published', 'draft', 'closed']:
@@ -194,7 +204,7 @@ def Responses(request, page_number=1):
     ).filter(responses_count__gt=0).order_by('-last_updated')[:4]
     
     # Pagination
-    paginator = Paginator(surveys, 10)
+    paginator = Paginator(surveys, 5)
     page = paginator.get_page(page_number)
     
     context = {
@@ -202,7 +212,8 @@ def Responses(request, page_number=1):
         'query': query,
         'state_filter': state_filter,
         'responses_filter': responses_filter,
-        'date_filter': date_filter,
+        'start_date': start_date,
+        'end_date': end_date,
         'recent_surveys': recent_surveys_with_responses,
     }
     

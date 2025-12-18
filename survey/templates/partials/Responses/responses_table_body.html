@@ -1,128 +1,25 @@
-<div
-  id="responses-table-and-pagination-container"
-  class="bg-white shadow-lg border border-gray-200 relative sm:rounded-lg overflow-hidden w-full"
->
-  <!-- searh bar-->
-  <div
-    class="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4"
-  >
-    <div class="w-full md:w-1/2 flex">
-      <form class="w-full flex items-center space-x-2">
-        <label for="simple-search" class="sr-only">Search</label>
-        <div class="relative w-full">
-          <div
-            class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none"
-          >
-            <svg
-              aria-hidden="true"
-              class="w-5 h-5 text-gray-500"
-              fill="currentColor"
-              viewbox="0 0 20 20"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                fill-rule="evenodd"
-                d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                clip-rule="evenodd"
-              />
-            </svg>
-          </div>
-          <input
-            type="text"
-            name="search"
-            value="{{ query|default:'' }}"
-            hx-get="{% url 'Responses' %}"
-            hx-trigger="keyup changed delay:500ms"
-            hx-target="#responses-table-and-pagination-container"
-            hx-swap="outerHTML"
-            hx-indicator="#htmx-spinner"
-            id="simple-search"
-            class="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 p-2"
-            placeholder="Search"
-            autocomplete="off"
-          />
-        </div>
-      </form>
-      <span
-        id="htmx-spinner"
-        class="htmx-indicator loading loading-spinner text-primary loading-lg"
-      ></span>
-    </div>
-    <div class="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0">
-        <div class="flex items-center space-x-3 w-full md:w-auto">
-            <!-- Filter Dropdown -->
-            <select
-                name="state_filter"
-                hx-get="{% url 'Responses' %}"
-                hx-target="#responses-table-and-pagination-container"
-                hx-swap="outerHTML"
-                hx-indicator="#htmx-spinner"
-                hx-trigger="change"
-                class="select select-bordered select-sm w-full max-w-xs bg-white border-gray-300 hover:border-primary focus:border-primary"
-            >
-                <option value="" {% if not state_filter %}selected{% endif %}>All States</option>
-                <option value="published" {% if state_filter == 'published' %}selected{% endif %}>Published</option>
-                <option value="draft" {% if state_filter == 'draft' %}selected{% endif %}>Draft</option>
-                <option value="closed" {% if state_filter == 'closed' %}selected{% endif %}>Closed</option>
-            </select>
-
-            <!-- Responses Count Filter -->
-            <select
-                name="responses_filter"
-                hx-get="{% url 'Responses' %}"
-                hx-target="#responses-table-and-pagination-container"
-                hx-swap="outerHTML"
-                hx-indicator="#htmx-spinner"
-                hx-trigger="change"
-                class="select select-bordered select-sm w-full max-w-xs bg-white border-gray-300 hover:border-primary focus:border-primary"
-            >
-                <option value="" {% if not responses_filter %}selected{% endif %}>All Responses</option>
-                <option value="has_responses" {% if responses_filter == 'has_responses' %}selected{% endif %}>Has Responses</option>
-                <option value="no_responses" {% if responses_filter == 'no_responses' %}selected{% endif %}>No Responses</option>
-            </select>
-
-            <!-- Date Filter -->
-            <select
-                name="date_filter"
-                hx-get="{% url 'Responses' %}"
-                hx-target="#responses-table-and-pagination-container"
-                hx-swap="outerHTML"
-                hx-indicator="#htmx-spinner"
-                hx-trigger="change"
-                class="select select-bordered select-sm w-full max-w-xs bg-white border-gray-300 hover:border-primary focus:border-primary"
-            >
-                <option value="" {% if not date_filter %}selected{% endif %}>All Time</option>
-                <option value="last_7_days" {% if date_filter == 'last_7_days' %}selected{% endif %}>Last 7 Days</option>
-                <option value="last_30_days" {% if date_filter == 'last_30_days' %}selected{% endif %}>Last 30 Days</option>
-                <option value="last_90_days" {% if date_filter == 'last_90_days' %}selected{% endif %}>Last 90 Days</option>
-            </select>
-        </div>
-    </div>
-  </div>
-
-  <!-- Table -->
-  <div class="overflow-x-auto">
-    <table class="w-full text-sm text-left text-gray-500">
-      <thead class="text-xs text-gray-700 uppercase bg-gray-100 pb-7">
-        <tr>
-          <th scope="col" class="px-4 py-3 w-[18%]">Survey Title</th>
-          <th scope="col" class="px-4 py-3 w-[32%]">Description</th>
-          <th scope="col" class="px-4 py-3 w-[15%] text-center">
-            Total Responses
-          </th>
-          <th scope="col" class="px-4 py-3">Last Response</th>
-          <th scope="col" class="text-center">Actions</th>
-        </tr>
-      </thead>
-      <tbody
-        id="responses-table-body"
-        class="responses-table-body divide-y divide-gray-200"
-      >
-        {% include "partials/Responses/responses_table_with_oob.html" %}
-      </tbody>
-    </table>
-  </div>
-
-  <!-- Pagination -->
-  {% include "partials/Responses/responses_pagination.html" %}
+<!-- Table -->
+<div class="overflow-x-auto">
+  <table class="w-full text-sm text-left text-gray-500">
+    <thead class="text-xs text-gray-700 uppercase bg-gray-100 pb-7">
+      <tr>
+        <th scope="col" class="px-4 py-3 w-[18%]">Survey Title</th>
+        <th scope="col" class="px-4 py-3 w-[32%]">Description</th>
+        <th scope="col" class="px-4 py-3 w-[15%] text-center">
+          Total Responses
+        </th>
+        <th scope="col" class="px-4 py-3">Last Response</th>
+        <th scope="col" class="text-center">Actions</th>
+      </tr>
+    </thead>
+    <tbody
+      id="responses-table-body"
+      class="responses-table-body divide-y divide-gray-200"
+    >
+      {% include "partials/Responses/responses_table_with_oob.html" %}
+    </tbody>
+  </table>
 </div>
+
+<!-- Pagination -->
+{% include "partials/Responses/responses_pagination.html" %}
