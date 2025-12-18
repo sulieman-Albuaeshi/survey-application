@@ -14,13 +14,25 @@
   <ul class="inline-flex items-stretch -space-x-px">
     <li>
       <button
-        {% if not page.has_previous %}disabled{% endif %}
-        {% if page.has_previous %}
-        hx-get="{% url 'Responses_Page' page.number|add:-1 %}{% if query %}?search={{ query }}{% endif %}{% if state_filter %}&state_filter={{ state_filter }}{% endif %}{% if responses_filter %}&responses_filter={{ responses_filter }}{% endif %}{% if date_filter %}&date_filter={{ date_filter }}{% endif %}"
+        {%
+        if
+        not
+        page.has_previous
+        %}disabled{%
+        endif
+        %}
+        {%
+        if
+        page.has_previous
+        %}
+        hx-get="{% url 'Responses_Page' page.number|add:-1 %}"
+        hx-include="#responses-filter-form"
         hx-push-url="true"
         hx-target="#responses-table-and-pagination-container"
-        hx-swap="outerHTML"
-        {% endif %}
+        hx-swap="innerHTML"
+        {%
+        endif
+        %}
         class="flex items-center justify-center h-full py-1.5 px-3 ml-0 text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 {% if not page.has_previous %}cursor-not-allowed {% else %} cursor-pointer {% endif %}"
       >
         <span class="sr-only">Previous</span>
@@ -42,10 +54,11 @@
     {% for page_number in page.paginator.page_range %}
     <li>
       <button
-        hx-get="{% url 'Responses_Page' page_number %}{% if query %}?search={{ query }}{% endif %}{% if state_filter %}&state_filter={{ state_filter }}{% endif %}{% if responses_filter %}&responses_filter={{ responses_filter }}{% endif %}{% if date_filter %}&date_filter={{ date_filter }}{% endif %}"
+        hx-get="{% url 'Responses_Page' page_number %}"
+        hx-include="#responses-filter-form"
         hx-push-url="true"
         hx-target="#responses-table-and-pagination-container"
-        hx-swap="outerHTML"
+        hx-swap="innerHTML"
         class="flex items-center justify-center px-3 h-full leading-tight border border-gray-300 {% if page_number == page.number %} bg-primary text-primary-content cursor-not-allowed {% else %} bg-white text-gray-500 hover:bg-gray-100 hover:text-gray-700 cursor-pointer {% endif %}"
       >
         {{ page_number }}
@@ -54,14 +67,25 @@
     {% endfor %}
     <li>
       <button
-        {% if not page.has_next %}disabled{% endif %}
-        {% if page.has_next %}
-        hx-get="{% url 'Responses_Page' page.number|add:1 %}{% if query %}?search={{ query }}{% endif %}{% if state_filter %}&state_filter={{ state_filter }}{% endif %}{% if responses_filter %}&responses_filter={{ responses_filter }}{% endif %}{% if date_filter %}&date_filter={{ date_filter }}{% endif %}"
+        {%
+        if
+        not
+        page.has_next
+        %}disabled{%
+        endif
+        %}
+        {%
+        if
+        page.has_next
+        %}
+        hx-get="{% url 'Responses_Page' page.number|add:1 %}"
+        hx-include="#responses-filter-form"
         hx-push-url="true"
-        hx-trigger="click"
         hx-target="#responses-table-and-pagination-container"
-        hx-swap="outerHTML"
-        {% endif %}
+        hx-swap="innerHTML"
+        {%
+        endif
+        %}
         class="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 {% if not page.has_next %}cursor-not-allowed {% else %} cursor-pointer {% endif %}"
       >
         <span class="sr-only">Next</span>
