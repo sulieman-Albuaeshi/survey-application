@@ -25,7 +25,7 @@ def normalize_formset_indexes( data: QueryDict, prefix: str):
                 new_index += 1  
 
             if key == prefix + "-" + str(index) + "-" + "position":
-                new_data[prefix+"-" + str(new_index) + "-" + "position"] = new_index
+                new_data[prefix+"-" + str(new_index) + "-" + "position"] = new_index + 1
                 continue
 
             new_data[prefix+"-" + str(new_index) + "-" + key.split("-")[2]] = value

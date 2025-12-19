@@ -8,8 +8,8 @@
         <h1 class="textarea-xl font-medium text-gray-950 text-center p-1">Likert Question</h1>
         <div class="flex justify-between items-start">
             <div class="flex flex-row gap-2 items-center flex-grow">
-                {% comment %} i used question count to show the question number becase the form.position in not accurate {% endcomment %}
-                <span class="text-lg font-semibold question-number">{{ question_count }}.</span>
+                {% comment %}  Use question_count for unsaved items; fallback to position on errors. {% endcomment %}
+                <span class="text-lg font-semibold question-number">{{ question_count|default:form.position.value }}.</span>
                 {# form.label renders the input field for the question's label #}
                 {{ form.label }}
                 {{ form.label.errors }}
