@@ -10,18 +10,17 @@
             </label>
         </div>
         {% if is_multi %}
-            <div class="form-control">
-                <label class="cursor-pointer label gap-2">
-                    <span class="label-text">Multiple answers</span>
-                    {{ form.allow_multiple }}
-                </label>
-            </div>
-            <div class="form-control">
-                <label class="cursor-pointer label gap-2">
-                    <span class="label-text">Randomize</span>
-                    {{ form.randomize_options }}
-                </label>
-            </div>
+        <div class="form-control">
+            <label class="cursor-pointer label gap-2">
+                <span class="label-text">Multiple answers</span>
+                {{ form.allow_multiple }}
+            </label>
+        </div>
+        <div class="form-control">
+            <label class="cursor-pointer label gap-2">
+                <span class="label-text">Randomize</span>
+                {{ form.randomize_options }}
+            </label>
         </div>
         {% endif %}
     </div>
