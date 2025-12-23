@@ -5,53 +5,102 @@
     {{ form.question_type }}
     <div class="card-body relative">
         {% include "partials/Create_survey/Questions/question_header_card.html" %}
+        
         <h1 class="textarea-xl font-medium text-gray-950 text-center p-1">Multi-Choice Question</h1>
-        <div class="flex justify-between items-start">
+        
+        <!-- Question Label -->
+        <div class="flex justify-between items-start mb-4">
             <div class="flex flex-row gap-2 items-center flex-grow">
                 <span class="text-lg font-semibold question-number">{{ question_count|default:form.position.value }}.</span>
-                {# form.label renders the input field for the question's label #}
                 {{ form.label }}
                 {{ form.label.errors }}
             </div>
         </div>
-        <div class="mt-4 flex flex-col lg:flex-row lg:items-center gap-y-3 gap-x-4">
-            <div class="flex flex-auto items-center gap-2">
-                <p class="text-md font-medium text-gray-700 whitespace-nowrap">Help text:</p>
-                {{ form.helper_text }}
-            </div>
-            <div class="flex flex-auto items-center gap-2 md:justify-end">
-                <p class="text-md font-medium text-gray-700 whitespace-nowrap">Min options to select:</p>
-                {{ form.the_minimum_number_of_options_to_be_selected }}
+
+        <!-- Settings: Help Text & Min Selections -->
+        <div class="mt-2 bg-slate-50 border border-slate-200 rounded-lg p-4 mb-6">
+            <div class="flex flex-col md:flex-row gap-4 items-start">
+                
+                <!-- 1. Helper Text -->
+                <div class="w-full md:flex-1">
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1.5">
+                        Help text <span class="font-normal text-slate-400 normal-case">(Optional)</span>
+                    </label>
+                    <div class="w-full">
+                        {{ form.helper_text }}
+                    </div>
+                </div>
+
+                <!-- 2. Min Selections -->
+                <div class="w-full md:w-48">
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1.5">
+                        Min. Selections
+                    </label>
+                    <div class="w-full">
+                        {{ form.the_minimum_number_of_options_to_be_selected }}
+                    </div>
+                    {% if form.the_minimum_number_of_options_to_be_selected.errors %}
+                        <div class="mt-1 text-xs text-red-600">
+                            {{ form.the_minimum_number_of_options_to_be_selected.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
             </div>
         </div>
-        {% if form.the_minimum_number_of_options_to_be_selected.errors %}
-            <div class="mt-1 text-sm text-red-600 text-right">
-                {% for error in form.the_minimum_number_of_options_to_be_selected.errors %}{{ error }}{% endfor %}
-            </div>
-        {% endif %}
-        <div x-data="optionsManager('{{ form.prefix }}', {{ form.options.value|default:'[]' }})"
-             class="flex flex-col justify-between divide-y divide-gray-200">
-            {# This is the crucial fix: Render the hidden input for options #}
+
+        <!-- Options Manager Section -->
+        <div x-data="optionsManager('{{ form.prefix }}', 'options', {{ form.options.value|default:'[]' }})"
+             class="flex flex-col gap-4">
+
             {{ form.options }}
-            <div class="pb-3">
-                <ul class="list-disc pl-3 mt-4" x-auto-animate>
-                    <label class="block text-sm font-medium text-gray-700">Options :</label>
-                    {% include "partials/Create_survey/option_button.html" %}
-                </ul>
-                <!-- The UI for adding a new option -->
-                <div class="flex items-center gap-2 mt-1">
+
+            <!-- The Gray Container (Like Matrix Style) -->
+            <div class="bg-slate-50/50 rounded-xl border border-slate-200 p-4">
+                
+                <!-- Header -->
+                <div class="flex items-center justify-between mb-3">
+                    <label class="block text-sm font-bold text-gray-700 uppercase tracking-wide">
+                        Answer Options
+                    </label>
+                    <span class="badge badge-sm badge-ghost" x-text="options.length"></span>
+                </div>
+
+                <!-- The List -->
+                <div class="flex-1 mb-2">
+                    <ul class="w-full space-y-2" x-auto-animate>
+                        
+                        {% include "partials/Create_survey/option_button.html" %}
+
+                        <!-- Empty State -->
+                        <li x-show="options.length === 0" class="text-center text-xs text-gray-400 italic py-8 border-2 border-dashed border-gray-200 rounded-lg bg-white">
+                            No options added yet.<br>Add choices like "Yes", "No", or "Maybe".
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- The Input Area (Footer of the container) -->
+                <div class="flex items-center gap-2 mt-auto pt-3 border-t border-gray-200">
                     <input type="text"
                            x-model="newOption"
                            @keydown.enter.prevent="addOption"
-                           class="input input-bordered input-primary input-sm w-2/5"
-                           placeholder="Type an option and click Add">
-                    <button type="button" @click="addOption" class="btn btn-sm btn-primary ">Add</button>
+                           class="input input-bordered input-sm w-full bg-white focus:outline-none focus:border-primary"
+                           placeholder="Type an option and press Enter...">
+                    
+                    <button type="button" @click="addOption" class="btn btn-sm btn-primary btn-square">
+                        <!-- Plus Icon -->
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                        </svg>
+                    </button>
                 </div>
-                <div class="mt-1 text-sm text-red-600">
-                    {{form.options.errors}}
+                
+                <div class="mt-1 text-xs text-red-600">
+                    {{ form.options.errors }}
                 </div>
             </div>
-            <div class="block px-2 py-2">
+
+            <!-- Footer (Required / Randomize toggles) -->
+            <div class="block px-2 py-2 border-t border-gray-100 mt-2">
                 {% include "partials/Create_survey/question_footer_card.html" with is_multi=True %}
             </div>
         </div>
