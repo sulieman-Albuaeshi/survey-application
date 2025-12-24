@@ -1,9 +1,33 @@
 {% load static %}
-<button class="absolute top-2 right-2 p-1 rounded-full hover:cursor-pointer hover:bg-red-100"
-        type="button"
-        @click="$dispatch('question-deleted'); $el.closest('.question-card').remove()">
-    <img src="{% static 'close-circle.svg' %}"
-         alt="Delete"
-         width="25"
-         height="25">
-</button>
+<div class="absolute top-2 right-2 flex items-center gap-1 mb-1">
+    
+    <!-- Move Up Button -->
+    <button type="button"
+            @click="$dispatch('move-question', { direction: -1, btn: $el })"
+            class="btn btn-ghost btn-xs btn-circle text-gray-400 hover:text-blue-600 hover:bg-blue-50"
+            title="Move Question Up">
+        <i class="fa-solid fa-arrow-up"></i>
+    </button>
+
+    <!-- Move Down Button -->
+    <button type="button"
+             @click="$dispatch('move-question', { direction: 1, btn: $el })"
+            class="btn btn-ghost btn-xs btn-circle text-gray-400 hover:text-blue-600 hover:bg-blue-50"
+            title="Move Question Down">
+        <i class="fa-solid fa-arrow-down"></i>
+    </button>
+
+    <!-- Vertical Divider -->
+    <div class="w-px h-4 bg-gray-200 mx-1"></div>
+
+    <!-- Delete Button -->
+    <button class="top-2 right-2 p-1 rounded-full hover:cursor-pointer hover:bg-red-100"
+            type="button"
+            @click="$dispatch('question-deleted'); $el.closest('.question-card').remove()">
+        <img src="{% static 'close-circle.svg' %}"
+            alt="Delete"
+            width="25"
+            height="25">
+    </button>
+
+</div>

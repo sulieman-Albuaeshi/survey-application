@@ -5,6 +5,7 @@
     <form class="flex flex-row gap-4" method="POST" action="{% url 'CreateSurvey' %}"
           x-data="questionManager()"
           @question-deleted.window="handleDeletion($event)"
+          @move-question="moveQuestion($event.detail.btn, $event.detail.direction)"
           @keydown.enter.prevent>
         {% csrf_token %}
         {{ Question_formset.management_form }}

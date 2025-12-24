@@ -72,6 +72,33 @@ document.addEventListener("alpine:init", () => {
       }
     },
 
+    moveQuestion(btnElement, direction) {
+      // 1. Find the card and its container
+      const currentCard = btnElement.closest(".question-card");
+      const container = document.getElementById("question_container"); // Ensure your main div has this ID
+
+      if (!currentCard || !container) return;
+
+      // 2. Find the sibling to swap with
+      if (direction === -1) {
+        // Move UP
+        const prevCard = currentCard.previousElementSibling;
+        // Check if prevCard exists and is actually a question card (not a hidden div)
+        if (prevCard && prevCard.classList.contains("question-card")) {
+          container.insertBefore(currentCard, prevCard);
+          this.updateQuestionOrder();
+        }
+      } else {
+        // Move DOWN
+        const nextCard = currentCard.nextElementSibling;
+        if (nextCard && nextCard.classList.contains("question-card")) {
+          // To move down, we insert the *next* card before the *current* card
+          container.insertBefore(nextCard, currentCard);
+          this.updateQuestionOrder();
+        }
+      }
+    },
+
     /**
      * Updates the hidden TOTAL_FORMS input for a given Django formset.
      * @param {number} delta - The amount to change the count by (+1 or -1).
@@ -106,6 +133,23 @@ document.addEventListener("alpine:init", () => {
       this._updateTotalForms(-1);
     },
 
+    updateQuestionOrder() {
+      const allQuestions = document.querySelectorAll(".question-card");
+
+      allQuestions.forEach((card, index) => {
+        // 1. Update Visual Number (e.g., "1.")
+        const numberSpan = card.querySelector(".question-number");
+        if (numberSpan) numberSpan.innerText = `${index + 1}.`;
+
+        // 2. Update Hidden Position Input (Important for Backend!)
+        // Finds input ending in '-position', e.g., name="questions-0-position"
+        const positionInput = card.querySelector('input[name$="-position"]');
+        if (positionInput) {
+          positionInput.value = index + 1;
+        }
+      });
+    },
+
     handleDeletion(event) {
       console.log("Renumbering questions...");
       if (this.question_count_position > 0) {
@@ -113,16 +157,10 @@ document.addEventListener("alpine:init", () => {
         this.decrementTotalForms();
       }
 
+      // Wait for DOM removal then reorder
       setTimeout(() => {
-        // Get all the *remaining* question cards
-        const remainingQuestions = document.querySelectorAll(".question-card");
-        // Loop through and re-number them
-        remainingQuestions.forEach((question, index) => {
-          const numberSpan = question.querySelector(".question-number");
-          if (numberSpan) numberSpan.innerText = `${index + 1}.`;
-        });
-        // console.log(allQuestions);
-      }, 500); // A timeout of 0 is all that's needed.
+        this.updateQuestionOrder();
+      }, 500);
     },
   }));
 });
