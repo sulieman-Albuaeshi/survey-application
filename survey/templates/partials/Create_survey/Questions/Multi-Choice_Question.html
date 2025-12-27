@@ -11,7 +11,7 @@
         <!-- Question Label -->
         <div class="flex justify-between items-start mb-4">
             <div class="flex flex-row gap-2 items-center flex-grow">
-                <span class="text-lg font-semibold question-number">{{ question_count|default:form.position.value }}.</span>
+                <span class="text-lg font-semibold question-number">{{ form.position.value}}.</span>
                 {{ form.label }}
                 {{ form.label.errors }}
             </div>
