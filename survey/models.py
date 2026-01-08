@@ -102,23 +102,27 @@ class MultiChoiceQuestion(Question):
         return distribution
 
     def get_numeric_answer(self, answer_data):
-        """Convert answer text to numeric value based on option index"""
+        """Convert answer text to a single numeric value using binary representation"""
         if not answer_data:
             return ""
         
         options = self.options
+        binary_sum = 0
         
-        def get_index(val):
+        # Ensure answer_data is a list for uniform processing
+        selections = answer_data if isinstance(answer_data, list) else [answer_data]
+        
+        for val in selections:
             try:
-                # Return 1-based index
-                return str(options.index(val) + 1)
+                # Find index of the selection (0-based)
+                idx = options.index(val)
+                # Add 2^index to the sum (1, 2, 4, 8, etc.)
+                binary_sum += (1 << idx)
             except ValueError:
-                return "0"
-        
-        if isinstance(answer_data, list):
-            return ", ".join([get_index(item) for item in answer_data])
-        else:
-            return get_index(answer_data)
+                # Value not in options, ignore
+                pass
+                
+        return str(binary_sum)
 
 
 class LikertQuestion(Question):
