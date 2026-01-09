@@ -177,6 +177,20 @@ class LikertQuestion(Question):
                 continue
         
         return distribution
+    
+    def get_numeric_answer(self, answer_data):
+        """Convert answer to numeric value"""
+        if not answer_data:
+            return ""
+        
+        try:
+            if isinstance(answer_data, dict) and 'position' in answer_data:
+                return str(int(float(answer_data['position'])))
+            else:
+                return str(int(float(answer_data)))
+        except (ValueError, TypeError, KeyError):
+            return ""
+
 
 class MatrixQuestion(Question):
     rows = models.JSONField(default=list)
