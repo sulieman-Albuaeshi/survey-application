@@ -1,5 +1,5 @@
 {% comment %} context = { 'page': page, 'query': query, # the search query if
-any 'recently_viewed': recently_viewed, # list of recently viewed items } 
+any 'recently_viewed': recently_viewed, # list of recently viewed items }
 {%endcomment %}
 <div class="w-full px-4">
   <!-- Start coding here -->
@@ -35,6 +35,7 @@ any 'recently_viewed': recently_viewed, # list of recently viewed items }
             <input
               type="text"
               name="search"
+              value="{{ query|default:'' }}"
               hx-get="{% url 'Dashboard' %}"
               hx-trigger="keyup changed delay:500ms "
               hx-target=".survey-table-body"
@@ -42,7 +43,6 @@ any 'recently_viewed': recently_viewed, # list of recently viewed items }
               id="simple-search"
               class="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 p-2"
               placeholder="Search"
-              required=""
             />
           </div>
         </form>
