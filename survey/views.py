@@ -168,6 +168,50 @@ class AddQuestionFormView(View):
         return render(request, f'partials/Create_survey/Questions/{template_name}.html', context)
 
 def Index(request, page_number=1):
+    from urllib.parse import urlencode
+
+    # --- Session Persistence Logic ---
+    FILTER_KEYS = ['search']
+    
+    # Check if request has any filter parameters (including page via URL path)
+    has_filters = any(request.GET.get(key) for key in FILTER_KEYS) or page_number > 1
+    
+    # If no filters provided AND it's a standard navigation (no HTMX) to page 1:
+    # Try to restore from session
+    if not has_filters and page_number == 1 and not request.headers.get('HX-Request'):
+        saved_state = request.session.get('dashboard_last_state')
+        if saved_state:
+            # Construct redirect URL
+            saved_page = saved_state.get('page_number', 1)
+            saved_params = saved_state.get('params', {})
+            
+            # Use 'Dashboard_Page' or 'Dashboard' based on saved page number
+            if saved_page > 1:
+                url = redirect('Dashboard_Page', page_number=saved_page).url
+            else:
+                url = redirect('Dashboard').url
+            
+            # Append query parameters if any
+            clean_params = {k: v for k, v in saved_params.items() if v}
+            
+            # Check if saved state is different from current default state
+            if saved_page != 1 or clean_params:
+                if clean_params:
+                    url += f"?{urlencode(clean_params)}"
+                return redirect(url)
+
+    # If parameters exist (or we are just rendering the current state), save to session
+    # We save even if it's the "default" state (clearing the previous state)
+    # UNLESS we just restored it in the previous block (but that block returns redirect)
+    current_params = {key: request.GET.get(key, '').strip() for key in FILTER_KEYS}
+    
+    # Save to session (only if it's not a background API call - but here it's fine)
+    request.session['dashboard_last_state'] = {
+        'page_number': page_number,
+        'params': current_params
+    }
+    # --- End Session Persistence Logic ---
+
     query = request.GET.get('search', '').strip()
 
     if query:
@@ -192,14 +236,62 @@ def Index(request, page_number=1):
         return render(request, 'partials/Dashboard/table_with_oob_pagination.html', context)
 
     # For initial page loads, add any extra context needed.
-    context['recent_surveys'] = survey_list[:4]
+    # We fetch fresh recent surveys so they are NOT affected by the search query
+    context['recent_surveys'] = Survey.objects.order_by('-last_updated')[:4]
     return render(request, 'index.html', context)
 
 def Responses(request, page_number=1):
     """Main responses view showing all surveys with response counts and filters"""
+    from urllib.parse import urlencode
     
+    # --- Session Persistence Logic ---
+    FILTER_KEYS = ['search', 'state_filter', 'responses_filter', 'start_date', 'end_date']
+    
+    # Check if request has any filter parameters (including page via URL path)
+    has_filters = any(request.GET.get(key) for key in FILTER_KEYS) or page_number > 1
+    
+    # If no filters provided AND it's a standard navigation (no HTMX) to page 1:
+    # Try to restore from session
+    if not has_filters and page_number == 1 and not request.headers.get('HX-Request'):
+        saved_state = request.session.get('responses_last_state')
+        if saved_state:
+            # Construct redirect URL
+            saved_page = saved_state.get('page_number', 1)
+            saved_params = saved_state.get('params', {})
+            
+            # Use 'Responses_Page' or 'Responses' based on saved page number
+            if saved_page > 1:
+                url = redirect('Responses_Page', page_number=saved_page).url
+            else:
+                url = redirect('Responses').url
+            
+            # Append query parameters if any
+            # Filter out empty strings to keep URL clean, though saved params likely have values
+            clean_params = {k: v for k, v in saved_params.items() if v}
+            
+            # Check if saved state is different from current default state
+            if saved_page != 1 or clean_params:
+                if clean_params:
+                    url += f"?{urlencode(clean_params)}"
+                return redirect(url)
+
+    # If parameters exist (or we are just rendering the current state), save to session
+    # We save even if it's the "default" state (clearing the previous state)
+    # UNLESS we just restored it in the previous block (but that block returns redirect)
+    
+    current_params = {key: request.GET.get(key, '').strip() for key in FILTER_KEYS}
+    
+    # Save to session (only if it's not a background API call - but here it's fine)
+    request.session['responses_last_state'] = {
+        'page_number': page_number,
+        'params': current_params
+    }
+    
+    # --- End Session Persistence Logic ---
+
     # Get filters and search query
     query = request.GET.get('search', '').strip()
+
     state_filter = request.GET.get('state_filter', '').strip()
     responses_filter = request.GET.get('responses_filter', '').strip()
     start_date = request.GET.get('start_date', '').strip()
