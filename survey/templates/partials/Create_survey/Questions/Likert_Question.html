@@ -13,7 +13,7 @@
         <div class="flex justify-between items-start mb-4">
             <div class="flex flex-row gap-2 items-center flex-grow">
                 {% comment %}  Use question_count for unsaved items; fallback to position on errors. {% endcomment %}
-                <span class="text-lg font-semibold question-number">{{ form.position.value }}.</span>
+                <span class="text-lg font-semibold question-number">.</span>
                 {{ form.label }}
                 {{ form.label.errors }}
             </div>

@@ -47,7 +47,7 @@ class MultiChoiceQuestionForm(BaseQuestionForm):
         fields = BaseQuestionForm.Meta.fields +  [ 'options', 'allow_multiple', 'randomize_options', 'the_minimum_number_of_options_to_be_selected']
         widgets = {
             **BaseQuestionForm.Meta.widgets,
-            'options': forms.HiddenInput(attrs={'name' : '{{form.prefix}}options'}),
+            'options': forms.HiddenInput(),
             'allow_multiple': forms.CheckboxInput(attrs={'class': 'toggle toggle-primary'}),
             'randomize_options': forms.CheckboxInput(attrs={'class': 'toggle toggle-primary'}),
             'the_minimum_number_of_options_to_be_selected': forms.NumberInput(attrs={'class': 'input input-sm input-info focus:ring-0 focus:ring-offset-0', 
@@ -58,12 +58,15 @@ class MultiChoiceQuestionForm(BaseQuestionForm):
         min_selected = cleaned_data.get('the_minimum_number_of_options_to_be_selected')
         options = cleaned_data.get('options')
 
-        if  options is None:
+        if self.cleaned_data.get('DELETE'):
+            return cleaned_data
+        
+        if not options:
             self.add_error(
                 'options',
                 "the Options field is required for a multiple choice question."
             )
-        if len(options) <= 1:
+        elif len(options) <= 1:
             self.add_error(
                 'options',
                 "At least two options are required for a multiple choice question.",
@@ -120,6 +123,10 @@ class LikertQuestionForm(BaseQuestionForm):
     def clean(self):
         cleaned_data = super().clean()
         options = cleaned_data.get('options')
+
+        if self.cleaned_data.get('DELETE'):
+            return cleaned_data
+
         if not options:
             self.add_error(
                 'options',
@@ -160,12 +167,15 @@ class MatrixQuestionForm(BaseQuestionForm):
         rows = cleaned_data.get('rows')
         columns = cleaned_data.get('columns')
 
+        if self.cleaned_data.get('DELETE'):
+            return cleaned_data
+
         if not rows:
             self.add_error(
                 'rows',
                 "The Rows fields are required for a Matrix question."
             )
-        if len(rows) <= 1:
+        elif len(rows) <= 1:
             self.add_error(
                 'rows',
                 "At least two rows are required for a Matrix question.",
@@ -232,6 +242,9 @@ class RatingQuestionForm(BaseQuestionForm):
         cleaned_data = super().clean()
         min_val = cleaned_data.get('range_min')
         max_val = cleaned_data.get('range_max')
+
+        if self.cleaned_data.get('DELETE'):
+            return cleaned_data
 
         if min_val is not None and max_val is not None:
             if min_val >= max_val:

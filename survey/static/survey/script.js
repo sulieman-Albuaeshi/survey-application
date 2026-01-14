@@ -52,7 +52,6 @@ document.addEventListener("alpine:init", () => {
   Alpine.data("questionManager", () => ({
     isDragging: false,
     question_count_position: 0,
-    questionID: null,
 
     init() {
       // 1. FIND THE DJANGO MANAGEMENT FORM INPUT
@@ -61,15 +60,10 @@ document.addEventListener("alpine:init", () => {
         `#id_questions-TOTAL_FORMS`
       );
       if (totalFormsInput) {
-        // 2. SYNC ALPINE STATE WITH DJANGO
-        // If Django rendered 1 form with an error, this value is '1'.
-        // So our next new question must be index '1'.
+        // Sync position with current total forms
         this.question_count_position = parseInt(totalFormsInput.value) || 0;
-      } else {
-        console.error(
-          "Critical Error: #id_questions-TOTAL_FORMS not found. Ensure {{ formset.management_form }} is in your HTML."
-        );
       }
+      this.updateQuestionOrder();
     },
 
     moveQuestion(btnElement, direction) {
@@ -99,10 +93,6 @@ document.addEventListener("alpine:init", () => {
       }
     },
 
-    /**
-     * Updates the hidden TOTAL_FORMS input for a given Django formset.
-     * @param {number} delta - The amount to change the count by (+1 or -1).
-     */
     _updateTotalForms(delta) {
       const totalFormsInput = document.querySelector(
         `#id_questions-TOTAL_FORMS`
@@ -129,35 +119,54 @@ document.addEventListener("alpine:init", () => {
       }, 100);
     },
 
-    decrementTotalForms() {
-      this._updateTotalForms(-1);
-    },
-
     updateQuestionOrder() {
       const allQuestions = document.querySelectorAll(".question-card");
 
-      allQuestions.forEach((card, index) => {
-        // 1. Update Visual Number (e.g., "1.")
-        const numberSpan = card.querySelector(".question-number");
-        if (numberSpan) numberSpan.innerText = `${index + 1}.`;
+      let visualIndex = 1; // Start counting from 1
 
-        // 2. Update Hidden Position Input (Important for Backend!)
-        // Finds input ending in '-position', e.g., name="questions-0-position"
+      allQuestions.forEach((card) => {
+        // 1. SKIP deleted questions (hidden ones)
+        if (card.style.display === "none") return;
+
+        // 2. Update Visual Number
+        const numberSpan = card.querySelector(".question-number");
+        if (numberSpan) numberSpan.innerText = `${visualIndex}.`;
+
+        // 3. Update Hidden Position Input
         const positionInput = card.querySelector('input[name$="-position"]');
         if (positionInput) {
-          positionInput.value = index + 1;
+          positionInput.value = visualIndex;
         }
+
+        visualIndex++; // Increment visual counter
       });
     },
 
-    handleDeletion(event) {
-      console.log("Renumbering questions...");
-      if (this.question_count_position > 0) {
-        this.question_count_position--;
-        this.decrementTotalForms();
-      }
+    softDelete(btn) {
+      const card = btn.closest(".question-card");
+      if (!card) return;
 
-      // Wait for DOM removal then reorder
+      // 1. Find the Django DELETE checkbox inside this card
+      // Django names them like: questions-0-DELETE
+      const deleteInput = card.querySelector('input[name$="-DELETE"]');
+
+      if (deleteInput) {
+        // Check the box. Django will handle the deletion on save.
+
+        console.log("koko", deleteInput);
+        deleteInput.value = "on";
+        deleteInput.checked = true;
+        console.log("koko:", deleteInput);
+        card.style.display = "none";
+        // 2. Hide the card visually (DO NOT REMOVE FROM DOM)
+      }
+      // 3. Remove 'required' attributes from inputs inside the card
+      const inputs = card.querySelectorAll("input, select, textarea");
+      inputs.forEach((input) => {
+        input.removeAttribute("required");
+      });
+
+      // 4. Re-calculate the numbers (1, 2, 3...) for the remaining visible cards
       setTimeout(() => {
         this.updateQuestionOrder();
       }, 500);

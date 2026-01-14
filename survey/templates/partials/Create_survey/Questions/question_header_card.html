@@ -19,8 +19,18 @@
 
     <!-- Vertical Divider -->
     <div class="w-px h-4 bg-gray-200 mx-1"></div>
-
-    <!-- Delete Button -->
+    <div style="display:none;">
+        {{ form.DELETE }}
+    </div>
+    <button class="top-2 right-2 p-1 rounded-full hover:cursor-pointer hover:bg-red-100"
+            type="button"
+            @click="softDelete($el)">
+        <img src="{% static 'close-circle.svg' %}"
+            alt="Delete"
+            width="25"
+            height="25">
+    </button>
+    {% comment %} <!-- Delete Button -->
     <button class="top-2 right-2 p-1 rounded-full hover:cursor-pointer hover:bg-red-100"
             type="button"
             @click="$dispatch('question-deleted'); $el.closest('.question-card').remove()">
@@ -28,6 +38,6 @@
             alt="Delete"
             width="25"
             height="25">
-    </button>
+    </button> {% endcomment %}
 
 </div>

@@ -1,3 +1,5 @@
+from django import forms
+from django.forms import BooleanField, HiddenInput
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_POST
@@ -40,13 +42,13 @@ class SurveyCreateView(CreateView):
 
     def post(self, request, *args, **kwargs):
         self.object = None
-        data = normalize_formset_indexes(request.POST.copy(), prefix="questions")
+        # data = normalize_formset_indexes(request.POST.copy(), prefix="questions")
 
-        # Replace the request.POST with cleaned data
-        request._post = data
+        # # Replace the request.POST with cleaned data
+        # request._post = data
 
         form = self.get_form()
-        question_formset = QuestionFormSet(data)
+        question_formset = QuestionFormSet(request.POST, instance=self.object)
 
         if form.is_valid() and question_formset.is_valid():
             if request.POST.get('action') == 'preview':
@@ -73,6 +75,7 @@ class SurveyCreateView(CreateView):
             # If backup data exists, use it to pre-fill the form and formset
             form = SurveyForm(backup_data)
             question_formset = QuestionFormSet(backup_data)
+
             context ={
                 'form': form,
                 'Question_formset': question_formset,
@@ -117,9 +120,12 @@ class AddQuestionFormView(View):
         # Get the question index (count) from the POST data.
         # This value represents the current number of questions *before* adding the new one,
         # and will be used as the index for the new formset prefix.
-        question_index_str = request.POST.get('question_count_position')
+        question_index = int(request.POST.get('question_count_position', 0))
 
-        question_index = int(question_index_str) if question_index_str else 0
+        data = normalize_formset_indexes(request.POST.copy(), prefix="questions")
+        # Replace the request.POST with cleaned data
+        request._post = data
+
         print("question_index:", question_index)
 
         question_type_name = request.POST.get('question_type')      
@@ -151,37 +157,15 @@ class AddQuestionFormView(View):
             # 'question_count': question_index + 1, # Pass the index back if the partial needs it, though not strictly for the prefix
             'form': form,
         }
+
+        if 'DELETE' not in form.fields:
+            form.fields['DELETE'] = BooleanField(
+                widget=HiddenInput, 
+                required=False, 
+                initial=False
+            )
+
         return render(request, f'partials/Create_survey/Questions/{template_name}.html', context)
-
-def preview_survey_data(request):
-    """View to preview survey data before publishing"""
-    if request.method == 'POST':
-        data = normalize_formset_indexes(request.POST, prefix="questions")
-        request._post = data
-        request.session['survey_backup_data'] = request.POST.copy()
-
-        form = SurveyForm(request.POST)
-        question_formset = QuestionFormSet(request.POST)
-
-        if form.is_valid() and question_formset.is_valid():
-            survey = form.save(commit=False)
-            questions = question_formset.save(commit=False)
-
-            context = {
-                'survey': survey,
-                'questions': questions,
-            }
-            return render(request, 'Survey_preview.html', context)
-        else:
-            # If the form or formset is invalid, re-render the CreateSurvey page with errors
-            context = {
-                'form': form,
-                'Question_formset': question_formset,
-                'question_type_list': que.get_available_type_names(),
-            }
-            return render(request, 'CreateSurvey.html', context)
-    else:
-        return HttpResponse(status=405)  # Method Not Allowed
 
 def Index(request, page_number=1):
     query = request.GET.get('search', '').strip()

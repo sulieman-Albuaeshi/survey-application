@@ -60,3 +60,14 @@
 .wiggle:hover .wiggle-icon {
   animation: wiggle 0.3s ease-in-out infinite;
 }
+
+/* Question numbering */
+#question_container {
+  counter-reset: q-counter;
+}
+.question-card:not([style*="display: none"]) {
+  counter-increment: q-counter;
+}
+.question-number::after {
+  content: counter(q-counter) ".";
+}

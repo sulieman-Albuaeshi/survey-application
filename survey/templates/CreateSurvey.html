@@ -5,9 +5,9 @@
     <form class="flex flex-row gap-4" method="POST" action="{% url 'CreateSurvey' %}"
           id="survey-form"
           x-data="questionManager()"
-          @question-deleted.window="handleDeletion($event)"
           @move-question="moveQuestion($event.detail.btn, $event.detail.direction)"
-          @keydown.enter.prevent>
+          @keydown.enter.prevent
+          @htmx:after-swap.camel="setTimeout(() => { updateQuestionOrder() }, 10)"> 
         {% csrf_token %}
         {{ Question_formset.management_form }}
         <div class="sticky top-6 self-start flex flex-col gap-4 m-4 rounded-b-lg  w-[20%]">
@@ -25,6 +25,16 @@
         {% comment %} middle Survey questions th adrag and drop machnism {% endcomment %}
         <div class="flex flex-col gap-4 m-4 mx-0 md:w-[60%] lg:w-[75%]" id="question_container" x-auto-animate>
             {% for f in Question_formset.forms %}
+                {% if f.DELETE.value %}
+                    <div style="display: none;">
+                        {{ f.id }}
+                        {{ f.DELETE }} 
+                        {# Render hidden fields to maintain index integrity #}
+                        {% for hidden in f.hidden_fields %}
+                            {{ hidden }}
+                        {% endfor %}
+                    </div>
+                {% else %}
                 {% with form=f %}
                     {% if f.question_type.value == 'Multi-Choice Question'%}
                         {% include "partials/Create_survey/Questions/Multi-Choice_Question.html" %}
@@ -39,6 +49,7 @@
                         {% include "partials/Create_survey/Questions/Rating_Question.html" %}
                     {% endif %}
                 {% endwith %}
+                {% endif %}
             {% endfor %}            
             <div id="target_question" hidden class="flex flex-col gap-3 p-4"></div>
             {% include "partials/Create_survey/question_container_card.html" %}
