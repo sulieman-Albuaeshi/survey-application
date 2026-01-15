@@ -17,6 +17,18 @@
         <i class="fa-solid fa-arrow-down"></i>
     </button>
 
+   <!-- Add Similar Button -->
+    <button type="button"
+            class="btn btn-ghost btn-xs btn-circle text-gray-400 hover:text-green-600 hover:bg-green-50"
+            title="Add Similar Question Below"
+            @click="incrementTotalForms()"
+            hx-post="{% url 'add_question' %}"
+            hx-target="closest .question-card"
+            hx-swap="afterend"
+            hx-vals='js:{ question_type: "{{ form.question_type.value }}", question_count_position: document.querySelector("#id_questions-TOTAL_FORMS").value }'>
+        <i class="fa-solid fa-plus"></i> 
+    </button>
+    
     <!-- Vertical Divider -->
     <div class="w-px h-4 bg-gray-200 mx-1"></div>
     <div style="display:none;">

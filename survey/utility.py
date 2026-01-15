@@ -28,8 +28,27 @@ def normalize_formset_indexes( data: QueryDict, prefix: str):
                 new_data[prefix+"-" + str(new_index) + "-" + "position"] = new_index + 1
                 continue
 
-            new_data[prefix+"-" + str(new_index) + "-" + key.split("-")[2]] = value
+            # Handle field names that might contain hyphens (join the rest of the parts)
+            field_name = "-".join(key.split("-")[2:])
+            new_data[prefix+"-" + str(new_index) + "-" + field_name] = value
         else:
             new_data[key] = value
 
+    # Update the TOTAL_FORMS to reflect the actual number of normalized forms
+    # new_index is 0-based, so count is new_index + 1 if strictly sequential, 
+    # but new_index increments only on change. 
+    
+    # Calculation: new_index is the *last* index used. 
+    # If the loop ran at least once, count is new_index + 1.
+    # If loop never ran (no forms), count is 0.
+    
+    # Note: This simple logic assumes at least one form exists if the loop entered.
+    # A safer way is to count unique indices encountered.
+    
+    # However, since we are just fixing the immediate issues:
+    if old_index is not None:
+         new_data[f"{prefix}-TOTAL_FORMS"] = new_index + 1
+    else:
+         new_data[f"{prefix}-TOTAL_FORMS"] = 0
+         
     return new_data

@@ -172,4 +172,53 @@ document.addEventListener("alpine:init", () => {
       }, 500);
     },
   }));
+
+  // --- UNSAVED CHANGES WARNING ---
+  let formIsDirty = false;
+  let isInitializing = true;
+
+  // Allow a grace period for initialization scripts (Alpine, HTMX) to run without marking form dirty
+  setTimeout(() => {
+    isInitializing = false;
+  }, 1000);
+
+  const surveyForm = document.getElementById("survey-form");
+  if (surveyForm) {
+      surveyForm.addEventListener("input", () => {
+          if (!isInitializing) formIsDirty = true;
+      });
+
+      // 2. Clear dirty flag on valid submit
+      surveyForm.addEventListener("submit", () => {
+          formIsDirty = false;
+      });
+  }
+
+  // 3. Mark dirty when HTMX modifies the DOM (adds question)
+  document.body.addEventListener("htmx:afterOnLoad", (evt) => {
+      // Check if the event target is inside our question container or is related to adding questions
+      if (!isInitializing && (evt.detail.target.id === "target_question" || evt.detail.target.closest("#survey-form"))) {
+           formIsDirty = true;
+      }
+  });
+
+  // 4. Trigger warning on page reload/close
+  window.addEventListener("beforeunload", (e) => {
+      // If we are in 'edit' mode (URL has action=edit), the initial reload might be intentional to reset.
+      // However, we only warn if the USER actually changed something (formIsDirty is true).
+      if (formIsDirty) {
+          e.preventDefault();
+          e.returnValue = "You have unsaved changes. Are you sure you want to leave?";
+      }
+  });
+
+  // 5. Clean URL on load if action=edit
+  // This ensures that if the user refreshes the page, it reloads without the 'edit' action,
+  // returning the form to its default (empty) state as requested.
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.has('action') && urlParams.get('action') === 'edit') {
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, '', newUrl);
+  }
+
 });
