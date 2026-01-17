@@ -51,6 +51,9 @@
                     {% if f.question_type.value == 'Ranking Question' %}
                         {% include "partials/Create_survey/Questions/Ranking_Question.html" %}
                     {% endif %}
+                    {% if f.question_type.value == 'Text Question' %}
+                        {% include "partials/Create_survey/Questions/Text_Question.html" %}
+                    {% endif %}
                 {% endwith %}
                 {% endif %}
             {% endfor %}            

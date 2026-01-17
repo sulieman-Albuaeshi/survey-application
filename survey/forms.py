@@ -288,6 +288,24 @@ class RankQuestionForm(BaseQuestionForm):
 
         return cleaned_data
 
+class TextQuestionForm(BaseQuestionForm):
+    polymorphic_ctype = forms.IntegerField(widget=forms.HiddenInput())
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        ctype = ContentType.objects.get_for_model(self._meta.model)
+        self.initial['polymorphic_ctype'] = ctype.id
+
+    class Meta(BaseQuestionForm.Meta):
+        model = models.TextQuestion
+        fields = BaseQuestionForm.Meta.fields + ['is_long_answer', 'min_length', 'max_length']
+        widgets = {
+            **BaseQuestionForm.Meta.widgets,
+            'is_long_answer': forms.CheckboxInput(attrs={'class': 'toggle toggle-primary'}),
+            'min_length': forms.NumberInput(attrs={'class': 'input input-sm input-info focus:ring-0 focus:ring-offset-0', 'placeholder': 'Min Length'}),
+            'max_length': forms.NumberInput(attrs={'class': 'input input-sm input-info focus:ring-0 focus:ring-offset-0', 'placeholder': 'Max Length'}),
+        }
+
 QuestionFormSet = polymorphic_inlineformset_factory(
     models.Survey,  # Parent Model
     models.Question, # Base Child Model
@@ -297,6 +315,7 @@ QuestionFormSet = polymorphic_inlineformset_factory(
         PolymorphicFormSetChild(models.MatrixQuestion, MatrixQuestionForm),
         PolymorphicFormSetChild(models.RatingQuestion, RatingQuestionForm),
         PolymorphicFormSetChild(models.RankQuestion, RankQuestionForm),
+        PolymorphicFormSetChild(models.TextQuestion, TextQuestionForm),
     ),
     extra=0,
     can_delete=True,

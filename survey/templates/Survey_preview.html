@@ -126,6 +126,35 @@
                                 {% endfor %}
                             </div>
                         </div>
+                    
+                    <!-- 3. TEXT QUESTION -->
+                    {% elif q.NAME == 'Text Question' %}
+                        <div class="form-control mt-2">
+                            {% if q.is_long_answer %}
+                                <textarea 
+                                    class="textarea textarea-bordered textarea-lg w-full h-32 focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all placeholder:text-slate-300" 
+                                    placeholder="Please type your detailed answer here..."
+                                {% if q.min_length %}minlength="{{ q.min_length }}"{% endif %}
+                                {% if q.max_length %}maxlength="{{ q.max_length }}"{% endif %}></textarea>
+                            {% else %}
+                                <input 
+                                    type="text" 
+                                    class="input input-bordered input-lg w-full focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all placeholder:text-slate-300" 
+                                    placeholder="Type your answer..."
+                                {% if q.min_length %}minlength="{{ q.min_length }}"{% endif %}
+                                {% if q.max_length %}maxlength="{{ q.max_length }}"{% endif %} />
+                            {% endif %}
+                            
+                            {% if q.min_length or q.max_length %}
+                                <div class="label">
+                                    <span class="label-text-alt text-slate-400 mt-2">
+                                        {% if q.min_length %}Min chars: {{ q.min_length }}{% endif %}
+                                        {% if q.min_length and q.max_length %} | {% endif %}
+                                        {% if q.max_length %}Max chars: {{ q.max_length }}{% endif %}
+                                    </span>
+                                </div>
+                            {% endif %}
+                        </div>
 
                     <!-- 3. MATRIX (Clean Table) -->
                     {% elif q.NAME == 'Matrix Question' %}

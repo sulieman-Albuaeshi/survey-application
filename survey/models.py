@@ -198,6 +198,14 @@ class MatrixQuestion(Question):
 
     NAME = "Matrix Question"
 
+
+class TextQuestion(Question):
+    is_long_answer = models.BooleanField(default=False)
+    min_length = models.IntegerField(null=True, blank=True)
+    max_length = models.IntegerField(null=True, blank=True)
+    
+    NAME = "Text Question"
+
     
 class RatingQuestion(Question):
     range_min = models.IntegerField(default=1)
