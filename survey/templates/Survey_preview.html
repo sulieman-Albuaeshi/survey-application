@@ -216,6 +216,70 @@
                                 </span>
                             </div>
                         </div>
+
+                    <!-- 5. RANKING QUESTION -->
+                    {% elif q.NAME == 'Ranking Question' %}
+                        <div class="mt-4" 
+                             x-data="{ 
+                                options: [
+                                    {% for option in q.options %}
+                                        '{{ option|escapejs }}'{% if not forloop.last %},{% endif %}
+                                    {% endfor %}
+                                ],
+                                swap(fromIndex, toIndex) {
+                                    if (toIndex >= 0 && toIndex < this.options.length) {
+                                        const temp = this.options[fromIndex];
+                                        this.options[fromIndex] = this.options[toIndex];
+                                        this.options[toIndex] = temp;
+                                    }
+                                }
+                             }">
+                            <!-- Helper Text -->
+                            <div class="flex items-center gap-2 mb-3">
+                                <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">
+                                    Rank Options
+                                </span>
+                            </div>
+
+                            <!-- Sortable List (Dynamic with Alpine) -->
+                            <div class="flex flex-col gap-3 relative" x-auto-animate>
+                                <template x-for="(option, index) in options" :key="option">
+                                    <div class="group relative flex items-center gap-2 p-4 bg-white border border-slate-200 rounded-xl shadow-sm hover:border-primary/50 hover:shadow-md transition-all cursor-move select-none active:cursor-grabbing">
+                                         
+                                         <!-- Rank Badge -->
+                                         <div class="flex-none w-8 h-8 rounded-full bg-slate-50 border border-slate-200 text-slate-500 font-bold text-sm flex items-center justify-center mr-4 group-hover:bg-primary group-hover:border-primary group-hover:text-white transition-colors shadow-sm" 
+                                              x-text="index + 1">
+                                         </div>
+
+                                         <!-- Option Text -->
+                                         <div class="flex-grow font-medium text-slate-700 text-base" x-text="option">
+                                         </div>
+
+                                         <!-- Actions -->
+                                         <div class="flex items-center gap-2 opacity-50 group-hover:opacity-100 transition-opacity duration-200">
+                                            
+                                            <!-- Sort Buttons (Vertical Bundle) -->
+                                            <div class="flex flex-row gap-0.5 border-r border-slate-100 pr-3 mr-1">
+                                                <button type="button" class="btn btn-ghost btn-xs w-6 h-5 min-h-0 p-0 rounded text-slate-400 hover:text-primary hover:bg-primary/10"
+                                                    @click="swap(index, index - 1)"
+                                                    title="Move Up"
+                                                    :disabled="index === 0"
+                                                    :class="{'opacity-30 cursor-not-allowed': index === 0}">
+                                                    <i class="fa-solid fa-chevron-up text-xs"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-ghost btn-xs w-6 h-5 min-h-0 p-0 rounded text-slate-400 hover:text-primary hover:bg-primary/10"
+                                                    @click="swap(index, index + 1)"
+                                                    title="Move Down"
+                                                    :disabled="index === options.length - 1"
+                                                    :class="{'opacity-30 cursor-not-allowed': index === options.length - 1}">
+                                                    <i class="fa-solid fa-chevron-down text-xs"></i>
+                                                </button>
+                                            </div>
+                                         </div> <!-- End Actions Div -->
+                                    </div> 
+                                </template>
+                            </div>
+                        </div>
                     {% endif %}
 
                 </div>
