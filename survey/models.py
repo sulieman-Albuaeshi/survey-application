@@ -206,6 +206,38 @@ class RatingQuestion(Question):
     max_label = models.CharField(max_length=50, blank=True, null=True) # e.g. "Excellent"
     NAME = "Rating Question"
 
+class RankQuestion(Question):
+    options = models.JSONField(default=list)
+    NAME = "Ranking Question"
+
+    def get_average_ranks(self):
+        """
+        Returns a dict of {option_name: average_rank_position}.
+        Lower number = Better rank (1st place, 2nd place, etc.)
+        """
+        answers = Answer.objects.filter(question=self)
+        stats = {opt: {'sum': 0, 'count': 0} for opt in self.options}
+        
+        for answer in answers:
+            # answer_data is expected to be an ordered list ['Option A', 'Option B']
+            ranking_list = answer.answer_data 
+            if isinstance(ranking_list, list):
+                for index, item in enumerate(ranking_list):
+                    if item in stats:
+                        # index + 1 because rank starts at 1, not 0
+                        stats[item]['sum'] += (index + 1)
+                        stats[item]['count'] += 1
+        
+        results = {}
+        for opt, data in stats.items():
+            if data['count'] > 0:
+                results[opt] = round(data['sum'] / data['count'], 2)
+            else:
+                results[opt] = 0
+        
+        # Sort by rank (lowest score is best)
+        return dict(sorted(results.items(), key=lambda item: item[1]))
+
 class Response(models.Model):
     survey = models.ForeignKey(Survey, on_delete=models.CASCADE, related_name='responses')
     respondent = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True)

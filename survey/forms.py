@@ -254,6 +254,40 @@ class RatingQuestionForm(BaseQuestionForm):
         
         return cleaned_data
 
+class RankQuestionForm(BaseQuestionForm):
+    polymorphic_ctype = forms.IntegerField(widget=forms.HiddenInput())
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        ctype = ContentType.objects.get_for_model(self._meta.model)
+        self.initial['polymorphic_ctype'] = ctype.id
+
+    class Meta(BaseQuestionForm.Meta):
+        model = models.RankQuestion
+        fields = BaseQuestionForm.Meta.fields + ['options']
+        widgets = {
+            **BaseQuestionForm.Meta.widgets,
+            'options': forms.HiddenInput(),
+        }
+
+    def clean(self):
+        """
+        This implements the +validateSelectionsCount() logic from your diagram
+        """
+        cleaned_data = super().clean()
+        
+        if self.cleaned_data.get('DELETE'):
+            return cleaned_data
+
+        options = cleaned_data.get('options', [])
+
+
+        # 1. Validate Options
+        if not options or len(options) < 2:
+            self.add_error('options', "You need at least two options to rank.")
+
+        return cleaned_data
+
 QuestionFormSet = polymorphic_inlineformset_factory(
     models.Survey,  # Parent Model
     models.Question, # Base Child Model
@@ -262,6 +296,7 @@ QuestionFormSet = polymorphic_inlineformset_factory(
         PolymorphicFormSetChild(models.LikertQuestion, LikertQuestionForm),
         PolymorphicFormSetChild(models.MatrixQuestion, MatrixQuestionForm),
         PolymorphicFormSetChild(models.RatingQuestion, RatingQuestionForm),
+        PolymorphicFormSetChild(models.RankQuestion, RankQuestionForm),
     ),
     extra=0,
     can_delete=True,
