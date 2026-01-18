@@ -1,0 +1,43 @@
+<div class="card section-header bg-white/90 backdrop-blur shadow-lg border border-gray-200/70 w-full group transition-all hover:shadow-xl">
+    <div class="card-body p-6 relative">
+        {% include "partials/Create_survey/Questions/question_header_card.html" %}
+        {{ form.position }}
+        {{ form.polymorphic_ctype }}
+        {{ form.question_type }}
+        <div class="flex items-start justify-between gap-4 mt-6">
+            <div class="flex items-start gap-4 ">
+                <div class="mt-1 h-10 w-10 rounded-xl bg-primary/15 text-primary flex items-center justify-center ring-1 ring-primary/20">
+                    <!-- divider icon -->
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16M4 12h10M4 17h16"/>
+                    </svg>
+                </div>
+
+                <div>
+                    <div class="text-sm font-semibold text-base-content/90">Section</div>
+                    <div class="text-xs text-base-content/60">Creates a new page title (no answer collected)</div>
+                </div>
+            </div>
+
+            <span class="badge badge-outline badge-info whitespace-nowrap">Page Break</span>
+        </div>
+
+        <div class="mt-5 rounded-xl border border-primary/20 bg-primary/5 p-4">
+            <label class="label pb-1">
+                <span class="label-text font-semibold">Section Title</span>
+            </label>
+            <div class="mt-1">
+                {{ form.label }}
+            </div>
+
+            {% if form.helper_text %}
+                <label class="label pt-4 pb-1">
+                    <span class="label-text">Subtitle (optional)</span>
+                </label>
+                <div class="mt-1">
+                    {{ form.helper_text }}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>

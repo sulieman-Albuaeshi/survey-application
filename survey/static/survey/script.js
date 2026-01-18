@@ -14,7 +14,7 @@ document.addEventListener("alpine:init", () => {
         // 1. Find the hidden input field that Django created.
         // The form prefix (e.g., 'multi-0') is passed in directly from the template.
         this.hiddenInput = this.$el.querySelector(
-          `input[type=hidden][name="${questionPrefix}-${type}"]`
+          `input[type=hidden][name="${questionPrefix}-${type}"]`,
         );
         console.log(" this.hiddenInput", this.hiddenInput);
 
@@ -46,7 +46,7 @@ document.addEventListener("alpine:init", () => {
       removeOption(index) {
         this.options.splice(index, 1);
       },
-    })
+    }),
   );
 
   Alpine.data("questionManager", () => ({
@@ -57,7 +57,7 @@ document.addEventListener("alpine:init", () => {
       // 1. FIND THE DJANGO MANAGEMENT FORM INPUT
       // This input holds the true number of forms currently on the page
       const totalFormsInput = document.querySelector(
-        `#id_questions-TOTAL_FORMS`
+        `#id_questions-TOTAL_FORMS`,
       );
       if (totalFormsInput) {
         // Sync position with current total forms
@@ -68,7 +68,9 @@ document.addEventListener("alpine:init", () => {
 
     moveQuestion(btnElement, direction) {
       // 1. Find the card and its container
-      const currentCard = btnElement.closest(".question-card");
+      const currentCard =
+        btnElement.closest(".question-card") ||
+        btnElement.closest(".section-header");
       const container = document.getElementById("question_container"); // Ensure your main div has this ID
 
       if (!currentCard || !container) return;
@@ -95,7 +97,7 @@ document.addEventListener("alpine:init", () => {
 
     _updateTotalForms(delta) {
       const totalFormsInput = document.querySelector(
-        `#id_questions-TOTAL_FORMS`
+        `#id_questions-TOTAL_FORMS`,
       );
       if (!totalFormsInput) {
         console.error(`TOTAL_FORMS input not found `);
@@ -143,7 +145,9 @@ document.addEventListener("alpine:init", () => {
     },
 
     softDelete(btn) {
-      const card = btn.closest(".question-card");
+      const card =
+        btn.closest(".section-header") || btn.closest(".question-card");
+      console.log("card:", card);
       if (!card) return;
 
       // 1. Find the Django DELETE checkbox inside this card

@@ -54,6 +54,9 @@
                     {% if f.question_type.value == 'Text Question' %}
                         {% include "partials/Create_survey/Questions/Text_Question.html" %}
                     {% endif %}
+                    {% if f.question_type.value == 'Section Header' %}
+                        {% include "partials/Create_survey/Questions/Section_Header.html" %}
+                    {% endif %}
                 {% endwith %}
                 {% endif %}
             {% endfor %}            

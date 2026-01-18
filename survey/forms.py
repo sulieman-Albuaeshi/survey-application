@@ -306,6 +306,31 @@ class TextQuestionForm(BaseQuestionForm):
             'max_length': forms.NumberInput(attrs={'class': 'input input-sm input-info focus:ring-0 focus:ring-offset-0', 'placeholder': 'Max Length'}),
         }
 
+
+class SectionHeaderForm(BaseQuestionForm):
+    polymorphic_ctype = forms.IntegerField(widget=forms.HiddenInput())
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        ctype = ContentType.objects.get_for_model(self._meta.model)
+        self.initial['polymorphic_ctype'] = ctype.id
+
+        # Section headers are not answerable questions.
+        self.fields.pop('required', None)
+
+    class Meta(BaseQuestionForm.Meta):
+        model = models.SectionHeader
+        fields = ['label',  'helper_text', 'position']
+        widgets = {
+            **BaseQuestionForm.Meta.widgets,
+            'label': forms.TextInput(attrs={'class': 'input input-md input-primary w-full font-semibold', 'placeholder': 'Section title'}),
+            'helper_text': forms.TextInput(attrs={
+                'class': 'input input-bordered w-full',
+                'placeholder': 'Optional subtitle',
+            }),
+            'position': forms.HiddenInput(),
+        }
+
 QuestionFormSet = polymorphic_inlineformset_factory(
     models.Survey,  # Parent Model
     models.Question, # Base Child Model
@@ -316,6 +341,7 @@ QuestionFormSet = polymorphic_inlineformset_factory(
         PolymorphicFormSetChild(models.RatingQuestion, RatingQuestionForm),
         PolymorphicFormSetChild(models.RankQuestion, RankQuestionForm),
         PolymorphicFormSetChild(models.TextQuestion, TextQuestionForm),
+        PolymorphicFormSetChild(models.SectionHeader, SectionHeaderForm),
     ),
     extra=0,
     can_delete=True,

@@ -198,6 +198,14 @@ class MatrixQuestion(Question):
 
     NAME = "Matrix Question"
 
+    def get_numeric_answer(self, answer_data):
+        # Number of answered rows (best-effort)
+        if not answer_data:
+            return ""
+        if isinstance(answer_data, dict):
+            return str(len([v for v in answer_data.values() if v not in (None, "")]))
+        return "1"
+
 
 class TextQuestion(Question):
     is_long_answer = models.BooleanField(default=False)
@@ -205,6 +213,20 @@ class TextQuestion(Question):
     max_length = models.IntegerField(null=True, blank=True)
     
     NAME = "Text Question"
+
+    def get_numeric_answer(self, answer_data):
+        # 1 if answered, 0 if not (simple completion metric)
+        return "1" if answer_data not in (None, "") else "0"
+
+
+class SectionHeader(Question):
+    """A page title / separator used to split a survey into sections."""
+
+    NAME = "Section Header"
+
+    def get_numeric_answer(self, answer_data):
+        # Section headers do not collect answers.
+        return ""
 
     
 class RatingQuestion(Question):
