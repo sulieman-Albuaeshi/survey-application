@@ -78,17 +78,36 @@ document.addEventListener("alpine:init", () => {
       // 2. Find the sibling to swap with
       if (direction === -1) {
         // Move UP
-        const prevCard = currentCard.previousElementSibling;
-        // Check if prevCard exists and is actually a question card (not a hidden div)
-        if (prevCard && prevCard.classList.contains("question-card")) {
+        // Loop to find the previous visible element
+        let prevCard = currentCard.previousElementSibling;
+        while (prevCard && prevCard.style.display === "none") {
+          prevCard = prevCard.previousElementSibling;
+        }
+
+        // Check if prevCard exists and is actually a question card or section header
+        if (
+          prevCard &&
+          (prevCard.classList.contains("question-card") ||
+            prevCard.classList.contains("section-header"))
+        ) {
           container.insertBefore(currentCard, prevCard);
           this.updateQuestionOrder();
         }
       } else {
         // Move DOWN
-        const nextCard = currentCard.nextElementSibling;
-        if (nextCard && nextCard.classList.contains("question-card")) {
+        // Loop to find the next visible element
+        let nextCard = currentCard.nextElementSibling;
+        while (nextCard && nextCard.style.display === "none") {
+          nextCard = nextCard.nextElementSibling;
+        }
+
+        if (
+          nextCard &&
+          (nextCard.classList.contains("question-card") ||
+            nextCard.classList.contains("section-header"))
+        ) {
           // To move down, we insert the *next* card before the *current* card
+          // This effectively swaps them in the DOM order relative to each other
           container.insertBefore(nextCard, currentCard);
           this.updateQuestionOrder();
         }
@@ -122,25 +141,33 @@ document.addEventListener("alpine:init", () => {
     },
 
     updateQuestionOrder() {
-      const allQuestions = document.querySelectorAll(".question-card");
+      const allQuestions = document.querySelectorAll(
+        ".question-card, .section-header",
+      );
 
-      let visualIndex = 1; // Start counting from 1
+      let visualIndex = 1; // Start counting from 1 for UI numbering
+      let databaseIndex = 1; // Start counting from 1 for database position
 
       allQuestions.forEach((card) => {
         // 1. SKIP deleted questions (hidden ones)
         if (card.style.display === "none") return;
 
-        // 2. Update Visual Number
-        const numberSpan = card.querySelector(".question-number");
-        if (numberSpan) numberSpan.innerText = `${visualIndex}.`;
-
-        // 3. Update Hidden Position Input
+        // 2. Update Hidden Position Input (For BOTH questions and headers)
+        // This ensures the backend gets the correct order including headers
         const positionInput = card.querySelector('input[name$="-position"]');
         if (positionInput) {
-          positionInput.value = visualIndex;
+          positionInput.value = databaseIndex;
         }
+        databaseIndex++;
 
-        visualIndex++; // Increment visual counter
+        // 3. Update Visual Number (ONLY for Question Cards)
+        if (card.classList.contains("question-card")) {
+          const numberSpan = card.querySelector(".question-number");
+          if (numberSpan) {
+            numberSpan.innerText = `${visualIndex}.`;
+          }
+          visualIndex++; // Only increment visual counter for questions
+        }
       });
     },
 
@@ -160,7 +187,8 @@ document.addEventListener("alpine:init", () => {
         console.log("koko", deleteInput);
         deleteInput.value = "on";
         deleteInput.checked = true;
-        console.log("koko:", deleteInput);
+        deleteInput.value = "on"; // Redundant for checkbox but safe
+
         card.style.display = "none";
         // 2. Hide the card visually (DO NOT REMOVE FROM DOM)
       }

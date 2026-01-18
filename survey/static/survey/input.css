@@ -3,7 +3,10 @@
 @plugin "flowbite/plugin";
 @source "../../node_modules/flowbite";
 @plugin "daisyui" {
-  themes: light --default, dark --prefersdark, cupcake;
+  themes:
+    light --default,
+    dark --prefersdark,
+    cupcake;
 }
 
 .Pagination {
@@ -59,15 +62,4 @@
 /* Apply animation to the icon when the button (group) is hovered */
 .wiggle:hover .wiggle-icon {
   animation: wiggle 0.3s ease-in-out infinite;
-}
-
-/* Question numbering */
-#question_container {
-  counter-reset: q-counter;
-}
-.question-card:not([style*="display: none"]) {
-  counter-increment: q-counter;
-}
-.question-number::after {
-  content: counter(q-counter) ".";
 }
