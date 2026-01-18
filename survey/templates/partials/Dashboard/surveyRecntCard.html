@@ -1,15 +1,15 @@
 <div class="card w-full bg-white shadow-md border border-gray-200 h-[270px]">
     <div class="card-body">
         <div class="flex items-center justify-between">
-            <h2 class="card-title font-bold text-xl line-clamp-1" title="{{ title }}">
+            <h2 class="card-title font-bold text-xl line-clamp-1" title="{{ survey.title }}">
                 <!-- title -->
-                {{ title }}
+                {{  survey.title }}
             </h2>
-            <span class="bg-yellow-100 text-yellow-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-yellow-900 dark:text-yellow-300">Draft</span>
+            <span class="text-lg font-normal me-2 px-2.5 py-0.5 rounded-full {{ survey.status_badge_class }}"> {{ survey.state }} </span>
         </div>
         <p class="text-gray-500 mt-1 my-1 line-clamp-3">
             <!-- description -->
-            {{ description }}
+            {{ survey.description }}
         </p>
         <div class="flex items-center justify-between mt-4 text-sm text-gray-500">
             <div class="flex items-center">
@@ -21,10 +21,10 @@
                     <path d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.5 3.5 0 0 1 9 12.5a3.5 3.5 0 0 1 5.951 2.012A8.949 8.949 0 0 1 10 18Z" />
                 </svg>
                 <!-- user -->
-                {{ created_by }}
+                {{ survey.created_by }}
             </div>
             <div class="text-xs text-gray-400">
-                <span>Updated:  <span class="inline w-auto xl:block xl:w-[105px]">{{ last_updated|date:"Y-m-d H:i:s" }}</span> </span>
+                <span>Updated:  <span class="inline w-auto xl:block xl:w-[105px]">{{ survey.last_updated|date:"Y-m-d H:i:s" }}</span> </span>
             </div>
         </div>
         <div class="card-actions justify-end mt-4">

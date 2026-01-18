@@ -7,7 +7,7 @@
 {% endcomment %}
 <div class="grid grid-cols-1 w-full md:grid-cols-2 md:max-2xl:grid-cols-2  xl:grid-cols-4 gap-6 p-4">
     {% for survey in recent_surveys %}
-        {% include "partials/Dashboard/surveyRecntCard.html" with title=survey.title description=survey.description created_by=survey.created_by last_updated=survey.last_updated %}
+        {% include "partials/Dashboard/surveyRecntCard.html" with survey=survey %}
     {% endfor %}
 </div>
 <div class="flex flex-row gap-4 w-full items-start  justify-center">
