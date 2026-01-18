@@ -66,6 +66,9 @@ class Question(PolymorphicModel):
     required = models.BooleanField(default=False)
     position = models.IntegerField()
 
+    class Meta:
+        ordering = ['position']
+
     @classmethod
     def get_available_type_names(cls):
         """Returns a list of NAME static attributes from all direct subclasses."""

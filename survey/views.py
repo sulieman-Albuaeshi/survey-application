@@ -56,6 +56,9 @@ class SurveyCreateView(CreateView):
 
                 survey = form.save(commit=False)
                 questions = question_formset.save(commit=False)
+                
+                # Sort questions by position to ensure correct order in preview
+                questions.sort(key=lambda x: x.position)
 
                 context = {
                     'survey': survey,
@@ -75,6 +78,19 @@ class SurveyCreateView(CreateView):
             # If backup data exists, use it to pre-fill the form and formset
             form = SurveyForm(backup_data)
             question_formset = QuestionFormSet(backup_data)
+
+            # Manually sort the forms in the formset by their 'position' field value
+            # This ensures that when the user returns to edit, the questions are in the correct order
+            # even if they were added out of sequence (e.g. inserted in the middle).
+            def get_pos(f):
+                try:
+                    val = f['position'].value()
+                    return int(val) if val is not None else 9999
+                except (ValueError, TypeError):
+                    return 9999
+            
+            # Sort the internal list of forms
+            question_formset.forms.sort(key=get_pos)
 
             context ={
                 'form': form,
