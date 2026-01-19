@@ -25,7 +25,7 @@ any 'recently_viewed': recently_viewed, # list of recently viewed items }
           <!-- to use the get_surveys filter -->
           {% load survey_extras %} 
           {% for survey in page|get_surveys %} 
-          {%include "partials/Dashboard/tableRow.html" with survey=survey %} 
+            {%include "partials/Dashboard/tableRow.html" with survey=survey %} 
           {% endfor %}
         </tbody>
       </table>

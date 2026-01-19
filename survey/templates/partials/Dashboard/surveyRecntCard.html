@@ -1,35 +1,94 @@
-<div class="card w-full bg-white shadow-md border border-gray-200 h-[270px]">
-    <div class="card-body">
-        <div class="flex items-center justify-between">
-            <h2 class="card-title font-bold text-xl line-clamp-1" title="{{ survey.title }}">
-                <!-- title -->
-                {{  survey.title }}
+{% load survey_extras %}
+<div class="card w-full bg-base-100 shadow-sm hover:shadow-lg transition-all duration-300 border border-base-200 h-[260px] group">
+    <div class="card-body p-5 flex flex-col h-full">
+        <!-- Header: Title & Status -->
+        <div class="flex items-start justify-between gap-2">
+            <h2 class="card-title text-2xl font-bold text-base-content line-clamp-1 leading-tight transition-colors" title="{{ survey.title }}">
+                {{ survey.title }}
             </h2>
-            <span class="text-lg font-normal me-2 px-2.5 py-0.5 rounded-full {{ survey.status_badge_class }}"> {{ survey.state }} </span>
+            <!-- Status Badge Placeholder (Target for OOB swap) -->
+            <span id="survey-status-badge-{{ survey.uuid }}" 
+                  class="badge badge-md font-medium border-0 py-3 px-3 {{ survey.status_badge_class }}">
+                {{ survey.state|title }}
+            </span>
         </div>
-        <p class="text-gray-500 mt-1 my-1 line-clamp-3">
-            <!-- description -->
-            {{ survey.description }}
+
+        <!-- Description (Moved above time as requested) -->
+        <p class="text-sm text-base-content/70 mt-2 line-clamp-2" title="{{ survey.description }}">
+            {{ survey.description|default:"No description provided." }}
         </p>
-        <div class="flex items-center justify-between mt-4 text-sm text-gray-500">
-            <div class="flex items-center">
-                <svg class="w-4 h-4 mr-1.5"
-                     aria-hidden="true"
-                     xmlns="http://www.w3.org/2000/svg"
-                     fill="currentColor"
-                     viewBox="0 0 20 20">
-                    <path d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.5 3.5 0 0 1 9 12.5a3.5 3.5 0 0 1 5.951 2.012A8.949 8.949 0 0 1 10 18Z" />
-                </svg>
-                <!-- user -->
-                {{ survey.created_by }}
+        
+        <!-- UUID Placeholder (Always present for OOB swap) -->
+        <div id="survey-uuid-{{ survey.uuid }}" class="min-h-[1.25rem] mt-1 flex items-center">
+            {% if survey.state == 'published' %}
+            <div class="flex items-center gap-2 bg-base-200/50 rounded-md pr-1 pl-2 py-0.5 border border-base-200 hover:border-base-300 transition-colors group/copy"
+                 x-data="{ copied: false, text: '/survey/{{survey.uuid}}' }">
+                <span class="text-xs font-mono text-base-content/60 truncate max-w-[200px] select-all cursor-text" title="{{survey.uuid}}">{{survey.uuid}}</span>
+                <button class="btn btn-ghost btn-xs btn-square h-5 w-5 min-h-0"
+                        @click.stop="navigator.clipboard.writeText(window.location.origin + text); copied = true; setTimeout(() => copied = false, 2000)"
+                        title="Copy survey link">
+                    <!-- Copy Icon -->
+                    <svg x-show="!copied" class="w-3.5 h-3.5 text-base-content/50 group-hover/copy:text-primary transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                    </svg>
+                    <!-- Check Icon -->
+                    <svg x-show="copied" class="w-3.5 h-3.5 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="display: none;">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                </button>
             </div>
-            <div class="text-xs text-gray-400">
-                <span>Updated:  <span class="inline w-auto xl:block xl:w-[105px]">{{ survey.last_updated|date:"Y-m-d H:i:s" }}</span> </span>
-            </div>
+            {% endif %}
         </div>
-        <div class="card-actions justify-end mt-4">
-            <button class="btn btn-sm btn-outline xl:max-2xl:btn-xs xl:p-3 ">View Details</button>
-            <button class="btn btn-sm btn-primary xl:max-2xl:btn-xs">Begin Survey</button>
+
+        <!-- Update Time -->
+        <div class="text-xs text-base-content/50 mt-2 flex items-center mb-auto">
+            <svg class="w-3 h-3 mr-1.5 opacity-70" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span class="font-medium">Updated {{ survey.last_updated|timesince }} ago</span>
+        </div>
+
+        <!-- Footer -->
+        <div class="pt-4 mt-2 border-t border-base-200 flex items-center justify-between gap-3">
+            <!-- Admin / User Info -->
+            <div class="flex items-center gap-2 min-w-0" title="Created by {{ survey.created_by.username }}">
+                <div class="placeholder">
+                    <div class="{{ survey.created_by.username|random_color }} text-white w-8 h-8 rounded-full ring ring-base-200 ring-offset-base-100 ring-offset-1 flex items-center justify-center">
+                        <span class="text-xs font-bold">{{ survey.created_by.username|slice:":1"|upper }}</span>
+                    </div>
+                </div>
+                <div class="flex flex-col truncate">
+                     <span class="text-xs font-semibold text-base-content/80 truncate">{{ survey.created_by.username }}</span>
+                     <span class="text-[10px] text-base-content/50">Admin</span>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex items-center gap-2">
+                <a class="btn btn-sm btn-ghost btn-square tooltip tooltip-top" 
+                   data-tip="View Responses"
+                   href="{% url 'SurveyResponseDetail' survey.uuid %}">
+                    <svg class="w-5 h-5 text-base-content/70" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z"></path>
+                    </svg>
+                </a>
+
+                {% if survey.state == 'published' %}
+                    <button 
+                        hx-post="{% url 'ToggleSurveyStatus' survey.uuid %}"
+                        hx-swap="outerHTML"
+                        class="btn btn-sm btn-warning xl:max-2xl:btn-xs">
+                        End Survey
+                    </button>
+                {% else %}
+                    <button 
+                        hx-post="{% url 'ToggleSurveyStatus' survey.uuid %}"
+                        hx-swap="outerHTML"
+                        class="btn btn-sm btn-primary xl:max-2xl:btn-xs">
+                        Start Survey
+                    </button>
+                {% endif %}
+            </div>
         </div>
     </div>
 </div>

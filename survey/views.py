@@ -585,3 +585,20 @@ def SurveyResponsesOverviewTable(request, uuid):
         'table_data': table_data,
     }
     return render(request, 'partials/SurveyResponseDetail/responses_overview_table.html', context)
+
+@require_POST
+def ToggleSurveyStatus(request, uuid):
+    """Toggle survey status between 'draft' and 'published'."""
+    survey = get_object_or_404(Survey, uuid=uuid)
+    
+    if survey.state == 'published':
+        survey.state = 'draft'
+    else:
+        survey.state = 'published'
+        
+    survey.save()
+    
+    # If the request is from the dashboard card, we might want to update the whole card or specific parts.
+    # Here we return the button and using OOB swap, we can update the status badge as well.
+    
+    return render(request, 'partials/Dashboard/survey_toggle_button.html', {'survey': survey})

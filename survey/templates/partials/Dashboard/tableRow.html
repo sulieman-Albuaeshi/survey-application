@@ -5,7 +5,7 @@
     <th scope="row" class="px-4 py-3 font-medium text-gray-600">{{ survey.title }}</th>
     <td class="mx-4 my-3 line-clamp-3">{{ survey.description }}</td>
     <td class="px-2 py-3 rounded-full text-center">
-        <span class="rounded-full px-4 py-2 {{ survey.status_badge_class }} ">{{ survey.state }}</span>
+        <span id="survey-table-status-{{ survey.uuid }}" class="rounded-full px-4 py-2 {{ survey.status_badge_class }} ">{{ survey.state }}</span>
     </td>
     <!-- TODO -->
     <td class="px-4 py-3 text-center">{{ survey.response_count }}</td>
