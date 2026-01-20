@@ -538,13 +538,6 @@ def DeleteSurvey(request, uuid):
     item.delete()
     return HttpResponse(status=200)
 
-def CallTheModal(request):
-    return render(request, 'partials/Modalfile.html')
-
-def CreateFile(request):
-    filename = request.POST.get('filename')
-    context = {'filename': filename}
-    return render(request, 'partials/subFile.html',context)
 def SurveyResponsesOverviewTable(request, uuid):
     """
     Returns the HTML for the responses overview table (numeric values).

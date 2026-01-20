@@ -1,10 +1,10 @@
 {% comment %} context = { 'page': page, 'query': query, # the search query if
 any 'recently_viewed': recently_viewed, # list of recently viewed items }
 {%endcomment %}
-<div class="w-full px-4">
+<div class="w-full">
   <!-- Start coding here -->
   <div
-    class="bg-white shadow-lg border border-gray-200 relative sm:rounded-lg overflow-hidden w-full"
+    class="bg-white shadow-sm hover:shadow-md transition-shadow duration-300 border border-slate-200 relative sm:rounded-xl overflow-hidden w-full"
   >
     <!-- header bar -->
     {% include "partials/table_filters.html" with filter_url="Dashboard" filter_target=".survey-table-body" filter_form_id="dashboard-filter-form" show_dashboard_actions=True %}
