@@ -6,7 +6,7 @@
      @htmx:after-swap.camel="setTimeout(() => { updateQuestionOrder() }, 10)">
     
     {% comment %} post request in the viwe i use  "request.POST.get('question_count')" {% endcomment %}
-    <form class="grid grid-cols-1 lg:grid-cols-12 gap-6 p-4 max-w-[1600px] mx-auto" method="POST" action="{% url 'CreateSurvey' %}"
+    <form class="grid grid-cols-1 lg:grid-cols-12 gap-6 p-4 max-w-[1600px] mx-auto" method="POST" action=""
           id="survey-form"
           @keydown.enter.prevent> 
         {% csrf_token %}
@@ -76,6 +76,10 @@
                     </div>
                 {% else %}
                 {% with form=f %}
+                    {% for hidden in f.hidden_fields %}
+                        {{ hidden }}
+                    {% endfor %}
+                    {{ f.id }}
                     {% if f.question_type.value == 'Multi-Choice Question'%}
                         {% include "partials/Create_survey/Questions/Multi-Choice_Question.html" %}
                     {% endif %}

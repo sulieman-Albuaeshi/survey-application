@@ -28,7 +28,7 @@
 
     <!-- UPDATED NAVBAR END -->
     <div class="navbar-end">
-        {% if request.resolver_match.url_name == 'CreateSurvey' %}
+        {% if request.resolver_match.url_name == 'CreateSurvey' or request.resolver_match.url_name == 'EditSurvey'%}
             <!-- Show these buttons ONLY on the Create Survey page -->
             <div class="flex items-center gap-3">
                 <!-- Preview Button -->

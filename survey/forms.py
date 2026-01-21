@@ -17,6 +17,13 @@ class SurveyForm(forms.ModelForm):
 
 class BaseQuestionForm(forms.ModelForm):
     question_type = forms.CharField(widget=forms.HiddenInput()) 
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.pk:
+            if hasattr(self.instance, 'NAME'):
+                self.initial['question_type'] = self.instance.NAME
+
     class Meta:
         model = models.Question
         fields = ['label', 'helper_text', 'required', 'position']

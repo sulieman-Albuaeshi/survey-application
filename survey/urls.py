@@ -7,10 +7,12 @@ urlpatterns = [
     path('__debug__/', include('debug_toolbar.urls')),
     path('Dashboard', views.Index, name='Dashboard'),
     path('Dashboard/<int:page_number>', views.Index, name='Dashboard_Page'),
-    path('CreateSurvey', views.SurveyCreateView.as_view(), name='CreateSurvey'),
+    path('CreateSurvey', views.create_survey, name='CreateSurvey'),
+    path('CreateSurvey/<uuid:uuid>/', views.edit_survey, name='EditSurvey'),
     path('create-survey/add-question/', views.AddQuestionFormView.as_view(), name='add_question'),
     path('survey/<uuid:uuid>', views.survey_Start_View, name='survey_start'),
-
+    # path("survey/<uuid:uuid>/copy", views.CopySurveyView.as_view(), name="Copy"),
+    
     # the views need to be Change
     path('responses', views.Responses, name='Responses'),
     path('responses/<int:page_number>', views.Responses, name='Responses_Page'),
