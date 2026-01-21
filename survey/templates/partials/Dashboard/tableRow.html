@@ -31,8 +31,8 @@
                 <li>
                     <a href="#">Show</a>
                 </li>
-                <li>
-                    <a href="#">Edit</a>
+                <li id="edit-survey-link-{{ survey.uuid }}">
+                    <a href="{% url 'EditSurvey' survey.uuid %}" {% if survey.state == 'published' %}class="text-gray-400 pointer-events-none"{% endif %}>Edit</a>
                 </li>
                 <div class="divider my-0"></div>
                 <li>

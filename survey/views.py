@@ -594,7 +594,7 @@ def ToggleSurveyStatus(request, uuid):
     # If the request is from the dashboard card, we might want to update the whole card or specific parts.
     # Here we return the button and using OOB swap, we can update the status badge as well.
     
-    return render(request, 'partials/Dashboard/survey_toggle_button.html', {'survey': survey})
+    return render(request, 'partials/Dashboard/survey_toggle_button_with_oob.html', {'survey': survey})
 
 def survey_Start_View(request, uuid):
     """View to start taking the survey."""

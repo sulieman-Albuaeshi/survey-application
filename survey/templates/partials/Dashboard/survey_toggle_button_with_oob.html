@@ -14,18 +14,16 @@
     </button>
 {% endif %}
 
-<span id="survey-status-badge-{{ survey.uuid }}" 
-      hx-swap-oob="true" 
-      class="text-lg font-normal me-2 px-2.5 py-0.5 rounded-full {{ survey.status_badge_class }}">
-    {{ survey.state|title }}
-</span>
 
+{% comment %} in survey table row {% endcomment %}
 <span id="survey-table-status-{{ survey.uuid }}" 
       hx-swap-oob="true" 
       class="rounded-full px-4 py-2 {{ survey.status_badge_class }}">
     {{ survey.state }}
 </span>
 
+
+{% comment %} in survey card {% endcomment %}
 <div id="survey-uuid-{{ survey.uuid }}" hx-swap-oob="true" class="min-h-[1.25rem] mt-1 flex items-center">
     {% if survey.state == 'published' %}
     <div class="flex items-center gap-2 bg-base-200/50 rounded-md pr-1 pl-2 py-0.5 border border-base-200 hover:border-base-300 transition-colors group/copy"
@@ -46,3 +44,16 @@
     </div>
     {% endif %}
 </div>
+
+
+<span id="survey-status-badge-{{ survey.uuid }}" 
+      hx-swap-oob="true" 
+      class="text-lg font-normal me-2 px-2.5 py-0.5 rounded-full {{ survey.status_badge_class }}">
+    {{ survey.state|title }}
+</span>
+
+
+<li id="edit-survey-link-{{ survey.uuid }}" 
+    hx-swap-oob="true">
+    <a href="{% url 'EditSurvey' survey.uuid %}" {% if survey.state == 'published' %}class="text-gray-400 pointer-events-none"{% endif %}>Edit</a>
+</li>
