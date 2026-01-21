@@ -618,11 +618,16 @@ def SurveyResponsesOverviewTable(request, uuid):
     # Exclude SectionHeader from the questions list
     questions = survey.questions.instance_of(Question).not_instance_of(SectionHeader).order_by('position')
     
-    responses = Response.objects.filter(survey=survey).order_by('-created_at').prefetch_related('answers__question')
+    responses_list = Response.objects.filter(survey=survey).order_by('-created_at').prefetch_related('answers__question')
+    
+    # Pagination
+    paginator = Paginator(responses_list, 20)  # Show 20 responses per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
     
     # Prepare data for the table
     table_data = []
-    for response in responses:
+    for response in page_obj:
         row = {'response': response, 'cells': []}
         # Map question_id to answer object for quick lookup
         response_answers = {a.question_id: a for a in response.answers.all()}
@@ -641,6 +646,7 @@ def SurveyResponsesOverviewTable(request, uuid):
         'survey': survey,
         'questions': questions,
         'table_data': table_data,
+        'page_obj': page_obj,
     }
     return render(request, 'partials/SurveyResponseDetail/responses_overview_table.html', context)
 

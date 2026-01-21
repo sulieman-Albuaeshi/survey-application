@@ -1,3 +1,4 @@
+<div id="responses-overview-container">
 <div
   class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm bg-white"
 >
@@ -31,7 +32,7 @@
         <td
           class="px-4 py-3 font-medium text-gray-400 group-hover:text-gray-600"
         >
-          {{ forloop.counter }}
+          {{ page_obj.start_index|add:forloop.counter0 }}
         </td>
         <td class="px-4 py-3">
           {% if row.response.respondent %}
@@ -114,4 +115,53 @@
       {% endfor %}
     </tbody>
   </table>
+</div>
+
+<!-- HTMX Pagination -->
+{% if page_obj.has_other_pages %}
+<div class="flex justify-center mt-6">
+    <div class="btn-group">
+        {% if page_obj.has_previous %}
+            <button
+                hx-get="{% url 'SurveyResponsesOverviewTable' survey.uuid %}?page={{ page_obj.previous_page_number }}"
+                hx-target="#responses-overview-container"
+                hx-swap="outerHTML"
+                class="btn btn-sm"
+            >
+                «
+            </button>
+        {% else %}
+            <button class="btn btn-sm" disabled>«</button>
+        {% endif %}
+        
+        {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+                <button class="btn btn-sm btn-active" disabled>{{ num }}</button>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <button
+                    hx-get="{% url 'SurveyResponsesOverviewTable' survey.uuid %}?page={{ num }}"
+                    hx-target="#responses-overview-container"
+                    hx-swap="outerHTML"
+                    class="btn btn-sm"
+                >
+                    {{ num }}
+                </button>
+            {% endif %}
+        {% endfor %}
+        
+        {% if page_obj.has_next %}
+            <button
+                hx-get="{% url 'SurveyResponsesOverviewTable' survey.uuid %}?page={{ page_obj.next_page_number }}"
+                hx-target="#responses-overview-container"
+                hx-swap="outerHTML"
+                class="btn btn-sm"
+            >
+                »
+            </button>
+        {% else %}
+            <button class="btn btn-sm" disabled>»</button>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
 </div>
