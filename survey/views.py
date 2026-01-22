@@ -588,6 +588,20 @@ def ToggleSurveyStatus(request, uuid):
     
     return render(request, 'partials/Dashboard/survey_toggle_button_with_oob.html', {'survey': survey})
 
+def ToggleSurveyStatusFromTable(request, uuid):
+    """Toggle survey status between 'draft' and 'published'."""
+    survey = get_object_or_404(Survey, uuid=uuid)
+    
+    if survey.state == 'published':
+        survey.state = 'draft'
+    else:
+        survey.state = 'published'
+        
+    survey.save()
+
+    return render(request, 'partials/Dashboard/table_toggel_oob.html', {'survey': survey})
+
+
 def survey_Start_View(request, uuid):
     """View to start taking the survey."""
     survey = get_object_or_404(Survey, uuid=uuid, state='published')

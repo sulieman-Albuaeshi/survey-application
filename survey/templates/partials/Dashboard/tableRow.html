@@ -41,6 +41,11 @@
                     <a href="{% url 'Copy' survey.uuid %}" >Copy</a>
                 </li>
                 <div class="divider my-0"></div>
+                <li >
+                    <button hx-post="{% url 'ToggleSurveyStatusFromTable' survey.uuid %}" hx-swap="outerHTML" >
+                        {% if survey.state == 'published' %}End Survey{% else %}Begin Survey{% endif %}
+                    </button>
+                </li>
                 <li>
                     <a class="text-red-500 hover:bg-red-50"
                         href="#"
