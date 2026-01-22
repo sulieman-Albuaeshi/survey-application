@@ -1,167 +1,159 @@
-<div id="responses-overview-container">
-<div
-  class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm bg-white"
->
-  <table class="table w-full">
-    <thead
-      class="bg-gray-50 text-gray-800 text-xs uppercase font-bold tracking-wider"
-    >
-      <tr>
-        <th class="px-4 py-3 border-b border-gray-200 bg-gray-50">#</th>
-        <th class="px-4 py-3 border-b border-gray-200 bg-gray-50">
-          Respondent
-        </th>
-        <th class="px-4 py-3 border-b border-gray-200 bg-gray-50">Date</th>
-        {% for question in questions %}
-        <th
-          class="px-4 py-3 border-b border-gray-200 text-center min-w-[60px] bg-gray-50"
-          title="{{ question.label }}"
-        >
-          <div class="flex flex-col items-center justify-center h-full">
-            <span class="text-primary font-extrabold text-base"
-              >Q{{ forloop.counter }}</span
-            >
-          </div>
-        </th>
-        {% endfor %}
-      </tr>
-    </thead>
-    <tbody class="text-sm divide-y divide-gray-100">
-      {% for row in table_data %}
-      <tr class="hover:bg-blue-50/30 transition-colors group">
-        <td
-          class="px-4 py-3 font-medium text-gray-400 group-hover:text-gray-600"
-        >
-          {{ page_obj.start_index|add:forloop.counter0 }}
-        </td>
-        <td class="px-4 py-3">
-          {% if row.response.respondent %}
-          <div class="flex items-center gap-6">
-            <div
-              class="h-10 w-10 rounded-full bg-white border-2 border-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-base shadow-md"
-            >
-              {{ row.response.respondent.username|slice:":1"|upper }}
-            </div>
-            <span class="font-semibold text-gray-700"
-              >{{ row.response.respondent.username }}</span
-            >
-          </div>
-          {% else %}
-          <div class="flex items-center gap-3">
-            <div
-              class="h-9 w-9 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 ring-1 ring-gray-200 shadow-sm"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-5 w-5"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fill-rule="evenodd"
-                  d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                  clip-rule="evenodd"
-                />
-              </svg>
-            </div>
-            <span class="italic text-gray-400">Anonymous</span>
-          </div>
-          {% endif %}
-        </td>
-        <td class="px-4 py-3 whitespace-nowrap text-gray-500 text-xs font-mono">
-          {{ row.response.created_at|date:"Y-m-d H:i" }}
-        </td>
-        {% for cell in row.cells %}
-        <td class="text-center px-4 py-3 border-l border-gray-50">
-          {% if cell != "-" %}
-          <span
-            class="inline-flex items-center justify-center min-w-[2rem] h-8 px-2 rounded-lg text-sm font-bold bg-white border border-gray-200 text-gray-700 shadow-sm font-mono whitespace-nowrap"
-          >
-            {{ cell }}
-          </span>
-          {% else %}
-          <span class="text-gray-300">-</span>
-          {% endif %}
-        </td>
-        {% endfor %}
-      </tr>
-      {% empty %}
-      <tr>
-        <td
-          colspan="{{ questions.count|add:3 }}"
-          class="text-center py-12 text-gray-500 bg-gray-50"
-        >
-          <div class="flex flex-col items-center justify-center">
-            <div class="bg-gray-100 p-3 rounded-full mb-3">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-6 w-6 text-gray-400"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                />
-              </svg>
-            </div>
-            <p class="font-medium">No responses found.</p>
-          </div>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</div>
-
-<!-- HTMX Pagination -->
-{% if page_obj.has_other_pages %}
-<div class="flex justify-center mt-6">
-    <div class="btn-group">
-        {% if page_obj.has_previous %}
-            <button
-                hx-get="{% url 'SurveyResponsesOverviewTable' survey.uuid %}?page={{ page_obj.previous_page_number }}"
-                hx-target="#responses-overview-container"
-                hx-swap="outerHTML"
-                class="btn btn-sm"
-            >
-                «
-            </button>
-        {% else %}
-            <button class="btn btn-sm" disabled>«</button>
-        {% endif %}
-        
-        {% for num in page_obj.paginator.page_range %}
-            {% if page_obj.number == num %}
-                <button class="btn btn-sm btn-active" disabled>{{ num }}</button>
-            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                <button
-                    hx-get="{% url 'SurveyResponsesOverviewTable' survey.uuid %}?page={{ num }}"
-                    hx-target="#responses-overview-container"
-                    hx-swap="outerHTML"
-                    class="btn btn-sm"
-                >
-                    {{ num }}
-                </button>
-            {% endif %}
-        {% endfor %}
-        
-        {% if page_obj.has_next %}
-            <button
-                hx-get="{% url 'SurveyResponsesOverviewTable' survey.uuid %}?page={{ page_obj.next_page_number }}"
-                hx-target="#responses-overview-container"
-                hx-swap="outerHTML"
-                class="btn btn-sm"
-            >
-                »
-            </button>
-        {% else %}
-            <button class="btn btn-sm" disabled>»</button>
-        {% endif %}
+<div id="responses-overview-container" class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md">
+    <!-- Header -->
+    <div class="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-white">
+        <div>
+            <h2 class="text-xl font-bold text-slate-800 tracking-tight">Responses Overview</h2>
+             <p class="text-sm text-slate-500 mt-1">Matrix view of all given answers</p>
+        </div>
     </div>
-</div>
-{% endif %}
+    
+    <div class="overflow-x-auto relative min-h-[300px]">
+      <table class="table w-full border-collapse">
+        <thead class="bg-slate-50/80 backdrop-blur-sm border-b border-slate-200 sticky top-0 z-10">
+          <tr>
+            <th class="px-6 py-5 text-left text-xs font-extrabold text-slate-500 uppercase tracking-wider">#</th>
+            <th class="px-6 py-5 text-left text-xs font-extrabold text-slate-500 uppercase tracking-wider">
+              Respondent
+            </th>
+            <!-- Date column removed as requested -->
+            {% for question in questions %}
+            <th
+              class="px-4 py-5 text-center min-w-[80px]"
+              title="{{ question.label }}"
+            >
+              <div class="flex flex-col items-center justify-center group/th cursor-help">
+                <span class="text-primary/80 font-extrabold text-sm group-hover/th:text-primary transition-colors"
+                  >Q{{ forloop.counter }}</span
+                >
+                <span class="text-[10px] text-slate-400 font-normal mt-0.5 max-w-[120px] truncate">{{ question.label }}</span>
+              </div>
+            </th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100 bg-white">
+          {% for row in table_data %}
+          <tr class="group hover:bg-slate-50 transition-all duration-200 ease-in-out border-l-4 border-l-transparent hover:border-l-primary hover:shadow-sm">
+            <td
+              class="px-6 py-4 font-bold text-slate-400 group-hover:text-primary transition-colors text-sm"
+            >
+              {{ page_obj.start_index|add:forloop.counter0 }}
+            </td>
+            <td class="px-6 py-4">
+              <div class="flex items-center gap-4">
+                {% if row.response.respondent %}
+                  <div class="h-11 w-11 rounded-2xl bg-gradient-to-br from-primary to-primary-focus text-white flex items-center justify-center font-bold text-lg shadow-lg shadow-primary/20 ring-2 ring-white group-hover:scale-105 transition-transform duration-300">
+                      {{ row.response.respondent.username|slice:":1"|upper }}
+                  </div>
+                  <div>
+                      <p class="font-bold text-slate-800 text-sm mb-0.5">{{ row.response.respondent.username }}</p>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-600">
+                          Member
+                      </span>
+                  </div>
+                {% else %}
+                  <div class="h-11 w-11 rounded-2xl bg-slate-200 text-slate-500 flex items-center justify-center shadow-inner ring-2 ring-white">
+                      <i class="fa-solid fa-user-secret text-lg"></i>
+                  </div>
+                  <div>
+                       <p class="font-bold text-slate-600 text-sm mb-0.5 italic">Anonymous</p>
+                       <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-500">
+                          Guest
+                      </span>
+                  </div>
+                {% endif %}
+              </div>
+            </td>
+            <!-- Date column removed -->
+            {% for cell in row.cells %}
+            <td class="text-center px-4 py-4"> <!-- Vertical borders removed -->
+              {% if cell != "-" %}
+              <div
+                class="inline-flex items-center justify-center min-w-[2.5rem] p-2 rounded-lg text-xs font-bold bg-white border border-slate-200 text-slate-600 shadow-sm max-w-[150px] truncate transition-transform group-hover:scale-105"
+                title="{{ cell }}"
+              >
+                {{ cell }}
+              </div>
+              {% else %}
+              <span class="text-slate-200 text-lg font-light">-</span>
+              {% endif %}
+            </td>
+            {% endfor %}
+          </tr>
+          {% empty %}
+          <tr>
+            <td
+              colspan="{{ questions.count|add:2 }}" 
+              class="text-center py-16"
+            >
+              <div class="flex flex-col items-center justify-center text-slate-400">
+                <div class="h-16 w-16 bg-slate-50 rounded-full flex items-center justify-center mb-4 text-slate-300">
+                   <i class="fa-solid fa-clipboard-question text-3xl"></i>
+                </div>
+                <p class="font-medium text-lg text-slate-600">No responses found</p>
+                 <p class="text-sm text-slate-400">Wait for new submissions</p>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- HTMX Pagination (Styled for Overview) -->
+    {% if page_obj.has_other_pages %}
+    <div class="p-4 bg-slate-50/50 border-t border-slate-200">
+      <div class="flex flex-col items-center justify-center gap-4">
+          <div class="join shadow-sm border border-slate-200 rounded-xl bg-white">
+              {% if page_obj.has_previous %}
+                  <button
+                      hx-get="{% url 'SurveyResponsesOverviewTable' survey.uuid %}?page={{ page_obj.previous_page_number }}"
+                      hx-target="#responses-overview-container"
+                      hx-swap="outerHTML"
+                      class="join-item btn btn-sm btn-ghost hover:bg-slate-50 text-slate-600 font-medium px-4 w-12"
+                  >
+                      <i class="fa-solid fa-chevron-left text-xs"></i>
+                  </button>
+              {% else %}
+                  <button class="join-item btn btn-sm btn-ghost disabled:bg-transparent disabled:text-slate-300 px-4 w-12" disabled>
+                      <i class="fa-solid fa-chevron-left text-xs"></i>
+                  </button>
+              {% endif %}
+              
+              {% for num in page_obj.paginator.page_range %}
+                  {% if page_obj.number == num %}
+                      <button class="join-item btn btn-sm btn-primary text-white pointer-events-none">{{ num }}</button>
+                  {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                      <button
+                          hx-get="{% url 'SurveyResponsesOverviewTable' survey.uuid %}?page={{ num }}"
+                          hx-target="#responses-overview-container"
+                          hx-swap="outerHTML"
+                          class="join-item btn btn-sm btn-ghost hover:bg-slate-50 text-slate-600 font-medium"
+                      >
+                          {{ num }}
+                      </button>
+                  {% endif %}
+              {% endfor %}
+              
+              {% if page_obj.has_next %}
+                  <button
+                      hx-get="{% url 'SurveyResponsesOverviewTable' survey.uuid %}?page={{ page_obj.next_page_number }}"
+                      hx-target="#responses-overview-container"
+                      hx-swap="outerHTML"
+                      class="join-item btn btn-sm btn-ghost hover:bg-slate-50 text-slate-600 font-medium px-4 w-12"
+                  >
+                       <i class="fa-solid fa-chevron-right text-xs"></i>
+                  </button>
+              {% else %}
+                  <button class="join-item btn btn-sm btn-ghost disabled:bg-transparent disabled:text-slate-300 px-4 w-12" disabled>
+                       <i class="fa-solid fa-chevron-right text-xs"></i>
+                  </button>
+              {% endif %}
+          </div>
+          <div class="text-xs text-slate-400 font-medium">
+             Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+          </div>
+      </div>
+    </div>
+    {% endif %}
 </div>

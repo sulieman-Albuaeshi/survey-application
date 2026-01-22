@@ -1,40 +1,62 @@
-<div class="flex flex-col h-full bg-white border border-gray-200 shadow-sm rounded-xl hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
-  <div class="p-5 flex-grow">
-      <div class="flex justify-between items-start mb-4">
-          <div class="p-2 bg-primary-50 rounded-lg text-primary-600">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z"></path>
-              </svg>
-          </div>
-          <!-- You could add a status badge here if available e.g. <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded">Active</span> -->
-      </div>
-      
-      <h3 class="font-bold text-gray-800 text-lg mb-2 line-clamp-1 leading-tight" title="{{ survey.title }}">
-          {{ survey.title }}
-      </h3>
-      {% if survey.description %}
-      <p class="text-sm text-gray-500 mb-3 line-clamp-2  min-h-[2.5em]" title="{{ survey.description }}">
-          {{ survey.description }}
-      </p>
-      {% else %}
-      <p class="text-sm text-gray-400 mb-3 italic">
-          No description provided
-      </p>
-      {% endif %}
+<a href="{% url 'SurveyResponseDetail' survey.uuid %}" class="group relative flex flex-col h-full bg-white rounded-3xl border border-slate-200 shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1.5 overflow-hidden hover:border-primary/30">
+    <!-- Decorative hover gradient background -->
+    <div class="absolute inset-0 bg-gradient-to-br from-primary/0 via-primary/0 to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
 
-      <div class="flex items-baseline mt-2">
-          <span class="text-2xl font-extrabold text-gray-900">{{ survey.responses_count }}</span>
-          <span class="ml-2 text-sm font-medium text-gray-500 uppercase tracking-wide">Responses</span>
-      </div>
-  </div>
+    <!-- Top decorative line -->
+    <div class="h-1.5 w-full bg-slate-100 group-hover:bg-gradient-to-r group-hover:from-primary/40 group-hover:via-primary group-hover:to-primary-focus transition-all duration-300"></div>
 
-  <div class="bg-gray-50 px-5 py-3 border-t border-gray-100 rounded-b-xl">
-      <a href="{% url 'SurveyResponseDetail' survey.uuid %}" 
-         class="flex items-center justify-between w-full text-sm font-semibold text-primary-600 hover:text-primary-700 transition-colors group">
-          <span>View Analytics</span>
-          <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
-          </svg>
-      </a>
-  </div>
-</div>
+    <div class="p-6 flex-grow flex flex-col relative z-10">
+        <!-- Header: Icon & Status -->
+        <div class="flex justify-between items-start mb-6">
+             <div class="h-12 w-12 rounded-2xl bg-white border-2 border-slate-100 flex items-center justify-center text-slate-400 group-hover:border-primary/20 group-hover:text-primary group-hover:shadow-lg group-hover:shadow-primary/10 transition-all duration-300">
+                 <i class="fa-solid fa-chart-pie text-xl transform group-hover:scale-110 transition-transform duration-300"></i>
+            </div>
+            
+             {% if survey.state == 'published' or survey.state == 'active' %}
+                <span class="badge badge-sm gap-1.5 bg-emerald-50 text-emerald-700 border border-emerald-100 font-bold px-3 py-2.5 rounded-full shadow-sm">
+                    <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Active
+                </span>
+            {% elif survey.state == 'draft' %}
+                 <span class="badge badge-sm gap-1.5 bg-amber-50 text-amber-700 border border-amber-100 font-bold px-3 py-2.5 rounded-full shadow-sm">
+                    <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span> Draft
+                 </span>
+             {% else %}
+                 <span class="badge badge-sm gap-1.5 bg-slate-50 text-slate-500 border border-slate-100 font-bold px-3 py-2.5 rounded-full shadow-sm">
+                    {{ survey.state|default:"Inactive"|title }}
+                 </span>
+             {% endif %}
+        </div>
+
+        <!-- Content -->
+        <div class="mb-6">
+            <h3 class="font-black text-slate-800 text-lg mb-2 line-clamp-1 group-hover:text-primary transition-colors leading-tight tracking-tight">
+                {{ survey.title }}
+            </h3>
+            
+            {% if survey.description %}
+                <p class="text-sm text-slate-500 line-clamp-2 leading-relaxed h-10">
+                    {{ survey.description }}
+                </p>
+            {% else %}
+                <p class="text-sm text-slate-400 italic h-10 flex items-center">
+                    No description available
+                </p>
+            {% endif %}
+        </div>
+
+        <!-- Footer / Stats -->
+        <div class="mt-auto pt-5 border-t border-slate-100 flex items-end justify-between group-hover:border-primary/10 transition-colors">
+            <div>
+                <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-1">Total Responses</p>
+                <div class="flex items-baseline gap-1">
+                    <span class="text-3xl font-black text-slate-800 group-hover:text-primary transition-colors tracking-tighter">{{ survey.responses_count }}</span>
+                </div>
+            </div>
+            
+             <div class="h-9 px-4 rounded-full bg-indigo-50 flex items-center justify-center gap-2 text-indigo-600 border border-indigo-100 font-bold text-xs uppercase tracking-wide group-hover:bg-primary group-hover:text-white group-hover:border-primary group-hover:shadow-md group-hover:shadow-primary/20 transition-all duration-300">
+                <span>View</span>
+                <i class="fa-solid fa-arrow-right text-xs transform -rotate-45 group-hover:rotate-0 transition-transform duration-300"></i>
+            </div>
+        </div>
+    </div>
+</a>

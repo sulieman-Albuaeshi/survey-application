@@ -1,152 +1,168 @@
 {% for response in responses %}
-<tr class="hover:bg-blue-50 transition-colors group">
-  <td class="font-medium px-6 py-4 text-gray-900">
+<tr class="group hover:bg-slate-50 transition-all duration-200 ease-in-out border-l-4 border-l-transparent hover:border-l-primary hover:shadow-sm relative">
+  <!-- Index -->
+  <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-slate-400 group-hover:text-primary transition-colors">
     {{ forloop.counter | add:responses.start_index | add:-1 }}
   </td>
+  
+  <!-- Respondent -->
   <td class="px-6 py-4">
-    {% if response.respondent %}
-    <div class="flex items-center gap-6">
-      <div
-        class="h-10 w-10 rounded-full bg-white border-2 border-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-base shadow-md"
-      >
-        {{ response.respondent.username|slice:":1"|upper }}
-      </div>
-      <span class="font-medium text-gray-700"
-        >{{ response.respondent.username }}</span
-      >
+    <div class="flex items-center gap-4">
+      {% if response.respondent %}
+        <div class="h-11 w-11 rounded-2xl bg-gradient-to-br from-primary to-primary-focus text-white flex items-center justify-center font-bold text-lg shadow-lg shadow-primary/20 ring-2 ring-white group-hover:scale-105 transition-transform duration-300">
+            {{ response.respondent.username|slice:":1"|upper }}
+        </div>
+        <div>
+            <p class="font-bold text-slate-800 text-sm mb-0.5">{{ response.respondent.username }}</p>
+            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-600">
+                Member
+            </span>
+        </div>
+      {% else %}
+        <div class="h-11 w-11 rounded-2xl bg-slate-200 text-slate-500 flex items-center justify-center shadow-inner ring-2 ring-white">
+            <i class="fa-solid fa-user-secret text-lg"></i>
+        </div>
+        <div>
+             <p class="font-bold text-slate-600 text-sm mb-0.5 italic">Anonymous</p>
+             <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-500">
+                Guest
+            </span>
+        </div>
+      {% endif %}
     </div>
+  </td>
+
+  <!-- Date -->
+  <td class="px-6 py-4">
+    <div class="flex flex-col">
+        <span class="text-sm font-semibold text-slate-700">
+            {{ response.created_at|date:"M d, Y" }}
+        </span>
+        <span class="text-xs text-slate-400 font-medium mt-0.5 flex items-center gap-1">
+            <i class="fa-regular fa-clock"></i> {{ response.created_at|date:"H:i" }}
+        </span>
+    </div>
+  </td>
+
+  <!-- Status -->
+  <td class="px-6 py-4">
+    {% if response.completed %}
+        <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-emerald-100/60 text-emerald-700 border border-emerald-200/50">
+            <span class="relative flex h-2 w-2">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+            Completed
+        </div>
     {% else %}
-    <div class="flex items-center gap-3">
-      <div
-        class="h-9 w-9 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 ring-1 ring-gray-200 shadow-sm"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-5 w-5"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-        >
-          <path
-            fill-rule="evenodd"
-            d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-            clip-rule="evenodd"
-          />
-        </svg>
-      </div>
-      <span class="italic text-gray-500">Anonymous</span>
-    </div>
+        <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-amber-100/60 text-amber-700 border border-amber-200/50">
+             <div class="w-2 h-2 rounded-full bg-amber-500"></div>
+            Incomplete
+        </div>
     {% endif %}
   </td>
-  <td class="px-6 py-4 text-gray-600">
-    {{ response.created_at|date:"M d, Y H:i" }}
-  </td>
-  <td class="px-6 py-4">
-    <span
-      class="badge {% if response.completed %}badge-success gap-1 text-white{% else %}badge-warning gap-1{% endif %} badge-sm font-medium py-3"
-    >
-      {% if response.completed %}
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        class="h-3 w-3"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M5 13l4 4L19 7"
-        />
-      </svg>
-      Completed {% else %}
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        class="h-3 w-3"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-        />
-      </svg>
-      Incomplete {% endif %}
-    </span>
-  </td>
-  <td class="text-center px-6 py-4">
+
+  <!-- Actions -->
+  <td class="px-6 py-4 text-center">
     <button
-      class="btn btn-sm btn-ghost text-primary hover:bg-primary hover:text-white transition-colors"
+      class="btn btn-sm btn-ghost btn-circle text-slate-400 hover:text-primary hover:bg-primary/10 transition-all duration-200 tooltip tooltip-left font-normal"
+      data-tip="View Details"
       onclick="viewResponse{{ response.id }}.showModal()"
     >
-      View Details
+        <i class="fa-regular fa-eye text-lg"></i>
     </button>
 
-    <!-- Modal for response details -->
-    <dialog id="viewResponse{{ response.id }}" class="modal">
-      <div class="modal-box max-w-2xl">
-        <form method="dialog">
-          <button
-            class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-          >
-            ✕
-          </button>
-        </form>
-        <h3 class="font-bold text-xl mb-6 border-b pb-2 text-gray-800">
-          Response Details
-        </h3>
-        <div class="space-y-4 max-h-[60vh] overflow-y-auto pr-2">
-          {% for answer in response.answers.all %}
-          <div class="bg-gray-50 p-4 rounded-lg border border-gray-100">
-            <p class="font-semibold text-gray-800 mb-2 text-sm">
-              <span class="text-primary mr-2"
-                >Q{{ answer.question.position }}.</span
-              >{{ answer.question.label }}
-            </p>
-            <div class="text-gray-600 pl-6 border-l-2 border-primary/20">
-              {% if answer.answer_data is not None %} {{ answer.answer_data }}
-              {% else %}
-              <span class="italic text-gray-400">No answer provided</span>
-              {% endif %}
+    <!-- ====== MODERN MODAL DESIGN ====== -->
+    <dialog id="viewResponse{{ response.id }}" class="modal backdrop-blur-sm">
+      <div class="modal-box w-11/12 max-w-4xl p-0 overflow-hidden bg-white shadow-2xl rounded-2xl scrollbar-hide">
+        
+        <!-- Sticky Header -->
+        <div class="bg-white/80 px-8 py-5 border-b border-slate-100 flex items-center justify-between sticky top-0 z-20 backdrop-blur-xl supports-[backdrop-filter]:bg-white/60">
+            <div class="flex items-center gap-4">
+                 {% if response.respondent %}
+                    <div class="h-10 w-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-extrabold text-lg">
+                        {{ response.respondent.username|slice:":1"|upper }}
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-lg text-slate-800 leading-tight">Response Details</h3>
+                        <p class="text-xs text-slate-500 font-medium">by <span class="text-primary">{{ response.respondent.username }}</span></p>
+                    </div>
+                {% else %}
+                    <div class="h-10 w-10 rounded-lg bg-slate-100 text-slate-500 flex items-center justify-center">
+                         <i class="fa-solid fa-user-secret text-lg"></i>
+                    </div>
+                     <div>
+                        <h3 class="font-bold text-lg text-slate-800 leading-tight">Response Details</h3>
+                        <p class="text-xs text-slate-500 font-medium">Anonymous</p>
+                    </div>
+                {% endif %}
             </div>
-          </div>
-          {% endfor %}
+            
+            <form method="dialog">
+                <button class="btn btn-sm btn-circle btn-ghost text-slate-400 hover:text-red-500 transition-colors">
+                  <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </form>
         </div>
-        <div class="modal-action border-t pt-4 mt-6">
-          <form method="dialog">
-            <button class="btn">Close</button>
+
+        <!-- Modal Body (Scrollable) -->
+        <div class="px-8 py-6 bg-slate-50/30 max-h-[70vh] overflow-y-auto custom-scrollbar">
+          
+          <div class="grid grid-cols-1 gap-6">
+            {% for answer in response.answers.all %}
+              <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow duration-200 group/card relative overflow-hidden">
+                <div class="absolute left-0 top-0 bottom-0 w-1 bg-slate-200 group-hover/card:bg-primary transition-colors"></div>
+                
+                <h4 class="font-bold text-slate-700 mb-3 text-sm flex items-start gap-2">
+                  <span class="inline-flex items-center justify-center h-6 w-6 rounded bg-slate-100 text-slate-500 text-xs font-bold shrink-0 mt-0.5">
+                    {{ answer.question.position }}
+                  </span>
+                  <span class="leading-relaxed">{{ answer.question.label }}</span>
+                </h4>
+                
+                <div class="pl-8">
+                  {% if answer.answer_data is not None %}
+                    <div class="text-slate-600 bg-slate-50 rounded-lg p-3 text-sm border border-slate-100 font-medium">
+                        {{ answer.answer_data }}
+                    </div>
+                  {% else %}
+                    <div class="flex items-center gap-2 text-slate-400 italic text-sm p-2">
+                        <i class="fa-regular fa-circle-xmark"></i>
+                        <span>Skipped / No answer provided</span>
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+          
+        </div>
+
+        <!-- Sticky Footer -->
+        <div class="bg-gray-50 px-8 py-4 border-t border-slate-200 flex justify-end gap-3 sticky bottom-0 z-20">
+           <form method="dialog">
+            <button class="btn btn-primary px-8 btn-sm shadow-lg shadow-primary/30">Close</button>
           </form>
         </div>
+        
       </div>
-      <form method="dialog" class="modal-backdrop">
+      <form method="dialog" class="modal-backdrop bg-slate-900/40 backdrop-blur-[2px]">
         <button>close</button>
       </form>
     </dialog>
+    <!-- ====== END MODAL ====== -->
+
   </td>
 </tr>
 {% empty %}
 <tr>
-  <td colspan="5" class="text-center py-12 text-gray-500 bg-gray-50">
-    <div class="flex flex-col items-center justify-center">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        class="h-12 w-12 mb-3 text-gray-300"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
-        />
-      </svg>
-      <p class="text-lg font-medium">No responses yet</p>
-      <p class="text-sm text-gray-400">Share your survey to get started</p>
+  <td colspan="5" class="">
+    <div class="flex flex-col items-center justify-center py-16 px-4 bg-slate-50/50 m-4 rounded-2xl border border-dashed border-slate-300">
+      <div class="h-20 w-20 bg-slate-100 rounded-full flex items-center justify-center mb-4 text-slate-300">
+          <i class="fa-solid fa-clipboard-question text-4xl"></i>
+      </div>
+      <p class="text-lg font-bold text-slate-600">No responses yet</p>
+      <p class="text-sm text-slate-400 mt-1 max-w-xs text-center">Once people start taking your survey, their responses will appear here.</p>
     </div>
   </td>
 </tr>
