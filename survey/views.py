@@ -28,6 +28,7 @@ def create_survey(request):
             'form': form,
             'Question_formset': question_formset,
             'question_type_list': que.get_available_type_names(),
+            'form_action_url': reverse('CreateSurvey'),
         }
         return render(request, template_name, context)
 
@@ -46,11 +47,10 @@ def create_survey(request):
                 question_formset.instance = survey
                 question_formset.save()
 
-            return render(request, 'Survey_preview.html', {
-                'survey': survey,
-                'questions': survey.questions.all().order_by('position'),
-                'back_url': reverse('EditSurvey', args=[survey.uuid]),
-            })
+            # Redirect to the dedicated preview view, passing the Edit URL as the "back" link
+            preview_url = reverse('SurveyPreview', args=[survey.uuid])
+            edit_url = reverse('EditSurvey', args=[survey.uuid])
+            return redirect(f"{preview_url}?back_url={edit_url}")
 
         with transaction.atomic():
             survey = form.save(commit=False)
@@ -69,6 +69,8 @@ def create_survey(request):
         'form': form,
         'Question_formset': question_formset,
         'question_type_list': que.get_available_type_names(),
+        'form_action_url': reverse('EditSurvey', kwargs={'uuid': survey.uuid}),
+
     })
 
 
@@ -84,6 +86,7 @@ def edit_survey(request, uuid):
             'form': form,
             'Question_formset': question_formset,
             'question_type_list': que.get_available_type_names(),
+            'form_action_url': reverse('EditSurvey', kwargs={'uuid': survey.uuid}),
         })
 
     form = SurveyForm(request.POST, instance=survey)
@@ -93,20 +96,16 @@ def edit_survey(request, uuid):
         if request.POST.get('action') == 'preview':
             with transaction.atomic():
                 updated_survey = form.save(commit=False)
-                # Ensure we keep track this is a preview, status might remain what it was or 'draft'
-                # If editing, we keep the current state unless saving? 
-                # Be safe: don't change state on preview, just save content.
                 updated_survey.question_count = question_formset.total_form_count()
                 updated_survey.save()
 
                 question_formset.instance = updated_survey
                 question_formset.save()
 
-            return render(request, 'Survey_preview.html', {
-                'survey': updated_survey,
-                'questions': updated_survey.questions.all().order_by('position'),
-                'back_url': reverse('EditSurvey', args=[updated_survey.uuid]),
-            })
+            # Redirect to the dedicated preview view, passing the Edit URL as the "back" link
+            preview_url = reverse('SurveyPreview', args=[updated_survey.uuid])
+            edit_url = reverse('EditSurvey', args=[updated_survey.uuid])
+            return redirect(f"{preview_url}?back_url={edit_url}")
 
         with transaction.atomic():
             updated_survey = form.save(commit=False)
@@ -124,8 +123,21 @@ def edit_survey(request, uuid):
         'form': form,
         'Question_formset': question_formset,
         'question_type_list': que.get_available_type_names(),
+        'form_action_url': reverse('EditSurvey', kwargs={'uuid': survey.uuid}),
     })
-    
+
+def delete_survey_confirm(request, uuid):
+    """
+    Renders a confirmation modal for survey deletion.
+    """
+    survey = get_object_or_404(Survey, uuid=uuid)
+    context = {'survey': survey}
+    return render(request, 'partials/Dashboard/delete_modal.html', context)
+
+def DeleteSurvey(request, uuid):
+    item = get_object_or_404(Survey, uuid=uuid)
+    item.delete()
+    return redirect('/Dashboard')
 class AddQuestionFormView(View):
     def post(self, request, *args, **kwargs):
         # Get the question index (count) from the POST data.
@@ -518,13 +530,6 @@ def GetChartData(request, uuid, question_id):
     
     return JsonResponse(data)
 
-# HTMX 
-@require_POST
-def DeleteSurvey(request, uuid):
-    item = get_object_or_404(Survey, uuid=uuid)
-    item.delete()
-    return HttpResponse(status=200)
-
 def SurveyResponsesOverviewTable(request, uuid):
     """
     Returns the HTML for the responses overview table (numeric values).
@@ -594,3 +599,47 @@ def survey_Start_View(request, uuid):
     }
 
     return render(request, 'Survey_Start.html', context)
+
+def survey_preview_view(request, uuid):
+    """Read-only preview of a saved survey"""
+    survey = get_object_or_404(Survey, uuid=uuid)
+    questions = survey.questions.all().order_by('position')
+    
+    # Allow overriding the back link (default to Dashboard)
+    back_url = request.GET.get('back_url', '/Dashboard')
+
+    return render(request, 'Survey_preview.html', {
+        'survey': survey,
+        'questions': questions,
+        'back_url': back_url, 
+    })
+
+def CopySurveyView(request, uuid):
+    """View to copy an existing survey."""
+    original_survey = get_object_or_404(Survey, uuid=uuid)
+
+    new_survey = Survey.objects.create(
+        title=f"Copy of {original_survey.title}",
+        description=original_survey.description,
+        created_by=CustomUser.objects.first(),
+        state='draft',
+        question_count=original_survey.question_count,
+    )
+
+    # Copy questions
+    for question in original_survey.questions.all():
+        question.pk = None  # Clear PK to create a new instance
+        question.survey = new_survey
+        question.save()
+
+    form = SurveyForm(instance=new_survey)
+    question_formset = QuestionFormSet(instance=form.instance, queryset=new_survey.questions.all())
+
+    context = {
+        'form': form,
+        'Question_formset': question_formset,
+        'question_type_list': que.get_available_type_names(),
+        'form_action_url': reverse('EditSurvey', kwargs={'uuid': new_survey.uuid}),
+    }
+
+    return render(request, 'CreateSurvey.html', context)
