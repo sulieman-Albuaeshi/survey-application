@@ -1,5 +1,6 @@
 from django import forms
 from django.forms import BooleanField, HiddenInput
+import json
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_POST
@@ -14,14 +15,14 @@ from datetime import timedelta, datetime
 from django.views import View
 from django.views.generic import CreateView, UpdateView, DeleteView, DetailView
 from django.shortcuts import redirect
+from django.urls import reverse
+from .utility import normalize_formset_indexes
 from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
-from .utility import normalize_formset_indexes
-
-
-
 from django.contrib.auth import login
+from django.contrib.auth.mixins import LoginRequiredMixin
+
+
 
 # Create your views here.
 class SignUpView(CreateView):
@@ -35,141 +36,115 @@ class SignUpView(CreateView):
         login(self.request, user)
         return redirect(self.success_url)
 
-
-
-class SurveyCreateView(LoginRequiredMixin, CreateView):
-    model = Survey
-
-    form_class = SurveyForm
+@login_required
+def create_survey(request):
     template_name = 'CreateSurvey.html'
-    success_url = '/Dashboard'  
 
-    def get_context_data(self, **kwargs):
-        """
-        Adds the formset to the template context.
-        """
-        context = super().get_context_data(**kwargs)
-        context['question_type_list'] = que.get_available_type_names()
+    if request.method == 'GET':
+        form = SurveyForm()
+        question_formset = QuestionFormSet(queryset=que.objects.none())
 
-        if self.request.POST:
-            # If submitting, bind Context to the formset
-            context['Question_formset'] = QuestionFormSet(self.request.POST)
-        else:
-            # If GET, create an empty formset
-            context['Question_formset'] = QuestionFormSet()
+        context = {
+            'form': form,
+            'Question_formset': question_formset,
+            'question_type_list': que.get_available_type_names(),
+            'form_action_url': reverse('CreateSurvey'),
+        }
+        return render(request, template_name, context)
 
-        return context
+    form = SurveyForm(request.POST)
+    question_formset = QuestionFormSet(request.POST, instance=form.instance, queryset=que.objects.none())
 
-    def post(self, request, *args, **kwargs):
-        self.object = None
-        # data = normalize_formset_indexes(request.POST.copy(), prefix="questions")
-
-        # # Replace the request.POST with cleaned data
-        # request._post = data
-
-        form = self.get_form()
-        question_formset = QuestionFormSet(request.POST, instance=self.object)
-
-        if form.is_valid() and question_formset.is_valid():
-            if request.POST.get('action') == 'preview':
-                request.session['survey_backup_data'] = request.POST.copy()
-
-                survey = form.save(commit=False)
-                questions = question_formset.save(commit=False)
-                
-                # Sort questions by position to ensure correct order in preview
-                questions.sort(key=lambda x: x.position)
-
-                context = {
-                    'survey': survey,
-                    'questions': questions,
-                }
-
-                return render(request, 'Survey_preview.html', context)
-            return super().post(request, *args, **kwargs)
-        else:
-            return super().form_invalid(form)
-    
-
-    def get(self, request, *args, **kwargs):
-        # Check for backup data in session
-        backup_data = request.session.get('survey_backup_data')
-        if request.GET.get('action') == 'edit' and  backup_data:
-            # If backup data exists, use it to pre-fill the form and formset
-            form = SurveyForm(backup_data)
-            question_formset = QuestionFormSet(backup_data)
-
-            # Manually sort the forms in the formset by their 'position' field value
-            # This ensures that when the user returns to edit, the questions are in the correct order
-            # even if they were added out of sequence (e.g. inserted in the middle).
-            def get_pos(f):
-                try:
-                    val = f['position'].value()
-                    return int(val) if val is not None else 9999
-                except (ValueError, TypeError):
-                    return 9999
-            
-            # Sort the internal list of forms
-            question_formset.forms.sort(key=get_pos)
-
-            context ={
-                'form': form,
-                'Question_formset': question_formset,
-                'question_type_list': que.get_available_type_names(),
-            }
-            return render(request, self.template_name, context)
-        else:
-            return super().get(request, *args, **kwargs)
-
-    def form_valid(self, form):
-        """
-            Called if the SurveyForm is valid. 
-            We must also validate and save the FormSet here.
-        """
-        context = self.get_context_data()
-        formset = context['Question_formset']
-
-        if formset.is_valid():
-            # Use a transaction to ensure Survey and Questions are saved together
-            # or rolled back if something fails.
+    if form.is_valid() and question_formset.is_valid():
+        if request.POST.get('action') == 'preview':
             with transaction.atomic():
-                # 1. Save the Survey (Parent)
-                self.object = form.save(commit=False)
+                survey = form.save(commit=False)
+                survey.state = 'draft' # Previewing now saves as draft
+                survey.created_by = request.user
+                survey.question_count = question_formset.total_form_count()
+                survey.save()
                 
-                # Determine state based on user action
-                action = self.request.POST.get('action')
-                if action == 'publish':
-                    self.object.state = 'published'
-                else:
-                    self.object.state = 'draft'
+                question_formset.instance = survey
+                question_formset.save()
 
-                self.object.created_by = self.request.user
-                
-                # Calculate valid questions count (excluding SectionHeader)
-                valid_questions = 0
-                for f in formset:
-                    # check if the form is marked for deletion
-                    if f.cleaned_data.get('DELETE'):
-                         continue
-                    # Check question type if available in cleaned_data
-                    q_type = f.cleaned_data.get('question_type')
-                    if q_type != 'Section Header':
-                        valid_questions += 1
-                        
-                self.object.question_count = valid_questions
-                self.object.save()
-                
-                # 2. Link the FormSet to the newly created Survey
-                formset.instance = self.object
-                
-                formset.save()
-                
-            if 'survey_backup_data' in self.request.session:
-                 del self.request.session['survey_backup_data']
-            return  redirect(self.get_success_url()) # Redirects to success_url
-        else:
-            return self.form_invalid(form)  
-        
+            # Redirect to the dedicated preview view, passing the Edit URL as the "back" link
+            preview_url = reverse('SurveyPreview', args=[survey.uuid])
+            edit_url = reverse('EditSurvey', args=[survey.uuid])
+            return redirect(f"{preview_url}?back_url={edit_url}")
+
+        with transaction.atomic():
+            survey = form.save(commit=False)
+            action = request.POST.get('action')
+            survey.state = 'published' if action == 'publish' else 'draft'
+            survey.created_by = request.user
+            survey.question_count = question_formset.total_form_count()
+            survey.save()
+
+            question_formset.instance = survey
+            question_formset.save()
+
+        return redirect('/Dashboard')
+
+    return render(request, template_name, {
+        'form': form,
+        'Question_formset': question_formset,
+        'question_type_list': que.get_available_type_names(),
+        'form_action_url': reverse('CreateSurvey'),
+
+    })
+
+@login_required
+def edit_survey(request, uuid):
+    template_name = 'CreateSurvey.html'
+    survey = get_object_or_404(Survey, uuid=uuid)
+
+    if request.method == 'GET':
+        form = SurveyForm(instance=survey)
+        question_formset = QuestionFormSet(instance=survey, queryset=survey.questions.all())
+
+        return render(request, template_name, {
+            'form': form,
+            'Question_formset': question_formset,
+            'question_type_list': que.get_available_type_names(),
+            'form_action_url': reverse('EditSurvey', kwargs={'uuid': survey.uuid}),
+        })
+
+    form = SurveyForm(request.POST, instance=survey)
+    question_formset = QuestionFormSet(request.POST, instance=survey, queryset=survey.questions.all())
+
+    if form.is_valid() and question_formset.is_valid():
+        if request.POST.get('action') == 'preview':
+            with transaction.atomic():
+                updated_survey = form.save(commit=False)
+                updated_survey.question_count = question_formset.total_form_count()
+                updated_survey.save()
+
+                question_formset.instance = updated_survey
+                question_formset.save()
+
+            # Redirect to the dedicated preview view, passing the Edit URL as the "back" link
+            preview_url = reverse('SurveyPreview', args=[updated_survey.uuid])
+            edit_url = reverse('EditSurvey', args=[updated_survey.uuid])
+            return redirect(f"{preview_url}?back_url={edit_url}")
+
+        with transaction.atomic():
+            updated_survey = form.save(commit=False)
+            action = request.POST.get('action')
+            updated_survey.state = 'published' if action == 'publish' else 'draft'
+            updated_survey.question_count = question_formset.total_form_count()
+            updated_survey.save()
+
+            question_formset.instance = updated_survey
+            question_formset.save()
+
+        return redirect('/Dashboard')
+
+    return render(request, template_name, {
+        'form': form,
+        'Question_formset': question_formset,
+        'question_type_list': que.get_available_type_names(),
+        'form_action_url': reverse('EditSurvey', kwargs={'uuid': survey.uuid}),
+    })
 
 class AddQuestionFormView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
@@ -225,6 +200,20 @@ class AddQuestionFormView(LoginRequiredMixin, View):
             )
 
         return render(request, f'partials/Create_survey/Questions/{template_name}.html', context)
+@login_required
+def delete_survey_confirm(request, uuid):
+    """
+    Renders a confirmation modal for survey deletion.
+    """
+    survey = get_object_or_404(Survey, uuid=uuid)
+    context = {'survey': survey}
+    return render(request, 'partials/Dashboard/delete_modal.html', context)
+
+@login_required
+def DeleteSurvey(request, uuid):
+    item = get_object_or_404(Survey, uuid=uuid)
+    item.delete()
+    return redirect('/Dashboard')
 
 @login_required
 def Index(request, page_number=1):
@@ -636,15 +625,7 @@ def GetChartData(request, uuid, question_id):
     
     return JsonResponse(data)
 
-# HTMX 
-@require_POST
 @login_required
-def DeleteSurvey(request, uuid):
-    item = get_object_or_404(Survey, uuid=uuid, created_by=request.user)
-    item.delete()
-    return HttpResponse(status=200)
-@login_required
-
 def SurveyResponsesOverviewTable(request, uuid):
     """
     Returns the HTML for the responses overview table (numeric values).
@@ -703,6 +684,21 @@ def ToggleSurveyStatus(request, uuid):
     
     return render(request, 'partials/Dashboard/survey_toggle_button_with_oob.html', {'survey': survey})
 
+@login_required
+def ToggleSurveyStatusFromTable(request, uuid):
+    """Toggle survey status between 'draft' and 'published'."""
+    survey = get_object_or_404(Survey, uuid=uuid)
+    
+    if survey.state == 'published':
+        survey.state = 'draft'
+    else:
+        survey.state = 'published'
+        
+    survey.save()
+
+    return render(request, 'partials/Dashboard/table_toggel_oob.html', {'survey': survey})
+
+@login_required 
 def survey_Start_View(request, uuid):
     """View to start taking the survey."""
     survey = get_object_or_404(Survey, uuid=uuid, state='published')
@@ -714,3 +710,107 @@ def survey_Start_View(request, uuid):
     }
 
     return render(request, 'Survey_Start.html', context)
+
+@login_required
+def survey_preview_view(request, uuid):
+    """Read-only preview of a saved survey"""
+    survey = get_object_or_404(Survey, uuid=uuid)
+    questions = survey.questions.all().order_by('position')
+    
+    # Allow overriding the back link (default to Dashboard)
+    back_url = request.GET.get('back_url', '/Dashboard')
+
+    return render(request, 'Survey_preview.html', {
+        'survey': survey,
+        'questions': questions,
+        'back_url': back_url, 
+    })
+
+@login_required
+def CopySurveyView(request, uuid):
+    """View to copy an existing survey."""
+    original_survey = get_object_or_404(Survey, uuid=uuid)
+
+    new_survey = Survey.objects.create(
+        title=f"Copy of {original_survey.title}",
+        description=original_survey.description,
+        created_by=CustomUser.objects.first(),
+        state='draft',
+        question_count=original_survey.question_count,
+    )
+
+    # Copy questions
+    for question in original_survey.questions.all():
+        question.pk = None  # Clear PK to create a new instance
+        question.survey = new_survey
+        question.save()
+
+    form = SurveyForm(instance=new_survey)
+    question_formset = QuestionFormSet(instance=form.instance, queryset=new_survey.questions.all())
+
+    context = {
+        'form': form,
+        'Question_formset': question_formset,
+        'question_type_list': que.get_available_type_names(),
+        'form_action_url': reverse('EditSurvey', kwargs={'uuid': new_survey.uuid}),
+    }
+
+    return render(request, 'CreateSurvey.html', context)
+
+def survey_submit(request, uuid):
+    """Submit the survey responses."""
+    survey = get_object_or_404(Survey, uuid=uuid)
+    if request.method == 'POST':
+        try:
+            with transaction.atomic():
+                response = Response.objects.create(survey=survey)
+                
+                for question in survey.questions.all():
+                    base_key = f'question_{question.position}'
+                    values = request.POST.getlist(base_key)
+                    
+                    if question.NAME == 'Matrix Question':
+                        answer_data = {}
+                        for i, row_label in enumerate(question.rows, start=1):
+                            row_key = f'{row_label}_row{i}' # e.g., row-label_1_row1
+                            val = request.POST.get(row_key)
+                            if val:
+                                answer_data[row_key] = val # Store { "Row Label": "Value" }
+                        # If empty dict, set to None so validation catches it
+                        if not answer_data: 
+                            answer_data = None
+
+                    elif question.NAME == 'Ranking Question':
+                        if values:
+                            # Save as dict where key is the rank (1-based)
+                            answer_data = {str(i): val for i, val in enumerate(values, start=1)}
+                        else:
+                            answer_data = None
+
+                    else:
+                        if len(values) > 1:
+                            answer_data = values 
+                        elif len(values) == 1:
+                            answer_data = values[0] # Single string handling
+                        else:
+                            answer_data = None
+                    
+                    # 2. Server-side Validation
+                    if question.required and not answer_data:
+                        redirect_url = reverse('Survey_Start', args=[survey.uuid])
+                        return redirect(redirect_url)
+
+                    if answer_data is not None:
+                        Answer.objects.create(
+                            response=response,
+                            question=question,
+                            answer_data=answer_data
+                        )
+        
+        except Exception as e:
+            # Handle exceptions, possibly logging or user feedback
+            return HttpResponse("An error occurred while submitting the survey.", status=500)
+            
+        return redirect('SurveyResponseDetail', uuid=survey.uuid)
+        # redirect to thanks page
+        # return render(request, 'thanks.html')

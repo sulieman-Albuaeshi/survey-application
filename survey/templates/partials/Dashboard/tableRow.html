@@ -1,7 +1,7 @@
 {% comment %} 
     context = {'survey': survey}
 {% endcomment %}
-<tr class="border-b">
+<tr class="border-b" id="survey-row-{{ survey.uuid }}">
     <th scope="row" class="px-4 py-3 font-medium text-gray-600">{{ survey.title }}</th>
     <td class="mx-4 my-3 line-clamp-3">{{ survey.description }}</td>
     <td class="px-2 py-3 rounded-full text-center">
@@ -29,19 +29,31 @@
             <ul tabindex="0"
                 class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-44">
                 <li>
-                    <a href="#">Show</a>
+                    <a href="{% url 'SurveyResponseDetail' survey.uuid %}">Show Responses</a>
+                </li>
+                <li>
+                    <a href="{% url 'SurveyPreview' survey.uuid %}" target="_blank" rel="noopener noreferrer">Preview</a>
                 </li>
                 <li id="edit-survey-link-{{ survey.uuid }}">
                     <a href="{% url 'EditSurvey' survey.uuid %}" {% if survey.state == 'published' %}class="text-gray-400 pointer-events-none"{% endif %}>Edit</a>
                 </li>
-                <div class="divider my-0"></div>
                 <li>
-                    <a class="text-red-500"
-                        href="#"  {# Use href="#" to keep it looking like a link #}
-                        hx-post="/surveys/{{ survey.uuid }}/delete"
-                        hx-confirm="Are you sure you want to delete this survey? {{ survey.title }} will be permanently deleted."
-                        hx-target="closest tr"
-                    hx-swap="outerHTML">Delete</a>
+                    <a href="{% url 'Copy' survey.uuid %}" >Copy</a>
+                </li>
+                <div class="divider my-0"></div>
+                <li >
+                    <button hx-post="{% url 'ToggleSurveyStatusFromTable' survey.uuid %}" hx-swap="outerHTML" >
+                        {% if survey.state == 'published' %}End Survey{% else %}Begin Survey{% endif %}
+                    </button>
+                </li>
+                <li>
+                    <a class="text-red-500 hover:bg-red-50"
+                        href="#"
+                        hx-get="{% url 'DeleteSurveyConfirmModal' survey.uuid %}"
+                        hx-target="#modal-container"
+                        hx-swap="innerHTML">
+                        Delete
+                    </a>
                 </li>
             </ul>
         </div>

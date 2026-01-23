@@ -141,15 +141,26 @@ class LikertQuestion(Question):
         
         total = 0
         count = 0
+        options_list = self.options # Expecting a list of strings
+        
         for answer in answers:
             try:
-                if isinstance(answer.answer_data, dict) and 'position' in answer.answer_data:
-                    val = float(answer.answer_data['position'])
+                # Direct string matching
+                val_str = str(answer.answer_data)
+                
+                # Check if it's in the options list
+                if val_str in options_list:
+                    # Map to 1-based index (Strongly Disagree -> 1, ..., Strongly Agree -> 5)
+                    val = options_list.index(val_str) + 1
+                    total += val
+                    count += 1
                 else:
-                    val = float(answer.answer_data)
-                total += val
-                count += 1
-            except (ValueError, TypeError, KeyError):
+                     # Fallback for legacy numeric data or unexpected values
+                     val = float(int(answer.answer_data['position']))
+                     total += val
+                     count += 1
+
+            except (ValueError, TypeError):
                 continue
         
         if count == 0:
@@ -160,39 +171,37 @@ class LikertQuestion(Question):
     def get_rating_distribution(self):
         """Get distribution of ratings"""
         answers = Answer.objects.filter(question=self)
-        distribution = {}
-        
-        # Initialize distribution with 0 for all possible ratings
-        for i in range(1, self.scale_max + 1):
-            distribution[i] = 0
+        distribution = {opt: 0 for opt in self.options} # Initialize with option labels
         
         for answer in answers:
-            try:
-                # Handle both direct values and dictionary format (legacy support)
-                if isinstance(answer.answer_data, dict) and 'position' in answer.answer_data:
-                    rating = int(float(answer.answer_data['position']))
-                else:
-                    rating = int(float(answer.answer_data))
-                
-                distribution[rating] = distribution.get(rating, 0) + 1
-            except (ValueError, TypeError, KeyError):
-                # Skip invalid data
-                continue
-        
+            val_str = str(answer.answer_data)
+            if val_str in distribution:
+                distribution[val_str] += 1
+            # If data is numeric (old format), try to map it to the label
+            elif str(val_str).isdigit():
+                 try:
+                     # 1-based index to 0-based
+                     idx = int(val_str) - 1
+                     if 0 <= idx < len(self.options):
+                         label = self.options[idx]
+                         distribution[label] += 1
+                 except (ValueError, IndexError):
+                     pass
+
         return distribution
     
+    #  TODO : Convert the values to numeric representation 
     def get_numeric_answer(self, answer_data):
-        """Convert answer to numeric value"""
+        """Convert answer label to numeric value (1-based index)"""
         if not answer_data:
             return ""
         
-        try:
-            if isinstance(answer_data, dict) and 'position' in answer_data:
-                return str(int(float(answer_data['position'])))
-            else:
-                return str(int(float(answer_data)))
-        except (ValueError, TypeError, KeyError):
-            return ""
+        val_str = str(answer_data)
+        if val_str in self.options:
+            return str(self.options.index(val_str) + 1)
+        
+        # Fallback if it's already a number
+        return val_str
 
 
 class MatrixQuestion(Question):

@@ -29,8 +29,8 @@
     </div>
 
     <!-- UPDATED NAVBAR END -->
-    <div class="navbar-end gap-2">
-        {% if request.resolver_match.url_name == 'CreateSurvey' %}
+    <div class="navbar-end">
+        {% if request.resolver_match.url_name == 'CreateSurvey' or request.resolver_match.url_name == 'EditSurvey' or request.resolver_match.url_name == 'Copy' %}
             <!-- Show these buttons ONLY on the Create Survey page -->
             <div class="flex items-center gap-3">
                 <!-- Preview Button -->

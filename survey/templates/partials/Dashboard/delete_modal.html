@@ -1,0 +1,40 @@
+<dialog id="delete_modal_{{ survey.uuid }}" class="modal" open>
+    <div class="modal-box">
+        <h3 class="font-bold text-lg text-error">Delete Survey</h3>
+        
+        <p class="py-4">
+            Are you sure you want to delete <span class="font-bold text-gray-800">"{{ survey.title }}"</span>?
+            <br>
+            <span class="text-sm text-gray-500">This action cannot be undone.</span>
+        </p>
+
+        {% if survey.state == 'published' %}
+        <div class="alert alert-warning shadow-lg text-sm mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+            <div>
+                <span class="font-bold">Warning: This survey is Published!</span>
+                <br>
+                Deleting it will prevent users from accessing it immediately.
+                Existing responses will also be permanently deleted.
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="modal-action">
+            <form method="dialog">
+                <!-- if there is a button in form, it will close the modal -->
+                <button class="btn btn-ghost" onclick="document.getElementById('delete_modal_{{ survey.uuid }}').remove()">Cancel</button>
+            </form>
+            
+            <a class="btn btn-error" 
+                    href="{% url 'DeleteSurvey' survey.uuid %}"
+                    {% comment %} onclick="document.getElementById('delete_modal_{{ survey.uuid }}').remove()" {% endcomment %}
+                    >
+                Yes, Delete it
+            </a>
+        </div>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+        <button onclick="document.getElementById('delete_modal_{{ survey.uuid }}').remove()">close</button>
+    </form>
+</dialog>
