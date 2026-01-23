@@ -1,0 +1,37 @@
+{% load static %}
+<div class="card bg-white shadow-lg border border-gray-200">
+    <div class="card-body">
+        <h3 class="text-xl font-semibold mb-6 text-center">{{ data.question.label }}</h3>
+        
+        <!-- Ranking Question Analytics -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div>
+                <div class="alert alert-info shadow-sm mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <span>Lower score = Better rank (1st place)</span>
+                </div>
+
+                <div class="space-y-4">
+                    <h4 class="font-semibold text-gray-700">Average Ranking Position</h4>
+                    <ul class="w-full steps steps-vertical lg:steps-vertical">
+                        {% for option, avg_rank in data.distribution.items %}
+                        <li class="step step-primary" data-content="{{ forloop.counter }}">
+                            <div class="flex justify-between w-full ml-4">
+                                <span class="font-bold">{{ option }}</span>
+                                <span class="badge badge-lg badge-outline">Avg: {{ avg_rank }}</span>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            
+            <div>
+                <!-- Using a horizontal bar chart usually looks better for ranking, but standard bar works -->
+                <canvas data-question-id="{{ data.question.id }}" 
+                        data-survey-uuid="{{ survey.uuid }}"
+                        width="400" height="250"></canvas>
+            </div>
+        </div>
+    </div>
+</div>

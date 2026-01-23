@@ -4,6 +4,12 @@
             {% include "partials/SurveyAnalytics/likert_question_analytics.html" with data=data survey=survey total_responses=total_responses %}
         {% elif data.type == "MultiChoiceQuestion" %}
             {% include "partials/SurveyAnalytics/multichoice_question_analytics.html" with data=data survey=survey total_responses=total_responses %}
+        {% elif data.type == "RatingQuestion" %}
+            {% include "partials/SurveyAnalytics/rating_question_analytics.html" with data=data survey=survey total_responses=total_responses %}
+        {% elif data.type == "RankQuestion" %}
+            {% include "partials/SurveyAnalytics/rank_question_analytics.html" with data=data survey=survey total_responses=total_responses %}
+        {% elif data.type == "MatrixQuestion" %}
+            {% include "partials/SurveyAnalytics/matrix_question_analytics.html" with data=data survey=survey total_responses=total_responses %}
         {% else %}
             <div class="card bg-white shadow-lg border border-gray-200">
                 <div class="card-body">

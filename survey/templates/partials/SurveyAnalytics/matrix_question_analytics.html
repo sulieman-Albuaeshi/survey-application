@@ -1,0 +1,44 @@
+{% load static %}
+<div class="card bg-white shadow-lg border border-gray-200">
+    <div class="card-body">
+        <h3 class="text-xl font-semibold mb-6 text-center">{{ data.question.label }}</h3>
+        
+        <!-- Matrix Question Analytics -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div>
+                 <h4 class="font-semibold text-gray-700 mb-3">Response Heatmap</h4>
+                 <div class="overflow-x-auto">
+                    <table class="table table-compact w-full text-center">
+                        <thead>
+                            <tr>
+                                <th></th> <!-- Corner -->
+                                {% for col in data.question.columns %}
+                                <th class="text-xs">{{ col }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row, cols in data.distribution.items %}
+                            <tr>
+                                <th class="text-left text-xs">{{ row }}</th>
+                                {% for col_name, count in cols.items %}
+                                <td class="bg-blue-50/{{ count|default:0 }} hover:bg-blue-100">
+                                    {{ count }}
+                                </td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                 </div>
+            </div>
+            
+            <div>
+                <!-- Stacked Bar Chart for Matrix -->
+                <canvas data-question-id="{{ data.question.id }}" 
+                        data-survey-uuid="{{ survey.uuid }}"
+                        width="400" height="250"></canvas>
+            </div>
+        </div>
+    </div>
+</div>

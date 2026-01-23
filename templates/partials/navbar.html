@@ -19,11 +19,13 @@
     </div>
 
     <div class="navbar-center hidden lg:flex">
+        {% if user.is_authenticated %}
         <ul class="menu menu-horizontal px-1">
             <li><a href="{% url 'Dashboard' %}">My Survey</a></li>
             <li><a href="{% url 'CreateSurvey' %}">Create Survey</a></li>
             <li><a href="{% url 'Responses' %}">Responses</a></li>
         </ul>
+        {% endif %}
     </div>
 
     <!-- UPDATED NAVBAR END -->
@@ -47,13 +49,40 @@
                 <button type="submit" form="survey-form" name="action" value="publish" class="btn btn-primary shadow-xl rounded-full px-6 gap-2 font-bold uppercase tracking-wide">
                     <i class="fa-solid fa-rocket"></i> Publish
                 </button>
-
             </div>
         {% else %}
+            {% if user.is_authenticated %}
             <!-- Show this button on all other pages (Dashboard, etc) -->
-            <a class="btn btn-primary" id="primary-button" href="{% url 'CreateSurvey' %}">
+            <a class="btn btn-primary " id="primary-button" href="{% url 'CreateSurvey' %}">
                 Create New Survey
             </a>
+            {% endif %}
+        {% endif %}
+
+        {% if user.is_authenticated %}
+            <div class="dropdown dropdown-end" style="margin-right: 1rem;">
+                <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar placeholder">
+                    <div class="bg-primary text-primary-content rounded-full w-10">
+                        <span class="text-xl">{{ user.username|slice:":1"|upper }}</span>
+                    </div>
+                </div>
+                <!-- Controls position: 'right: 0' aligns it perfectly under the avatar's right edge. Increase this number to move it left. -->
+                <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52 border border-base-200" style="z-index: 9999; right: -2rem;">
+                    <li class="px-4 py-2 font-bold text-center border-b border-base-200 mb-2">{{ user.username }}</li>
+                    <li class="mt-1">
+                        <form action="{% url 'logout' %}" method="post" class="p-0 hover:bg-transparent">
+                            {% csrf_token %}
+                            <button type="submit" class="flex w-full items-center justify-between gap-2 text-error font-medium hover:bg-error/10 active:bg-error/20 rounded-lg px-4 py-2 transition-all duration-200">
+                                Logout
+                                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                            </button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        {% else %}
+            <a href="{% url 'login' %}" class="btn btn-ghost">Login</a>
+            <a href="{% url 'signup' %}" class="btn btn-primary">Sign Up</a>
         {% endif %}
     </div>
 </div>

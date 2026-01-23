@@ -35,7 +35,7 @@
         <div class="card bg-gradient-to-br from-green-500 to-green-600 text-white shadow-lg">
             <div class="card-body">
                 <p class="text-sm opacity-90">Questions</p>
-                <p class="text-4xl font-bold">{{ survey.questions.count }}</p>
+                <p class="text-4xl font-bold">{{ survey.question_count }}</p>
             </div>
         </div>
         
@@ -81,65 +81,80 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 const ctx = canvas.getContext('2d');
                 
-                // Generate colors
-                const backgroundColors = generateColors(data.labels.length);
+                // Check if it's a stacked chart (for Matrix)
+                let chartType = 'bar';
+                let datasets = [];
+                let options = {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false } // Hide legend for simple bars
+                    },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                    }
+                };
+
+                if (data.is_stacked) {
+                    // Matrix Question Configuration
+                    datasets = data.datasets.map((ds, index) => {
+                        const color = getBaseColor(index);
+                        return {
+                            label: ds.label,
+                            data: ds.data,
+                            backgroundColor: color,
+                            borderColor: color.replace('0.6', '1'),
+                            borderWidth: 1
+                        };
+                    });
+                    
+                    options.plugins.legend = { display: true }; // Show legend for stacked
+                    options.scales.x = { stacked: true };
+                    options.scales.y = { stacked: true, beginAtZero: true };
+                } else {
+                    // Standard Questions
+                    const backgroundColors = generateColors(data.labels.length);
+                    datasets = [{
+                        label: 'Responses',
+                        data: data.values,
+                        backgroundColor: backgroundColors,
+                        borderColor: backgroundColors.map(color => color.replace('0.6', '1')),
+                        borderWidth: 2
+                    }];
+                    
+                    if (data.y_label) {
+                         options.plugins.title = { display: true, text: data.y_label };
+                    }
+                }
                 
                 new Chart(ctx, {
-                    type: 'bar',
+                    type: chartType,
                     data: {
                         labels: data.labels,
-                        datasets: [{
-                            label: 'Responses',
-                            data: data.values,
-                            backgroundColor: backgroundColors,
-                            borderColor: backgroundColors.map(color => color.replace('0.6', '1')),
-                            borderWidth: 2
-                        }]
+                        datasets: datasets
                     },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                display: false
-                            },
-                            title: {
-                                display: false,
-                                text: data.question_label,
-                                font: {
-                                    size: 14
-                                }
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: {
-                                    stepSize: 1
-                                }
-                            }
-                        }
-                    }
+                    options: options
                 });
             })
             .catch(error => console.error('Error loading chart:', error));
     });
     
-    function generateColors(count) {
-        const colors = [
+    function getBaseColor(index) {
+         const colors = [
             'rgba(59, 130, 246, 0.6)',   // blue
             'rgba(16, 185, 129, 0.6)',   // green
             'rgba(251, 146, 60, 0.6)',   // orange
             'rgba(139, 92, 246, 0.6)',   // purple
             'rgba(236, 72, 153, 0.6)',   // pink
             'rgba(234, 179, 8, 0.6)',    // yellow
-            'rgba(239, 68, 68, 0.6)',    // red
-            'rgba(6, 182, 212, 0.6)',    // cyan
         ];
-        
+        return colors[index % colors.length];
+    }
+
+    function generateColors(count) {
         const result = [];
         for (let i = 0; i < count; i++) {
-            result.push(colors[i % colors.length]);
+            result.push(getBaseColor(i));
         }
         return result;
     }

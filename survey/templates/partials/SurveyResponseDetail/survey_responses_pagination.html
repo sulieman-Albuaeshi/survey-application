@@ -1,30 +1,32 @@
 {% if responses.has_other_pages %}
-<div class="flex justify-center mt-6">
-    <div class="btn-group">
+<div class="flex flex-col items-center justify-center gap-4 mt-6">
+    <div class="join shadow-sm border border-slate-200 rounded-xl bg-white">
         {% if responses.has_previous %}
             <button
                 hx-get="?page={{ responses.previous_page_number }}"
                 hx-target="#survey-responses-container"
                 hx-swap="outerHTML"
                 hx-push-url="true"
-                class="btn btn-sm"
+                class="join-item btn btn-sm btn-ghost hover:bg-slate-50 text-slate-600 font-medium px-4 w-12"
             >
-                «
+                <i class="fa-solid fa-chevron-left text-xs"></i>
             </button>
         {% else %}
-            <button class="btn btn-sm" disabled>«</button>
+            <button class="join-item btn btn-sm btn-ghost disabled:bg-transparent disabled:text-slate-300 px-4 w-12" disabled>
+                 <i class="fa-solid fa-chevron-left text-xs"></i>
+            </button>
         {% endif %}
         
         {% for num in responses.paginator.page_range %}
             {% if responses.number == num %}
-                <button class="btn btn-sm btn-active" disabled>{{ num }}</button>
+                <button class="join-item btn btn-sm btn-primary text-white pointer-events-none">{{ num }}</button>
             {% elif num > responses.number|add:'-3' and num < responses.number|add:'3' %}
                 <button
                     hx-get="?page={{ num }}"
                     hx-target="#survey-responses-container"
                     hx-swap="outerHTML"
                     hx-push-url="true"
-                    class="btn btn-sm"
+                    class="join-item btn btn-sm btn-ghost hover:bg-slate-50 text-slate-600 font-medium"
                 >
                     {{ num }}
                 </button>
@@ -37,13 +39,18 @@
                 hx-target="#survey-responses-container"
                 hx-swap="outerHTML"
                 hx-push-url="true"
-                class="btn btn-sm"
+                class="join-item btn btn-sm btn-ghost hover:bg-slate-50 text-slate-600 font-medium px-4 w-12"
             >
-                »
+                 <i class="fa-solid fa-chevron-right text-xs"></i>
             </button>
         {% else %}
-            <button class="btn btn-sm" disabled>»</button>
+            <button class="join-item btn btn-sm btn-ghost disabled:bg-transparent disabled:text-slate-300 px-4 w-12" disabled>
+                <i class="fa-solid fa-chevron-right text-xs"></i>
+            </button>
         {% endif %}
+    </div>
+    <div class="text-xs text-slate-400 font-medium">
+        Page {{ responses.number }} of {{ responses.paginator.num_pages }}
     </div>
 </div>
 {% endif %}
