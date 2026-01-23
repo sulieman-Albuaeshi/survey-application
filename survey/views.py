@@ -322,8 +322,12 @@ def Index(request, page_number=1):
     paginator = Paginator(surveys, 5)
     page = paginator.get_page(page_number)
 
+    # Use get_elided_page_range for better pagination
+    elided_page_range = paginator.get_elided_page_range(page.number, on_each_side=1, on_ends=1)
+
     context = {
         'page': page,
+        'elided_page_range': elided_page_range,
         'query': query,
         'state_filter': state_filter,
         'responses_filter': responses_filter,
@@ -452,8 +456,12 @@ def Responses(request, page_number=1):
     paginator = Paginator(surveys, 5)
     page = paginator.get_page(page_number)
     
+    # Use get_elided_page_range for better pagination
+    elided_page_range = paginator.get_elided_page_range(page.number, on_each_side=1, on_ends=1)
+
     context = {
         'page': page,
+        'elided_page_range': elided_page_range,
         'query': query,
         'state_filter': state_filter,
         'responses_filter': responses_filter,

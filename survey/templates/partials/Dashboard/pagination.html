@@ -1,16 +1,7 @@
 <nav aria-label="Table navigation"
      id="pagination-controls"
      hx-swap-oob="true">
-    <div class="flex flex-col md:flex-row justify-between items-center p-4 bg-gray-50">
-        <span class="text-sm text-gray-700 mb-3 md:mb-0">
-            Showing
-            <span class="font-semibold">{{ page.start_index }}</span>
-            to
-            <span class="font-semibold">{{ page.end_index }}</span>
-            of
-            <span class="font-semibold">{{ page.paginator.count }}</span>
-            surveys
-        </span>
+    <div class="flex flex-col justify-center items-center p-4 bg-gray-50 gap-4">
         <ul class="inline-flex items-stretch -space-x-px">
             <li>
                 <button {% if not page.has_previous %}disabled{% endif %}
@@ -31,7 +22,12 @@
                     </svg>
                 </button>
             </li>
-            {% for page_number in page.paginator.page_range %}
+            {% for page_number in elided_page_range %}
+              {% if page_number == page.paginator.ELLIPSIS %}
+              <li>
+                <span class="flex items-center justify-center px-3 h-full leading-tight text-gray-500 bg-white border border-gray-300">...</span>
+              </li>
+              {% else %}
             <li>
                 <button
                     hx-get="{% url 'Dashboard_Page' page_number %}{% if query %}?search={{ query }}{% endif %}"
@@ -42,6 +38,7 @@
                     {{ page_number }}
                 </button>
             </li>
+              {% endif %}
             {% endfor %}
             <li>
                 <button {% if not page.has_next %}disabled{% endif %}
@@ -63,5 +60,8 @@
                 </button>
             </li>
         </ul>
+        <div class="mt-2 px-4 py-1.5 text-xs font-medium text-gray-600 bg-white rounded-full border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200">
+            Showing <span class="text-indigo-600 font-bold">{{ page.start_index }}</span> - <span class="text-indigo-600 font-bold">{{ page.end_index }}</span> of <span class="text-gray-900 font-bold">{{ page.paginator.count }}</span> surveys
+        </div>
     </div>
 </nav>
