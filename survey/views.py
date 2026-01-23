@@ -17,6 +17,7 @@ from django.views.generic import CreateView, UpdateView, DeleteView, DetailView
 from django.shortcuts import redirect
 from django.urls import reverse
 from .utility import normalize_formset_indexes
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 def create_survey(request):
     template_name = 'CreateSurvey.html'
@@ -126,6 +127,61 @@ def edit_survey(request, uuid):
         'question_type_list': que.get_available_type_names(),
         'form_action_url': reverse('EditSurvey', kwargs={'uuid': survey.uuid}),
     })
+
+class AddQuestionFormView(LoginRequiredMixin, View):
+    def post(self, request, *args, **kwargs):
+        # Get the question index (count) from the POST data.
+        # This value represents the current number of questions *before* adding the new one,
+        # and will be used as the index for the new formset prefix.
+        question_index = int(request.POST.get('question_count_position', 0))
+
+        data = normalize_formset_indexes(request.POST.copy(), prefix="questions")
+        # Replace the request.POST with cleaned data
+        request._post = data
+
+        print("question_index:", question_index)
+
+        question_type_name = request.POST.get('question_type')      
+  
+        if question_type_name not in Question.get_available_type_names():
+            return HttpResponse(status=400)
+        
+        # Map question type names to their corresponding Model and Form classes
+        ModelFormMap = {
+           'Multi-Choice Question': MultiChoiceQuestionForm,
+            'Likert Question': LikertQuestionForm,
+            'Matrix Question': MatrixQuestionForm,
+            'Rating Question': RatingQuestionForm,
+            'Ranking Question': RankQuestionForm,
+            'Text Question': TextQuestionForm,
+            'Section Header': SectionHeaderForm,
+        }
+
+        print(question_type_name)
+        FormClass = ModelFormMap[question_type_name]
+
+        form = FormClass(
+            prefix=f'questions-{question_index}', 
+            initial={
+                'question_type': question_type_name, 
+                'position': question_index + 1,
+            }
+        )
+
+        template_name = question_type_name.replace(' ', '_')
+        context = {
+            # 'question_count': question_index + 1, # Pass the index back if the partial needs it, though not strictly for the prefix
+            'form': form,
+        }
+
+        if 'DELETE' not in form.fields:
+            form.fields['DELETE'] = BooleanField(
+                widget=HiddenInput, 
+                required=False, 
+                initial=False
+            )
+
+        return render(request, f'partials/Create_survey/Questions/{template_name}.html', context)
 
 def delete_survey_confirm(request, uuid):
     """
