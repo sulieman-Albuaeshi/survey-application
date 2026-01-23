@@ -205,6 +205,53 @@ document.addEventListener("alpine:init", () => {
     },
   }));
 
+  Alpine.data('surveySection', () => ({
+            isValid: false,
+            
+            init() {
+                this.$nextTick(() => {
+                    this.validate();
+                });
+            },
+
+            validate() {
+                const section = this.$el;
+                let allValid = true;
+
+                // 1. Check standard required fields
+                const requiredInputs = section.querySelectorAll('input[required], textarea[required], select[required]');
+                requiredInputs.forEach(input => {
+                    let fieldValid = true;
+                    if (input.type === 'radio') {
+                        const name = input.name;
+                        const group = section.querySelectorAll(`input[name="${name}"]`);
+                        fieldValid = Array.from(group).some(r => r.checked);
+                    } else {
+                        fieldValid = input.value.trim() !== '';
+                    }
+                    if (!fieldValid) allValid = false;
+                });
+
+                // 2. Check Checkbox Groups (Multi-Choice allowing multiple)
+                const checkboxGroups = section.querySelectorAll('[data-required-checkbox-group]');
+                checkboxGroups.forEach(group => {
+                    const minRequired = parseInt(group.getAttribute('data-min-required')) || 1;
+                    const checkedCount = group.querySelectorAll('input[type="checkbox"]:checked').length;
+                    
+                    // Show/Hide error message for this specific group
+                    const errorMsg = group.parentElement.querySelector('.checkbox-group-error');
+                    if (checkedCount < minRequired) {
+                         if (errorMsg) errorMsg.classList.remove('hidden');
+                         allValid = false;
+                    } else {
+                         if (errorMsg) errorMsg.classList.add('hidden');
+                    }
+                });
+
+                this.isValid = allValid;
+            }
+        }));
+
   // --- UNSAVED CHANGES WARNING ---
   let formIsDirty = false;
   let isInitializing = true;

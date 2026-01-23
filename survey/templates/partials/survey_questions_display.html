@@ -1,11 +1,13 @@
 {% load survey_extras %}
-
 {% for section in questions|group_by_sections:survey.shuffle_questions %}
-<div x-show="page === {{ forloop.counter0 }}" 
+<div x-data="surveySection"
+        x-show="page === {{ forloop.counter0 }}" 
         class="space-y-8" 
         x-transition:enter="transition ease-out duration-300 delay-100" 
         x-transition:enter-start="opacity-0 translate-y-4" 
-        x-transition:enter-end="opacity-100 translate-y-0">
+        x-transition:enter-end="opacity-100 translate-y-0"
+        @change="validate"
+        @input.debounce.200ms="validate">
     
     <!-- Section Header Display -->
     {% if section.title != "Section 1" or not forloop.first %}
@@ -59,15 +61,17 @@
 
             <!-- 1. MULTI-CHOICE -->
             {% if q.NAME == 'Multi-Choice Question' %}
-            <div class="flex flex-col gap-3">
+            <div class="flex flex-col gap-3" 
+                {% if q.required and q.allow_multiple %}data-required-checkbox-group{% endif %}
+                {% if q.allow_multiple %}data-min-required="{{ q.the_minimum_number_of_options_to_be_selected }}"{% endif %}>
                 {% for option in q.options|shuffle_if:q.randomize_options %}
                 <label class="group relative flex items-center p-4 rounded-xl border border-slate-200 bg-slate-50/50 cursor-pointer transition-all duration-200 
                             hover:border-primary hover:bg-white hover:shadow-md hover:shadow-primary/5
                             has-[:checked]:border-primary has-[:checked]:bg-primary/5 has-[:checked]:shadow-md">
                     {% if q.allow_multiple %}
-                        <input type="checkbox" name="q_{{ q.position }}" class="peer toggle checkbox-primary checkbox-sm border-slate-300 rounded-md">
+                        <input type="checkbox" name="question_{{ q.position }}" value="{{ option }}" class="peer toggle checkbox-primary checkbox-sm border-slate-300 rounded-md">
                     {% else %}
-                        <input type="radio" name="q_{{ q.position }}" class="peer radio radio-primary radio-sm border-slate-300">
+                        <input type="radio" name="question_{{ q.position }}" value="{{ option }}" class="peer radio radio-primary radio-sm border-slate-300" {% if q.required %}required{% endif %}>
                     {% endif %}
                     <span class="ml-4 text-base font-medium text-slate-600 transition-colors group-hover:text-slate-900 peer-checked:text-primary-focus peer-checked:font-bold">
                         {{ option }}
@@ -75,14 +79,19 @@
                 </label>
                 {% endfor %}
             </div>
-
+            {% if q.allow_multiple and q.the_minimum_number_of_options_to_be_selected > 1 %}
+                 <p class="text-xs text-info mb-2 flex items-center gap-1">
+                    <i class="fa-solid fa-circle-info"></i>
+                    Please select at least {{ q.the_minimum_number_of_options_to_be_selected }} options.
+                 </p>
+            {% endif %}
             <!-- 2. LIKERT -->
             {% elif q.NAME == 'Likert Question' %}
                 <div class="mt-4">
                     <div class="flex flex-wrap sm:flex-nowrap justify-between items-center gap-4 py-4 px-2">
                         {% for option in q.options %}
                         <label class="flex flex-col items-center gap-3 w-full sm:w-auto cursor-pointer group">
-                            <input type="radio" name="likert_{{ q.id }}" class="peer radio radio-primary radio-lg border-2 border-slate-300 group-hover:scale-110 group-hover:border-primary transition-all">
+                            <input type="radio" name="question_{{ q.position }}" value="{{ option }}" class="peer radio radio-primary radio-lg border-2 border-slate-300 group-hover:scale-110 group-hover:border-primary transition-all" {% if q.required %}required{% endif %}>
                             <span class="text-xs font-semibold text-slate-500 text-center uppercase tracking-wide group-hover:text-primary peer-checked:text-primary peer-checked:font-bold transition-colors">
                                 {{ option }}
                             </span>
@@ -95,15 +104,17 @@
             {% elif q.NAME == 'Text Question' %}
                 <div class="form-control mt-2 group-focus-within:text-primary">
                     {% if q.is_long_answer %}
-                        <textarea class="textarea textarea-bordered textarea-lg w-full min-h-[120px] focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all placeholder:text-slate-300 text-slate-700 leading-relaxed bg-slate-50 focus:bg-white" 
+                        <textarea name="question_{{ q.position }}" class="textarea textarea-bordered textarea-lg w-full min-h-[120px] focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all placeholder:text-slate-300 text-slate-700 leading-relaxed bg-slate-50 focus:bg-white" 
                             placeholder="Type your detailed answer here..."
                         {% if q.min_length %}minlength="{{ q.min_length }}"{% endif %}
-                        {% if q.max_length %}maxlength="{{ q.max_length }}"{% endif %}></textarea>
+                        {% if q.max_length %}maxlength="{{ q.max_length }}"{% endif %}
+                        {% if q.required %}required{% endif %}></textarea>
                     {% else %}
-                        <input type="text" class="input input-bordered input-lg w-full focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all placeholder:text-slate-300 bg-slate-50 focus:bg-white" 
+                        <input type="text" name="question_{{ q.position }}" class="input input-bordered input-lg w-full focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all placeholder:text-slate-300 bg-slate-50 focus:bg-white" 
                             placeholder="Type your short answer..."
                         {% if q.min_length %}minlength="{{ q.min_length }}"{% endif %}
-                        {% if q.max_length %}maxlength="{{ q.max_length }}"{% endif %} />
+                        {% if q.max_length %}maxlength="{{ q.max_length }}"{% endif %}
+                        {% if q.required %}required{% endif %} />
                     {% endif %}
                 </div>
 
@@ -126,7 +137,7 @@
                                 {% for col in q.columns %}
                                     <td class="text-center p-4">
                                         <label class="cursor-pointer inline-flex items-center justify-center p-2 rounded-full hover:bg-primary/10 transition-colors">
-                                            <input type="radio" name="matrix_q{{ q.position }}_row{{ forloop.parentloop.counter }}" class="radio radio-primary radio-sm">
+                                            <input type="radio" name="{{ row }}_row{{ forloop.parentloop.counter }}" value="{{ col }}" class="radio radio-primary radio-sm" {% if q.required %}required{% endif %}>
                                         </label>
                                     </td>
                                 {% endfor %}
@@ -146,7 +157,7 @@
                     <div class="flex flex-wrap justify-center gap-2 sm:gap-4" @mouseleave="hover = null">
                         {% for i in q.range_min|get_range:q.range_max %}
                         <label class="cursor-pointer group relative flex-1 min-w-[40px] max-w-[60px]" @mouseenter="hover = {{ i }}">
-                            <input type="radio" name="q_{{ q.position }}" value="{{ i }}" x-model="rating" class="sr-only">
+                            <input type="radio" name="question_{{ q.position }}" value="{{ i }}" x-model="rating" class="sr-only" {% if q.required %}required{% endif %}>
                             <div class="aspect-square w-full rounded-xl border-2 flex items-center justify-center text-lg font-bold shadow-sm transition-all duration-200"
                                     :class="{'bg-primary border-primary text-white shadow-lg shadow-primary/30 -translate-y-2 scale-110': {{ i }} <= (hover || rating), 'bg-white border-slate-200 text-slate-400 group-hover:border-primary/30': {{ i }} > (hover || rating)}">
                                 {{ i }}
@@ -157,7 +168,7 @@
                 </div>
 
             <!-- 6. RANKING -->
-                {% elif q.NAME == 'Ranking Question' %}
+            {% elif q.NAME == 'Ranking Question' %}
             <div class="mt-4" 
                     x-data="{ 
                     options: [
@@ -173,6 +184,9 @@
                         }
                     }
                     }">
+                    <template x-for="option in options" :key="option">
+                        <input type="hidden" name="question_{{ q.position }}" :value="option">
+                    </template>
                     <!-- Re-implementing clearer ranking UI -->
                 <div class="flex flex-col gap-3" x-auto-animate>
                     <template x-for="(option, index) in options" :key="option">
@@ -193,24 +207,41 @@
     {% endfor %}
 
     <!-- Navigation Buttons -->
-    <div class="flex justify-between items-center pt-8 pb-12">
-        <button type="button" class="btn btn-ghost hover:bg-slate-200 gap-2 text-slate-500" 
-                x-show="page > 0" 
-                @click="window.scrollTo({top: 0, behavior: 'smooth'}); page--">
-            <i class="fa-solid fa-arrow-left"></i> Previous
-        </button>
-        
-        <button type="button" class="btn btn-primary btn-lg px-8 rounded-xl shadow-lg shadow-primary/25 hover:shadow-primary/40 gap-3" 
-                x-show="page < total - 1" 
-                @click="window.scrollTo({top: 0, behavior: 'smooth'}); page++">
-            Next Section <i class="fa-solid fa-arrow-right"></i>
-        </button>
+    <div class="flex flex-col gap-4 pt-8 pb-12">
+        <!-- Global Error Message -->
+        <div x-show="!isValid" 
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 -translate-y-2"
+             x-transition:enter-end="opacity-100 translate-y-0"
+             class="bg-red-50 border border-red-200 rounded-lg p-3 flex items-start gap-3 w-full animate-pulse">
+            <i class="fa-solid fa-circle-exclamation text-red-500 mt-0.5"></i>
+            <div>
+                <h4 class="text-sm font-semibold text-red-700">Incomplete Section</h4>
+                <p class="text-xs text-red-600 mt-1">Please answer all required questions marked with a red dot <span class="w-1.5 h-1.5 rounded-full bg-red-500 inline-block align-middle mx-0.5"></span> to proceed.</p>
+            </div>
+        </div>
 
-        <!-- Submit Button -->
-            <button type="submit" class="btn btn-primary btn-lg px-10 rounded-xl shadow-xl shadow-primary/30 hover:shadow-primary/50 hover:-translate-y-1 transition-all gap-3 bg-gradient-to-r from-primary to-primary-focus border-0" 
-                x-show="page === total - 1">
-            Submit Survey <i class="fa-solid fa-paper-plane"></i>
-        </button>
+        <div class="flex justify-between items-center w-full">
+            <button type="button" class="btn btn-ghost hover:bg-slate-200 gap-2 text-slate-500" 
+                    x-show="page > 0" 
+                    @click="window.scrollTo({top: 0, behavior: 'smooth'}); page--">
+                <i class="fa-solid fa-arrow-left"></i> Previous
+            </button>
+            
+            <button type="button" class="btn btn-primary btn-lg px-8 rounded-xl shadow-lg shadow-primary/25 hover:shadow-primary/40 gap-3 disabled:bg-slate-200 disabled:text-slate-400 disabled:shadow-none disabled:border-slate-200" 
+                    x-show="page < total - 1" 
+                    :disabled="!isValid"
+                    @click="window.scrollTo({top: 0, behavior: 'smooth'}); page++">
+                Next Section <i class="fa-solid fa-arrow-right"></i>
+            </button>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary btn-lg px-10 rounded-xl shadow-xl shadow-primary/30 hover:shadow-primary/50 hover:-translate-y-1 transition-all gap-3 bg-gradient-to-r from-primary to-primary-focus border-0 disabled:from-slate-300 disabled:to-slate-300 disabled:shadow-none disabled:text-slate-500" 
+                x-show="page === total - 1"
+                :disabled="!isValid">
+                Submit Survey <i class="fa-solid fa-paper-plane"></i>
+            </button>
+        </div>
     </div>
 
 </div>

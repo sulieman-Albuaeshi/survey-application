@@ -85,9 +85,8 @@
                 :style="`width: ${((page + 1) / total) * 100}%`"></div>
         </div>
 
-        <form method="POST" action="" class="space-y-6">
+        <form method="POST" action="{% url 'survey_submit' survey.uuid %}" class="space-y-6">
             {% csrf_token %}
-            
             {% include "partials/survey_questions_display.html" %}
         </form>
     </div>
