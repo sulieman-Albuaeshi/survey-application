@@ -1,0 +1,43 @@
+{% load static %}
+<div class="card bg-white shadow-lg border border-gray-200">
+    <div class="card-body">
+        <h3 class="text-xl font-semibold mb-6 text-center">{{ data.question.label }}</h3>
+        
+        <!-- Rating Question Analytics -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div>
+                <div >
+                    <div class="stat-title">Average Rating</div>
+                    <div class="stat-value text-primary">{{ data.average }}</div>
+                    <div class="stat-desc">Range: {{ data.question.range_min }} - {{ data.question.range_max }}</div>
+                </div>
+                
+                <div class="mt-4 space-y-2">
+                    <h4 class="font-semibold text-gray-700">Rating Frequency</h4>
+                    {% for rating, count in data.distribution.items %}
+                    {% widthratio count total_responses 100 as percentage %}
+                    <div class="flex items-center gap-3">
+                        <span class="w-12 text-sm font-medium">{{ rating }}</span>
+                        <div class="flex-1">
+                            <div class="w-full bg-gray-200 rounded-full h-6">
+                                <div class="bg-primary h-6 rounded-full flex items-center justify-end pr-2 text-white text-xs font-semibold"
+                                     style="width: {{ percentage }}%">
+                                     {{ count }}
+                                </div>
+                            </div>
+                        </div>
+                        <span class="w-12 text-sm text-gray-600">{{ count }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div>
+                <!-- Chart Canvas -->
+                <canvas data-question-id="{{ data.question.id }}" 
+                        data-survey-uuid="{{ survey.uuid }}"
+                        width="400" height="250"></canvas>
+            </div>
+        </div>
+    </div>
+</div>

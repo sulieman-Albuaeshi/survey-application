@@ -210,7 +210,28 @@ class MatrixQuestion(Question):
 
     NAME = "Matrix Question"
 
-    #  TODO : Convert the values to numeric representation as Likert Question
+    def get_matrix_distribution(self):
+        """
+        Returns a heatmap-like distribution:
+        {
+            'Row 1': {'Col A': 5, 'Col B': 2},
+            'Row 2': {'Col A': 1, 'Col B': 6}
+        }
+        """
+        answers = Answer.objects.filter(question=self)
+        
+        # Initialize structure
+        distribution = {row: {col: 0 for col in self.columns} for row in self.rows}
+        
+        for ans in answers:
+            data = ans.answer_data # Expected: {'Row 1': 'Col A', 'Row 2': 'Col B'}
+            if isinstance(data, dict):
+                for row_key, col_val in data.items():
+                    if row_key in distribution and col_val in distribution[row_key]:
+                        distribution[row_key][col_val] += 1
+                        
+        return distribution
+
     def get_numeric_answer(self, answer_data):
         # Number of answered rows (best-effort)
         if not answer_data:
@@ -249,9 +270,71 @@ class RatingQuestion(Question):
     max_label = models.CharField(max_length=50, blank=True, null=True) # e.g. "Excellent"
     NAME = "Rating Question"
 
+    def get_numeric_answer(self, answer_data):
+        """Returns the rating value directly."""
+        if answer_data is None or answer_data == "":
+            return ""
+        return str(answer_data)
+
+    def get_average_rating(self):
+        """Calculate average rating for this question"""
+        answers = Answer.objects.filter(question=self)
+        if not answers.exists():
+            return 0
+        
+        total = 0
+        count = 0
+        for answer in answers:
+            try:
+                val = float(answer.answer_data)
+                total += val
+                count += 1
+            except (ValueError, TypeError):
+                continue
+        
+        if count == 0:
+            return 0
+            
+        return round(total / count, 2)
+
+    def get_rating_distribution(self):
+        """Get distribution of ratings"""
+        answers = Answer.objects.filter(question=self)
+        distribution = {}
+        
+        # Initialize distribution
+        for i in range(self.range_min, self.range_max + 1):
+            distribution[i] = 0
+        
+        for answer in answers:
+            try:
+                val = int(float(answer.answer_data))
+                if val in distribution:
+                    distribution[val] += 1
+            except (ValueError, TypeError):
+                continue
+        
+        return distribution
+
 class RankQuestion(Question):
     options = models.JSONField(default=list)
     NAME = "Ranking Question"
+
+    def get_numeric_answer(self, answer_data):
+        """
+        Returns the index (0-based) of the first choice in the options list.
+        This treats the #1 ranked item as the 'selected' value.
+        """
+        if not answer_data or not isinstance(answer_data, list) or len(answer_data) == 0:
+            return ""
+        try:
+            # Return index of the first item in the ranking
+            first_choice = answer_data[0]
+            if first_choice in self.options:
+                 return str(self.options.index(first_choice))
+        except (ValueError, AttributeError):
+            pass
+        return ""
 
     def get_average_ranks(self):
         """
