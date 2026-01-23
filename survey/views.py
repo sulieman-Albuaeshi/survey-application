@@ -7,19 +7,39 @@ from django.db.models import Q, Count, Avg, Max, Prefetch
 from django.db import transaction
 from django.core.paginator import Paginator
 from .models import Question as que, Survey, Response, Answer, MultiChoiceQuestion, LikertQuestion, CustomUser, Question, SectionHeader, RatingQuestion, RankQuestion, MatrixQuestion, TextQuestion
-from .forms import MultiChoiceQuestionForm, RatingQuestionForm, SurveyForm,  LikertQuestionForm,  QuestionFormSet, MatrixQuestionForm, RankQuestionForm, TextQuestionForm, SectionHeaderForm
+from .forms import MultiChoiceQuestionForm, RatingQuestionForm, SurveyForm,  LikertQuestionForm,  QuestionFormSet, MatrixQuestionForm, RankQuestionForm, TextQuestionForm, SectionHeaderForm, CustomUserCreationForm
 from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
 from datetime import timedelta, datetime
 from django.views import View
 from django.views.generic import CreateView, UpdateView, DeleteView, DetailView
 from django.shortcuts import redirect
+from django.urls import reverse_lazy
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from .utility import normalize_formset_indexes
 
 
+
+from django.contrib.auth import login
+
 # Create your views here.
-class SurveyCreateView(CreateView):
+class SignUpView(CreateView):
+    form_class = CustomUserCreationForm
+    success_url = reverse_lazy('Dashboard')
+    template_name = 'registration/signup.html'
+
+    def form_valid(self, form):
+        # Save user and log them in
+        user = form.save()
+        login(self.request, user)
+        return redirect(self.success_url)
+
+
+
+class SurveyCreateView(LoginRequiredMixin, CreateView):
     model = Survey
+
     form_class = SurveyForm
     template_name = 'CreateSurvey.html'
     success_url = '/Dashboard'  
@@ -123,7 +143,7 @@ class SurveyCreateView(CreateView):
                 else:
                     self.object.state = 'draft'
 
-                self.object.created_by = CustomUser.objects.first()
+                self.object.created_by = self.request.user
                 
                 # Calculate valid questions count (excluding SectionHeader)
                 valid_questions = 0
@@ -151,7 +171,7 @@ class SurveyCreateView(CreateView):
             return self.form_invalid(form)  
         
 
-class AddQuestionFormView(View):
+class AddQuestionFormView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         # Get the question index (count) from the POST data.
         # This value represents the current number of questions *before* adding the new one,
@@ -206,6 +226,7 @@ class AddQuestionFormView(View):
 
         return render(request, f'partials/Create_survey/Questions/{template_name}.html', context)
 
+@login_required
 def Index(request, page_number=1):
     from urllib.parse import urlencode
 
@@ -259,7 +280,7 @@ def Index(request, page_number=1):
 
     # Base queryset with response counts
     # We need annotate to filter by responses count
-    surveys = Survey.objects.annotate(
+    surveys = Survey.objects.filter(created_by=request.user).annotate(
         responses_count=Count('responses')
     )
 
@@ -317,9 +338,10 @@ def Index(request, page_number=1):
 
     # For initial page loads, add any extra context needed.
     # We fetch fresh recent surveys so they are NOT affected by the search query
-    context['recent_surveys'] = Survey.objects.order_by('-last_updated')[:4]
+    context['recent_surveys'] = Survey.objects.filter(created_by=request.user).order_by('-last_updated')[:4]
     return render(request, 'index.html', context)
 
+@login_required
 def Responses(request, page_number=1):
     """Main responses view showing all surveys with response counts and filters"""
     from urllib.parse import urlencode
@@ -380,7 +402,7 @@ def Responses(request, page_number=1):
     print(f"DEBUG: query='{query}', state='{state_filter}', responses='{responses_filter}'")
 
     # Base queryset with response counts
-    surveys = Survey.objects.annotate(
+    surveys = Survey.objects.filter(created_by=request.user).annotate(
         responses_count=Count('responses')
     )
     
@@ -422,7 +444,7 @@ def Responses(request, page_number=1):
     surveys = surveys.order_by('-last_updated')
     
     # Get recent surveys with responses (not affected by search/filters for the card section)
-    recent_surveys_with_responses = Survey.objects.annotate(
+    recent_surveys_with_responses = Survey.objects.filter(created_by=request.user).annotate(
         responses_count=Count('responses')
     ).filter(responses_count__gt=0).order_by('-last_updated')[:4]
     
@@ -449,9 +471,10 @@ def Responses(request, page_number=1):
     
     return render(request, 'Responses.html', context)
 
+@login_required
 def SurveyResponseDetail(request, uuid):
     """Detailed view of responses for a specific survey"""
-    survey = get_object_or_404(Survey, uuid=uuid)
+    survey = get_object_or_404(Survey, uuid=uuid, created_by=request.user)
     responses = Response.objects.filter(survey=survey).order_by('-created_at')
     
     # Pagination for responses
@@ -477,9 +500,10 @@ def SurveyResponseDetail(request, uuid):
     
     return render(request, 'SurveyResponseDetail.html', context)
 
+@login_required
 def SurveyAnalytics(request, uuid):
     """Analytics and charts for a specific survey"""
-    survey = get_object_or_404(Survey, uuid=uuid)
+    survey = get_object_or_404(Survey, uuid=uuid, created_by=request.user)
     questions = survey.questions.all()
     
     # Prepare analytics data for each question
@@ -538,9 +562,10 @@ def SurveyAnalytics(request, uuid):
     
     return render(request, 'SurveyAnalytics.html', context)
 
+@login_required
 def GetChartData(request, uuid, question_id):
     """API endpoint to get chart data for a specific question"""
-    survey = get_object_or_404(Survey, uuid=uuid)
+    survey = get_object_or_404(Survey, uuid=uuid, created_by=request.user)
     question = get_object_or_404(que, pk=question_id)
     
     data = {
@@ -605,16 +630,18 @@ def GetChartData(request, uuid, question_id):
 
 # HTMX 
 @require_POST
+@login_required
 def DeleteSurvey(request, uuid):
-    item = get_object_or_404(Survey, uuid=uuid)
+    item = get_object_or_404(Survey, uuid=uuid, created_by=request.user)
     item.delete()
     return HttpResponse(status=200)
+@login_required
 
 def SurveyResponsesOverviewTable(request, uuid):
     """
     Returns the HTML for the responses overview table (numeric values).
     """
-    survey = get_object_or_404(Survey, uuid=uuid)
+    survey = get_object_or_404(Survey, uuid=uuid, created_by=request.user)
     # Exclude SectionHeader from the questions list
     questions = survey.questions.instance_of(Question).not_instance_of(SectionHeader).order_by('position')
     
@@ -651,9 +678,10 @@ def SurveyResponsesOverviewTable(request, uuid):
     return render(request, 'partials/SurveyResponseDetail/responses_overview_table.html', context)
 
 @require_POST
+@login_required
 def ToggleSurveyStatus(request, uuid):
     """Toggle survey status between 'draft' and 'published'."""
-    survey = get_object_or_404(Survey, uuid=uuid)
+    survey = get_object_or_404(Survey, uuid=uuid, created_by=request.user)
     
     if survey.state == 'published':
         survey.state = 'draft'

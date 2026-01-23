@@ -1,8 +1,18 @@
 from django import forms
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.auth.forms import UserCreationForm
 from polymorphic.formsets import polymorphic_inlineformset_factory, PolymorphicFormSetChild
 from . import models
 
+class CustomUserCreationForm(UserCreationForm):
+    class Meta:
+        model = models.CustomUser
+        fields = ("username",)
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Remove the confusing help text about 150 characters
+        self.fields['username'].help_text = ''
 
 class SurveyForm(forms.ModelForm):
     class Meta:
