@@ -34,7 +34,6 @@ urlpatterns = [
 
 url_for_htmx = [
     path("surveys/<uuid:uuid>/toggle-status", views.ToggleSurveyStatus, name="ToggleSurveyStatus"),
-    path("surveys/<uuid:uuid>/toggle-status-table", views.ToggleSurveyStatusFromTable, name="ToggleSurveyStatusFromTable"),
 ]
 
 urlpatterns += url_for_htmx

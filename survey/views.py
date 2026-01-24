@@ -16,7 +16,7 @@ from django.views import View
 from django.views.generic import CreateView, UpdateView, DeleteView, DetailView
 from django.shortcuts import redirect
 from django.urls import reverse
-from .utility import normalize_formset_indexes
+from .utility import normalize_formset_indexes, get_dashboard_surveys
 from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login
@@ -260,69 +260,9 @@ def Index(request, page_number=1):
         'params': current_params
     }
     # --- End Session Persistence Logic ---
-
-    query = request.GET.get('search', '').strip()
-    state_filter = request.GET.get('state_filter', '').strip()
-    responses_filter = request.GET.get('responses_filter', '').strip()
-    start_date = request.GET.get('start_date', '').strip()
-    end_date = request.GET.get('end_date', '').strip()
-
-    # Base queryset with response counts
-    # We need annotate to filter by responses count
-    surveys = Survey.objects.filter(created_by=request.user).annotate(
-        responses_count=Count('responses')
-    )
-
-    # 1. Apply Date Filter (based on last_updated)
-    if start_date:
-        try:
-            start_date_obj = datetime.strptime(start_date, '%Y-%m-%d').date()
-            surveys = surveys.filter(last_updated__date__gte=start_date_obj)
-        except ValueError:
-            pass # Ignore invalid date format
-            
-    if end_date:
-        try:
-            end_date_obj = datetime.strptime(end_date, '%Y-%m-%d').date()
-            # Add one day to include the end date itself
-            surveys = surveys.filter(last_updated__date__lte=end_date_obj)
-        except ValueError:
-            pass # Ignore invalid date format
-
-    # 2. Apply State Filter
-    if state_filter and state_filter.lower() in ['draft', 'published', 'archived', 'closed']:
-         surveys = surveys.filter(state=state_filter.lower())
     
-    # 3. Apply Responses Count Filter
-    if responses_filter == 'has_responses':
-        surveys = surveys.filter(responses_count__gt=0)
-    elif responses_filter == 'no_responses':
-        surveys = surveys.filter(responses_count=0)
-
-    # 4. Apply Search Query
-    if query:
-        surveys = surveys.filter(
-            Q(title__icontains=query) |
-            Q(description__icontains=query)
-        )
-    
-    surveys = surveys.order_by('-last_updated')
-
-    paginator = Paginator(surveys, 5)
-    page = paginator.get_page(page_number)
-
-    # Use get_elided_page_range for better pagination
-    elided_page_range = paginator.get_elided_page_range(page.number, on_each_side=1, on_ends=1)
-
-    context = {
-        'page': page,
-        'elided_page_range': elided_page_range,
-        'query': query,
-        'state_filter': state_filter,
-        'responses_filter': responses_filter,
-        'start_date': start_date,
-        'end_date': end_date,
-    }
+    # CALL HELPER
+    context = get_dashboard_surveys(request.user, request.GET, page_number)
 
     is_htmx = request.headers.get('HX-Request') == 'true'
 
@@ -678,25 +618,18 @@ def ToggleSurveyStatus(request, uuid):
         survey.state = 'published'
         
     survey.save()
-    
-    # If the request is from the dashboard card, we might want to update the whole card or specific parts.
-    # Here we return the button and using OOB swap, we can update the status badge as well.
-    
-    return render(request, 'partials/Dashboard/survey_toggle_button_with_oob.html', {'survey': survey})
 
-@login_required
-def ToggleSurveyStatusFromTable(request, uuid):
-    """Toggle survey status between 'draft' and 'published'."""
-    survey = get_object_or_404(Survey, uuid=uuid)
-    
-    if survey.state == 'published':
-        survey.state = 'draft'
-    else:
-        survey.state = 'published'
-        
-    survey.save()
+    saved_state = request.session.get('dashboard_last_state', {})
+    saved_page = saved_state.get('page_number', 1)
+    saved_params = saved_state.get('params', {})
 
-    return render(request, 'partials/Dashboard/table_toggel_oob.html', {'survey': survey})
+    # 3. Re-fetch Data using Helper
+    context = get_dashboard_surveys(request.user, saved_params, saved_page)
+
+    # 4. Add Recent Surveys (since these might have changed order/status too)
+    context['recent_surveys'] = Survey.objects.filter(created_by=request.user).order_by('-last_updated')[:4]
+    
+    return render(request, 'partials/Dashboard/tabel_with_recnt_survey.html', context)
 
 @login_required 
 def survey_Start_View(request, uuid):

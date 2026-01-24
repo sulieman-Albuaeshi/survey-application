@@ -7,7 +7,8 @@ any 'recently_viewed': recently_viewed, # list of recently viewed items }
     class="bg-white shadow-sm hover:shadow-md transition-shadow duration-300 border border-slate-200 relative sm:rounded-xl overflow-hidden w-full"
   >
     <!-- header bar -->
-    {% include "partials/table_filters.html" with filter_url="Dashboard" filter_target=".survey-table-body" filter_form_id="dashboard-filter-form" show_dashboard_actions=True %}
+    {% url 'Dashboard' as dashboard_url %}
+    {% include "partials/table_filters.html" with filter_url=dashboard_url filter_target=".survey-table-body" filter_form_id="dashboard-filter-form" show_dashboard_actions=True %}
     <!-- Table Content-->
     <div class="overflow-x-visible relative">
       <table class="w-full text-sm text-left text-gray-500 table-fixed">

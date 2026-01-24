@@ -19,7 +19,7 @@
              </div>
         </div>
         
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="recent-activity-section">
             {% for survey in recent_surveys %}
                 {% include "partials/Dashboard/surveyRecntCard.html" with survey=survey %}
             {% empty %}
@@ -46,7 +46,7 @@
              </div>
         </div>
         
-        <div class="w-full">
+        <div class="w-full" id ="all-surveys-table">
             {% include "partials/Dashboard/tableSurvey.html" %}
         </div>
     </section>

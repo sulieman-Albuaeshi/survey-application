@@ -1,5 +1,11 @@
 from django.http import QueryDict
 
+from survey.models import Survey
+from django.core.paginator import Paginator
+from django.db.models import Q, Count
+from datetime import  datetime
+
+
 def normalize_formset_indexes( data: QueryDict, prefix: str):
     """
     Convert any question indexes (0,5,20...) → continuous (0,1,2...).
@@ -52,3 +58,66 @@ def normalize_formset_indexes( data: QueryDict, prefix: str):
          new_data[f"{prefix}-TOTAL_FORMS"] = 0
          
     return new_data
+
+def get_dashboard_surveys(user, params, page_number=1):
+    """
+    Reusable logic to filter surveys and return pagination data.
+    """
+    query = params.get('search', '').strip()
+    state_filter = params.get('state_filter', '').strip()
+    responses_filter = params.get('responses_filter', '').strip()
+    start_date = params.get('start_date', '').strip()
+    end_date = params.get('end_date', '').strip()
+
+    surveys = Survey.objects.filter(created_by=user).annotate(
+        responses_count=Count('responses')
+    )
+
+    # 1. Date Filter
+    if start_date:
+        try:
+            start_date_obj = datetime.strptime(start_date, '%Y-%m-%d').date()
+            surveys = surveys.filter(last_updated__date__gte=start_date_obj)
+        except ValueError:
+            pass
+            
+    if end_date:
+        try:
+            end_date_obj = datetime.strptime(end_date, '%Y-%m-%d').date()
+            surveys = surveys.filter(last_updated__date__lte=end_date_obj)
+        except ValueError:
+            pass
+
+    # 2. State Filter
+    if state_filter and state_filter.lower() in ['draft', 'published', 'archived', 'closed']:
+         surveys = surveys.filter(state=state_filter.lower())
+
+    # 3. Responses Filter
+    if responses_filter == 'has_responses':
+        surveys = surveys.filter(responses_count__gt=0)
+    elif responses_filter == 'no_responses':
+        surveys = surveys.filter(responses_count=0)
+
+    # 4. Search
+    if query:
+        surveys = surveys.filter(
+            Q(title__icontains=query) |
+            Q(description__icontains=query)
+        )
+
+    surveys = surveys.order_by('-last_updated')
+
+    paginator = Paginator(surveys, 5)
+    page = paginator.get_page(page_number)
+    elided_page_range = paginator.get_elided_page_range(page.number, on_each_side=1, on_ends=1)
+
+    return {
+        'page': page,
+        'elided_page_range': elided_page_range,
+        # Return params back so template inputs are populated
+        'query': query,
+        'state_filter': state_filter,
+        'responses_filter': responses_filter,
+        'start_date': start_date,
+        'end_date': end_date,
+    }

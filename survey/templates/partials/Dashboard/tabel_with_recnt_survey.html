@@ -1,0 +1,18 @@
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="recent-activity-section" 
+hx-swap-oob="true">
+    {% for survey in recent_surveys %}
+        {% include "partials/Dashboard/surveyRecntCard.html" with survey=survey %}
+    {% empty %}
+        <div class="col-span-full flex flex-col items-center justify-center p-12 bg-base-100 rounded-xl border-2 border-dashed border-base-300 text-center">
+            <svg class="h-10 w-10 text-gray-400 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <h3 class="text-sm font-medium text-gray-900">No surveys yet</h3>
+            <p class="mt-1 text-sm text-gray-500">Create your first survey to see it here.</p>
+        </div>
+    {% endfor %}
+</div>
+
+<div class="w-full" id ="all-surveys-table" hx-swap-oob="true">
+    {% include "partials/Dashboard/tableSurvey.html" %}
+</div>
