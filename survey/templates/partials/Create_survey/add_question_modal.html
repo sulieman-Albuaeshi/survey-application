@@ -1,7 +1,7 @@
 <dialog id="add_question_modal" class="modal modal-bottom sm:modal-middle">
-  <div class="modal-box p-0 overflow-hidden bg-white rounded-2xl max-w-2xl w-full scrollbar-hide">
+  <div class="modal-box p-0 bg-white rounded-2xl max-w-2xl w-full flex flex-col max-h-[90vh]">
     <!-- Header -->
-    <div class="flex flex-col justify-center px-6 py-4 border-b border-gray-100 bg-gray-50/80 backdrop-blur-sm sticky top-0 z-10 relative">
+    <div class="flex flex-col justify-center px-6 py-4 border-b border-gray-100 bg-gray-50/80 backdrop-blur-sm sticky top-0 z-10">
         <div>
             <h3 class="font-bold text-xl text-gray-800">Add a New Question</h3>
             <p class="text-xs text-gray-500 mt-0.5">Select a format to add to your survey</p>
@@ -14,7 +14,7 @@
     </div>
 
     <!-- Content -->
-    <div class="p-6 bg-white">
+    <div class="p-6 bg-white overflow-y-auto flex-1">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
             {% for question_type in question_type_list %}
             <button type="button"

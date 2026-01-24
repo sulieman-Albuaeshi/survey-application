@@ -1,22 +1,26 @@
 {% comment %} 
     context = {'survey': survey}
 {% endcomment %}
-<tr class="border-b" id="survey-row-{{ survey.uuid }}">
-    <th scope="row" class="px-4 py-3 font-medium text-gray-600">{{ survey.title }}</th>
-    <td class="mx-4 my-3 line-clamp-3">{{ survey.description }}</td>
-    <td class="px-2 py-3 rounded-full text-center">
-        <span id="survey-table-status-{{ survey.uuid }}" class="rounded-full px-4 py-2 {{ survey.status_badge_class }} ">{{ survey.state }}</span>
+<tr class="bg-white hover:bg-gray-50 border-b border-gray-100" id="survey-row-{{ survey.uuid }}">
+    <td class="px-8 py-4 font-medium text-gray-900">
+        {{ survey.title }}
+    </td>
+    <td class="px-8 py-4 text-gray-600 line-clamp-2">
+        {{ survey.description }}
+    </td>
+    <td class="px-8 py-4 text-center">
+        <span id="survey-table-status-{{ survey.uuid }}" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider {{ survey.status_badge_class }} ">{{ survey.state }}</span>
     </td>
     <!-- TODO -->
-    <td class="px-4 py-3 text-center">{{ survey.response_count }}</td>
-    <td class="px-4 py-3 text-center">{{ survey.last_updated|date:"SHORT_DATETIME_FORMAT" }}</td>
+    <td class="px-8 py-4 text-center text-gray-600 font-medium pb-7">{{ survey.response_count }}</td>
+    <td class="px-8 py-4 text-center text-gray-500 pb-7">{{ survey.last_updated|date:"M d, Y" }}</td>
     <!-- Dropdown menu -->
-    <td class="px-4 py-3 tex" x-data="{ open: false }">
+    <td class="px-8 py-4 text-center pb-7" x-data="{ open: false }">
         <div class="dropdown dropdown-left dropdown-center">
             <!-- 2. The trigger button needs a tabindex -->
             <div tabindex="0"
                  role="button"
-                 class="inline-flex items-center p-0.5 text-sm font-medium text-center text-gray-500 hover:text-gray-800 rounded-lg focus:outline-none">
+                 class="inline-flex items-center p-2 text-sm font-medium text-center text-gray-500 hover:text-gray-800 bg-gray-100 hover:bg-gray-200 rounded-full focus:outline-none transition-colors">
                 <svg class="w-5 h-5"
                      aria-hidden="true"
                      fill="currentColor"
