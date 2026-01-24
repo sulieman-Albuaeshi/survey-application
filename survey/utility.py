@@ -107,7 +107,7 @@ def get_dashboard_surveys(user, params, page_number=1):
 
     surveys = surveys.order_by('-last_updated')
 
-    paginator = Paginator(surveys, 5)
+    paginator = Paginator(surveys, 10)
     page = paginator.get_page(page_number)
     elided_page_range = paginator.get_elided_page_range(page.number, on_each_side=1, on_ends=1)
 
