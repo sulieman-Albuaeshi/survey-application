@@ -60,7 +60,7 @@
         {% endif %}
 
         {% if user.is_authenticated %}
-            <div class="dropdown dropdown-end" style="margin-right: 1rem;">
+            <div class="dropdown dropdown-end" style="margin-right: 1rem; margin-left: 0.5rem;">
                 <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar placeholder">
                     <div class="bg-primary text-primary-content rounded-full w-10">
                         <span class="text-xl">{{ user.username|slice:":1"|upper }}</span>
