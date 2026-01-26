@@ -727,7 +727,7 @@ def survey_submit(request, uuid):
                     elif question.NAME == 'Ranking Question':
                         if values:
                             # Save as dict where key is the rank (1-based)
-                            answer_data = {str(i): val for i, val in enumerate(values, start=1)}
+                            answer_data = {str(i): val for i, val in enumerate(values[::-1], start=1)}
                         else:
                             answer_data = None
 
