@@ -1,3 +1,4 @@
+{% load i18n %}
 {% comment %} 
     context = {'survey': survey}
 {% endcomment %}
@@ -33,22 +34,22 @@
             <ul tabindex="0"
                 class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-44">
                 <li>
-                    <a href="{% url 'SurveyResponseDetail' survey.uuid %}">Show Responses</a>
+                    <a href="{% url 'SurveyResponseDetail' survey.uuid %}">{% trans "Show Responses" %}</a>
                 </li>
                 <li>
-                    <a href="{% url 'SurveyPreview' survey.uuid %}" target="_blank" rel="noopener noreferrer">Preview</a>
+                    <a href="{% url 'SurveyPreview' survey.uuid %}" target="_blank" rel="noopener noreferrer">{% trans "Preview" %}</a>
                 </li>
                 <li id="edit-survey-link-{{ survey.uuid }}">
-                    <a href="{% url 'EditSurvey' survey.uuid %}" {% if survey.state == 'published' %}class="text-gray-400 pointer-events-none"{% endif %}>Edit</a>
+                    <a href="{% url 'EditSurvey' survey.uuid %}" {% if survey.state == 'published' %}class="text-gray-400 pointer-events-none"{% endif %}>{% trans "Edit" %}</a>
                 </li>
                 <li>
-                    <a href="{% url 'Copy' survey.uuid %}" >Copy</a>
+                    <a href="{% url 'Copy' survey.uuid %}" >{% trans "Copy" %}</a>
                 </li>
                 <div class="divider my-0"></div>
                 <li >
                     <button hx-post="{% url 'ToggleSurveyStatusConfirm' survey.uuid %}" hx-target="#modal-container"
                         hx-swap="innerHTML" >
-                        {% if survey.state == 'published' %}End Survey{% elif survey.state == 'archived' %}Restore{% elif survey.state == 'draft' %}Begin Survey{% endif %}
+                        {% if survey.state == 'published' %}{% trans "End Survey" %}{% elif survey.state == 'archived' %}{% trans "Restore" %}{% elif survey.state == 'draft' %}{% trans "Begin Survey" %}{% endif %}
                     </button>
                 </li>
                 <li>
@@ -57,7 +58,7 @@
                         hx-get="{% url 'DeleteSurveyConfirmModal' survey.uuid %}"
                         hx-target="#modal-container"
                         hx-swap="innerHTML">
-                        Delete
+                        {% trans "Delete" %}
                     </a>
                 </li>
             </ul>

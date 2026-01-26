@@ -1,19 +1,22 @@
-{% extends "base.html" %} {% block content %}
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-  <!-- Header -->
-  <div class="mb-10">
-    <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">Survey Responses</h1>
-    <p class="mt-2 text-sm text-gray-500">
-      Overview of recent activity and all collected responses across your surveys.
-    </p>
-  </div>
+{% extends "base.html" %} 
+{% load i18n %} 
+{% block content %}
+<div class="container mx-auto sm:px-6 py-8">
+  <div class="space-y-20 w-full animate-fade-in-up">
+    <!-- Header -->
+    <div class="mb-10">
+      <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">{% trans "Survey Responses" %}</h1>
+      <p class="mt-2 text-sm text-gray-500">
+      {% trans "Overview of recent activity and all collected responses across your surveys." %}
+      </p>
+    </div>
 
-  <!-- Recent Surveys with Responses -->
-  <section class="mb-12">
+    <!-- Recent Surveys with Responses -->
+    <section class="mb-12">
     <div class="flex items-center justify-between mb-6">
       <h2 class="text-xl font-bold text-gray-900">
           <i class="fa-solid fa-clock-rotate-left text-slate-400"></i> 
-          Recent Activity
+          {% trans "Recent Activity" %}
       </h2>
     </div>
     
@@ -25,29 +28,30 @@
             <svg class="h-10 w-10 text-gray-400 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
-            <h3 class="text-sm font-medium text-gray-900">No responses yet</h3>
-            <p class="mt-1 text-sm text-gray-500">Surveys with new responses will appear here.</p>
+            <h3 class="text-sm font-medium text-gray-900">{% trans "No responses yet" %}</h3>
+            <p class="mt-1 text-sm text-gray-500">{% trans "Surveys with new responses will appear here." %}</p>
         </div>
       {% endfor %}
     </div>
   </section>
 
   <!-- All Surveys Table -->
-  <section>
+  <section class="m-0">
     <div class="flex items-center justify-between mb-4">
       <h2 class="text-xl font-bold text-gray-900">
           <i class="fa-solid fa-list-check text-slate-400"></i> 
           All Surveys
       </h2>
     </div>
-
-    <div class="bg-white shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl overflow-hidden">
+    <div class="w-full">
+    <div class="bg-white shadow-sm hover:shadow-md transition-shadow duration-300 border border-slate-200 relative sm:rounded-xl overflow-hidden w-full">
       {% include "partials/table_filters.html" %}
       
       <div id="responses-table-and-pagination-container" class="border-t border-gray-100">
         {% include "partials/Responses/responses_table_body.html" %}
       </div>
     </div>
+  </div>
   </section>
 </div>
 {% endblock content %}

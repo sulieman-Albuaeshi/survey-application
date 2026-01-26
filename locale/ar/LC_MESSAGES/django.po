@@ -1,0 +1,450 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-25 21:44+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: ar\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
+"&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
+
+#: .\project\settings.py:110
+msgid "English"
+msgstr "الإنجليزية"
+
+#: .\project\settings.py:111
+msgid "Arabic"
+msgstr "العربية"
+
+#: .\survey\forms.py:23
+msgid "e.g. Customer Satisfaction"
+msgstr "مثال: رضا العملاء"
+
+#: .\survey\forms.py:24
+msgid "e.g. This survey is about customer satisfaction."
+msgstr "مثال: هذا الاستبيان حول رضا العملاء."
+
+#: .\survey\forms.py:29
+msgid "Survey Name"
+msgstr "اسم الاستبيان"
+
+#: .\survey\forms.py:30 .\survey\models.py:22
+#: .\survey\templates\partials\Dashboard\tableSurvey.html:17
+msgid "Title"
+msgstr "العنوان"
+
+#: .\survey\templates\partials\Dashboard\tableSurvey.html:18
+msgid "Description"
+msgstr "الوصف"
+
+#: .\survey\forms.py:31 .\survey\models.py:28
+msgid "Shuffle Questions"
+msgstr "خلط الأسئلة"
+
+#: .\survey\forms.py:32 .\survey\models.py:29
+msgid "Anonymous Responses"
+msgstr "ردود مجهولة"
+
+#: .\survey\forms.py:48
+msgid "Enter the label of the question"
+msgstr "أدخل عنوان السؤال"
+
+#: .\survey\forms.py:49
+msgid "Enter the helper text of the question"
+msgstr "أدخل نص المساعدة للسؤال"
+
+#: .\survey\forms.py:54 .\survey\models.py:69
+msgid "Label"
+msgstr "العنوان"
+
+#: .\survey\forms.py:55 .\survey\models.py:70
+msgid "Helper Text"
+msgstr "نص المساعدة"
+
+#: .\survey\forms.py:56 .\survey\models.py:71
+msgid "Required"
+msgstr "مطلوب"
+
+#: .\survey\forms.py:83
+msgid "Enter the minimum number of options to be selected"
+msgstr "أدخل الحد الأدنى من الخيارات التي يجب تحديدها"
+
+#: .\survey\forms.py:86 .\survey\models.py:90 .\survey\models.py:139
+#: .\survey\models.py:327
+msgid "Options"
+msgstr "الخيارات"
+
+#: .\survey\forms.py:87
+msgid "Allow Multiple Selections"
+msgstr "السماح باختيارات متعددة"
+
+#: .\survey\forms.py:88 .\survey\models.py:92
+msgid "Randomize Options"
+msgstr "ترتيب عشوائي للخيارات"
+
+#: .\survey\forms.py:89
+msgid "Minimum Options Required"
+msgstr "الحد الأدنى للخيارات المطلوبة"
+
+#: .\survey\forms.py:102
+msgid "The Options field is required for a multiple choice question."
+msgstr "حقل الخيارات مطلوب لسؤال الاختيار من متعدد."
+
+#: .\survey\forms.py:107
+msgid "At least two options are required for a multiple choice question."
+msgstr "مطلوب خيارين على الأقل لسؤال الاختيار من متعدد."
+
+#: .\survey\forms.py:117
+msgid ""
+"The minimum number of required options cannot be greater than the total "
+"number of available options."
+msgstr "لا يمكن أن يكون الحد الأدنى للخيارات المطلوبة أكبر من إجمالي عدد الخيارات المتاحة."
+
+#: .\survey\forms.py:121
+msgid "The minimum number of required options cannot be negative."
+msgstr "لا يمكن أن يكون الحد الأدنى للخيارات المطلوبة رقمًا سالبًا."
+
+#: .\survey\forms.py:168
+msgid "The Options field is required for a Likert question."
+msgstr "حقل الخيارات مطلوب لسؤال ليكرت."
+
+#: .\survey\forms.py:173
+msgid "At least two options are required for a Likert question."
+msgstr "مطلوب خيارين على الأقل لسؤال ليكرت."
+
+#: .\survey\forms.py:211
+msgid "The Rows fields are required for a Matrix question."
+msgstr "حقول الصفوف مطلوبة لسؤال المصفوفة."
+
+#: .\survey\forms.py:216
+msgid "At least two rows are required for a Matrix question."
+msgstr "مطلوب صفين على الأقل لسؤال المصفوفة."
+
+#: .\survey\forms.py:221
+msgid "The Columns fields are required for a Matrix question."
+msgstr "حقول الأعمدة مطلوبة لسؤال المصفوفة."
+
+#: .\survey\forms.py:226
+msgid "At least two columns are required for a Matrix question."
+msgstr "مطلوب عمودين على الأقل لسؤال المصفوفة."
+
+#: .\survey\forms.py:266
+msgid "e.g. Poor"
+msgstr "مثال: ضعيف"
+
+#: .\survey\forms.py:271
+msgid "e.g. Excellent"
+msgstr "مثال: ممتاز"
+
+#: .\survey\forms.py:276
+msgid "Range Minimum"
+msgstr "الحد الأدنى للنطاق"
+
+#: .\survey\forms.py:277
+msgid "Range Maximum"
+msgstr "الحد الأقصى للنطاق"
+
+#: .\survey\forms.py:278
+msgid "Minimum Label"
+msgstr "تسمية الحد الأدنى"
+
+#: .\survey\forms.py:279
+msgid "Maximum Label"
+msgstr "تسمية الحد الأقصى"
+
+#: .\survey\forms.py:288
+msgid "Max value must be greater than Min value."
+msgstr "يجب أن تكون القيمة العظمى أكبر من القيمة الصغرى."
+
+#: .\survey\forms.py:290
+msgid "Scale range is too large (max 20 steps)."
+msgstr "نطاق المقياس كبير جدًا (الحد الأقصى 20 خطوة)."
+
+#: .\survey\models.py:13
+#: .\survey\templates\partials\Responses\survey_response_card.html:22
+msgid "Draft"
+msgstr "مسودة"
+
+#: .\survey\models.py:14
+msgid "Published"
+msgstr "منشور"
+
+#: .\survey\models.py:15
+#: .\survey\templates\partials\Responses\survey_response_card.html:27
+msgid "Archived"
+msgstr "مؤرشف"
+
+#: .\survey\models.py:23
+msgid "Created At"
+msgstr "تاريخ الإنشاء"
+
+#: .\survey\models.py:24
+#: .\survey\templates\partials\Dashboard\tableSurvey.html:21
+msgid "Last Updated"
+msgstr "آخر تحديث"
+
+#: .\survey\models.py:25
+msgid "State"
+msgstr "الحالة"
+
+#: .\survey\models.py:26
+msgid "Created By"
+msgstr "تم الإنشاء بواسطة"
+
+#: .\survey\models.py:27
+msgid "Question Count"
+msgstr "عدد الأسئلة"
+
+#: .\survey\models.py:32 .\survey\models.py:68
+msgid "Survey"
+msgstr "الاستبيان"
+
+#: .\survey\models.py:33
+msgid "Surveys"
+msgstr "الاستبيانات"
+
+#: .\survey\models.py:72
+msgid "Position"
+msgstr "الموضع"
+
+#: .\survey\models.py:76
+msgid "Question"
+msgstr "سؤال"
+
+#: .\survey\models.py:77
+msgid "Questions"
+msgstr "الأسئلة"
+
+#: .\survey\models.py:91
+msgid "Allow Multiple"
+msgstr "السماح بمتعدد"
+
+#: .\survey\models.py:93
+msgid "Show as Dropdown"
+msgstr "عرض كقائمة منسدلة"
+
+#: .\survey\models.py:94
+msgid "Show as Rank Question"
+msgstr "عرض كسؤال ترتيب"
+
+#: .\survey\models.py:95
+msgid "Minimum Options to Select"
+msgstr "الحد الأدنى للخيارات للتحديد"
+
+#: .\survey\models.py:96
+msgid "Multi-Choice Question"
+msgstr "سؤال اختيار من متعدد"
+
+#: .\survey\models.py:140
+msgid "Scale Max"
+msgstr "الحد الأقصى للمقياس"
+
+#: .\survey\models.py:141
+msgid "Likert Question"
+msgstr "سؤال ليكرت"
+
+#: .\survey\models.py:215
+msgid "Rows"
+msgstr "الصفوف"
+
+#: .\survey\models.py:216
+msgid "Columns"
+msgstr "الأعمدة"
+
+#: .\survey\models.py:218
+msgid "Matrix Question"
+msgstr "سؤال مصفوفة"
+
+#: .\survey\models.py:252
+msgid "Is Long Answer"
+msgstr "إجابة طويلة"
+
+#: .\survey\models.py:253
+msgid "Minimum Length"
+msgstr "الحد الأدنى للطول"
+
+#: .\survey\models.py:254
+msgid "Maximum Length"
+msgstr "الحد الأقصى للطول"
+
+#: .\survey\models.py:256
+msgid "Text Question"
+msgstr "سؤال نصي"
+
+#: .\survey\models.py:266
+msgid "Section Header"
+msgstr "رأس القسم"
+
+#: .\survey\models.py:274
+msgid "Range Min"
+msgstr "الحد الأدنى للنطاق"
+
+#: .\survey\models.py:275
+msgid "Range Max"
+msgstr "الحد الأقصى للنطاق"
+
+#: .\survey\models.py:276
+msgid "Min Label"
+msgstr "تسمية الحد الأدنى"
+
+#: .\survey\models.py:277
+msgid "Max Label"
+msgstr "تسمية الحد الأقصى"
+
+#: .\survey\models.py:278
+msgid "Rating Question"
+msgstr "سؤال تقييم"
+
+#: .\survey\models.py:328
+msgid "Ranking Question"
+msgstr "سؤال ترتيب"
+
+#: .\survey\templates\Dashboard.html:17 .\survey\templates\Responses.html:18
+msgid "Recent Activity"
+msgstr "النشاط الأخير"
+
+#: .\survey\templates\Dashboard.html:19
+msgid "Surveys with recent responses"
+msgstr "الاستبيانات ذات الردود الحديثة"
+
+#: .\survey\templates\Dashboard.html:31
+#: .\survey\templates\partials\Dashboard\tableSurvey.html:38
+msgid "No surveys yet"
+msgstr "لا توجد استبيانات بعد"
+
+#: .\survey\templates\Dashboard.html:32
+msgid "Create your first survey to see it here."
+msgstr "قم بإنشاء استبيانك الأول لتراه هنا."
+
+#: .\survey\templates\Dashboard.html:45
+msgid "All Surveys"
+msgstr "كل الاستبيانات"
+
+#: .\survey\templates\Responses.html:7
+msgid "Survey Responses"
+msgstr "ردود الاستبيان"
+
+#: .\survey\templates\Responses.html:9
+msgid ""
+"Overview of recent activity and all collected responses across your surveys."
+msgstr "نظرة عامة على النشاط الأخير وجميع الردود التي تم جمعها عبر استبياناتك."
+
+#: .\survey\templates\Responses.html:30
+msgid "No responses yet"
+msgstr "لا توجد ردود بعد"
+
+#: .\survey\templates\Responses.html:31
+msgid "Surveys with new responses will appear here."
+msgstr "ستظهر الاستبيانات ذات الردود الجديدة هنا."
+
+#: .\survey\templates\partials\Dashboard\surveyRecntCard.html:19
+msgid "No description provided."
+msgstr "لم يتم تقديم وصف."
+
+#: .\survey\templates\partials\Dashboard\surveyRecntCard.html:30
+msgid "Copy survey link"
+msgstr "نسخ رابط الاستبيان"
+
+#: .\survey\templates\partials\Dashboard\tableRow.html:37
+msgid "Show Responses"
+msgstr "عرض الردود"
+
+#: .\survey\templates\partials\Dashboard\tableRow.html:40
+#: .\templates\partials\navbar.html:82
+msgid "Preview"
+msgstr "معاينة"
+
+#: .\survey\templates\partials\Dashboard\tableRow.html:43
+msgid "Edit"
+msgstr "تعديل"
+
+#: .\survey\templates\partials\Dashboard\tableRow.html:46
+msgid "Copy"
+msgstr "نسخ"
+
+#: .\survey\templates\partials\Dashboard\tableRow.html:52
+msgid "End Survey"
+msgstr "إنهاء الاستبيان"
+
+#: .\survey\templates\partials\Dashboard\tableRow.html:52
+msgid "Restore"
+msgstr "استعادة"
+
+#: .\survey\templates\partials\Dashboard\tableRow.html:52
+msgid "Begin Survey"
+msgstr "بدء الاستبيان"
+
+#: .\survey\templates\partials\Dashboard\tableRow.html:61
+msgid "Delete"
+msgstr "حذف"
+
+#: .\survey\templates\partials\Dashboard\tableSurvey.html:19
+msgid "Status"
+msgstr "الحالة"
+
+#: .\survey\templates\partials\Dashboard\tableSurvey.html:20
+#: .\templates\partials\navbar.html:15 .\templates\partials\navbar.html:33
+msgid "Responses"
+msgstr "الردود"
+
+#: .\survey\templates\partials\Dashboard\tableSurvey.html:22
+msgid "Actions"
+msgstr "إجراءات"
+
+#: .\survey\templates\partials\Dashboard\tableSurvey.html:39
+msgid "Get started by creating your first survey."
+msgstr "ابدأ بإنشاء استبيانك الأول."
+
+#: .\survey\templates\partials\Dashboard\tableSurvey.html:41
+#: .\templates\partials\navbar.html:95
+msgid "Create New Survey"
+msgstr "إنشاء استبيان جديد"
+
+#: .\survey\templates\partials\Responses\survey_response_card.html:18
+msgid "Active"
+msgstr "نشط"
+
+#: .\survey\templates\partials\Responses\survey_response_card.html:44
+msgid "No description available"
+msgstr "لا يوجد وصف متاح"
+
+#: .\survey\templates\partials\Responses\survey_response_card.html:52
+msgid "Total Responses"
+msgstr "إجمالي الردود"
+
+#: .\survey\templates\partials\Responses\survey_response_card.html:59
+msgid "View"
+msgstr "عرض"
+
+#: .\templates\partials\navbar.html:13 .\templates\partials\navbar.html:31
+msgid "My Survey"
+msgstr "استبياناتي"
+
+#: .\templates\partials\navbar.html:14 .\templates\partials\navbar.html:32
+msgid "Create Survey"
+msgstr "إنشاء استبيان"
+
+#: .\templates\partials\navbar.html:88
+msgid "Publish"
+msgstr "نشر"
+
+#: .\templates\partials\navbar.html:114
+msgid "Logout"
+msgstr "تسجيل الخروج"
+
+#: .\templates\partials\navbar.html:122
+msgid "Login"
+msgstr "تسجيل الدخول"
+
+#: .\templates\partials\navbar.html:123
+msgid "Sign Up"
+msgstr "إنشاء حساب"
+
+#: .\survey\templates\partials\table_filters.html:20
+msgid "Search surveys..."
+msgstr "ابحث في الاستبيانات..."

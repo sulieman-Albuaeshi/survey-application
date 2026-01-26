@@ -1,10 +1,11 @@
+{% load i18n %}
 <form 
   id="{{ filter_form_id|default:'responses-filter-form' }}"
   class="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4 bg-white border border-gray-200 rounded-t-lg border-b-0"
 >
   <!-- Search -->
   <div class="w-full md:w-1/3">
-    <label for="simple-search" class="sr-only">Search</label>
+    <label for="simple-search" class="sr-only">{% trans "Search" %}</label>
     <div class="relative w-full">
       <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
         <svg aria-hidden="true" class="w-5 h-5 text-gray-500" fill="currentColor" viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
@@ -16,7 +17,7 @@
         name="search" 
         value="{{ query|default:'' }}" 
         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 p-2" 
-        placeholder="Search surveys..." 
+        placeholder="{% trans 'Search surveys...' %}" 
         hx-get="{% if filter_url %}{{ filter_url }}{% else %}{% url 'Responses' %}{% endif %}" 
         hx-target="{{ filter_target|default:'#responses-table-and-pagination-container' }}" 
         hx-swap="innerHTML" 

@@ -1,3 +1,4 @@
+{% load i18n %}
 <a href="{% url 'SurveyResponseDetail' survey.uuid %}" class="group relative flex flex-col h-full bg-white rounded-3xl border border-slate-200 shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1.5 overflow-hidden hover:border-primary/30">
     <!-- Decorative hover gradient background -->
     <div class="absolute inset-0 bg-gradient-to-br from-primary/0 via-primary/0 to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
@@ -14,16 +15,16 @@
             
              {% if survey.state == 'published' or survey.state == 'active' %}
                 <span class="badge badge-sm gap-1.5 bg-emerald-50 text-emerald-700 border border-emerald-100 font-bold px-3 py-2.5 rounded-full shadow-sm">
-                    <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Active
+                    <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span> {% trans "Active" %}
                 </span>
             {% elif survey.state == 'draft' %}
                  <span class="badge badge-sm gap-1.5 bg-amber-50 text-amber-700 border border-amber-100 font-bold px-3 py-2.5 rounded-full shadow-sm">
-                    <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span> Draft
+                    <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span> {% trans "Draft" %}
                  </span>
                  
              {% elif survey.state == 'archived'%}
                     <span class="badge badge-sm gap-1.5 bg-slate-50 text-slate-500 border border-slate-100 font-bold px-3 py-2.5 rounded-full shadow-sm">
-                        <span class="h-1.5 w-1.5 rounded-full bg-red-200"></span> Archived
+                        <span class="h-1.5 w-1.5 rounded-full bg-red-200"></span> {% trans "Archived" %}
                     </span>
              {% endif %}
         </div>
@@ -40,7 +41,7 @@
                 </p>
             {% else %}
                 <p class="text-sm text-slate-400 italic h-10 flex items-center">
-                    No description available
+                    {% trans "No description available" %}
                 </p>
             {% endif %}
         </div>
@@ -48,14 +49,14 @@
         <!-- Footer / Stats -->
         <div class="mt-auto pt-5 border-t border-slate-100 flex items-end justify-between group-hover:border-primary/10 transition-colors">
             <div>
-                <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-1">Total Responses</p>
+                <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-1">{% trans "Total Responses" %}</p>
                 <div class="flex items-baseline gap-1">
                     <span class="text-3xl font-black text-slate-800 group-hover:text-primary transition-colors tracking-tighter">{{ survey.responses_count }}</span>
                 </div>
             </div>
             
              <div class="h-9 px-4 rounded-full bg-indigo-50 flex items-center justify-center gap-2 text-indigo-600 border border-indigo-100 font-bold text-xs uppercase tracking-wide group-hover:bg-primary group-hover:text-white group-hover:border-primary group-hover:shadow-md group-hover:shadow-primary/20 transition-all duration-300">
-                <span>View</span>
+                <span>{% trans "View" %}</span>
                 <i class="fa-solid fa-arrow-right text-xs transform -rotate-45 group-hover:rotate-0 transition-transform duration-300"></i>
             </div>
         </div>
