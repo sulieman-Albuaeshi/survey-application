@@ -382,7 +382,7 @@ def Responses(request, page_number=1):
     ).filter(responses_count__gt=0).order_by('-last_updated')[:4]
     
     # Pagination
-    paginator = Paginator(surveys, 5)
+    paginator = Paginator(surveys, 10)
     page = paginator.get_page(page_number)
     
     # Use get_elided_page_range for better pagination

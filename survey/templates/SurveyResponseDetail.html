@@ -135,7 +135,7 @@
       <div role="tablist" class="inline-flex items-center p-1.5 bg-gray-100 rounded-full gap-2">
         <button
           role="tab"
-          class="tab-btn inline-flex items-center px-8 py-3 text-sm font-bold rounded-full transition-all duration-300 gap-3 bg-white text-indigo-600 shadow-md transform scale-105"
+          class="tab-btn inline-flex hover:cursor-pointer items-center px-8 py-3 text-sm font-bold rounded-full transition-all duration-300 gap-3 bg-white text-indigo-600 shadow-md transform scale-105"
           data-target="individual-responses"
           onclick="switchTab(event)"
         >
@@ -146,7 +146,7 @@
         </button>
         <button
           role="tab"
-          class="tab-btn inline-flex items-center px-8 py-3 text-sm font-bold rounded-full transition-all duration-300 gap-3 text-gray-500 hover:text-indigo-600 hover:bg-white hover:shadow-sm"
+          class="tab-btn inline-flex hover:cursor-pointer items-center px-8 py-3 text-sm font-bold rounded-full transition-all duration-300 gap-3 text-gray-500 hover:text-indigo-600 hover:bg-white hover:shadow-sm"
           data-target="responses-overview"
           hx-get="{% url 'SurveyResponsesOverviewTable' survey.uuid %}"
           hx-target="#responses-overview-content"

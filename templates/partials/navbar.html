@@ -13,7 +13,12 @@
                 <li><a href="{% url 'Responses' %}">Responses</a></li>
             </ul>
         </div>
-        <a class="btn btn-ghost text-xl hover:cursor-pointer gap-2" href="{% url 'Dashboard' %}">
+        
+        {% if request.resolver_match.url_name == 'CreateSurvey' or request.resolver_match.url_name == 'EditSurvey' or request.resolver_match.url_name == 'Copy' %}
+        <a class="btn btn-ghost text-xl hover:cursor-pointer gap-2 hidden md:flex" href="{% url 'Dashboard' %}">
+        {% else %}
+        <a class="btn btn-ghost text-xl hover:cursor-pointer gap-2 flex" href="{% url 'Dashboard' %}">
+        {% endif %}
             <span class="text-slate-700 font-bold">koko</span><span class="text-primary font-bold">Survey</span>
         </a>
     </div>
@@ -32,7 +37,7 @@
     <div class="navbar-end">
         {% if request.resolver_match.url_name == 'CreateSurvey' or request.resolver_match.url_name == 'EditSurvey' or request.resolver_match.url_name == 'Copy' %}
             <!-- Show these buttons ONLY on the Create Survey page -->
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2 md:gap-3">
                 <!-- Preview Button -->
                 <button
                     type="submit"
@@ -40,27 +45,28 @@
                     name="action"
                     value="preview"
                     formtarget="_self"
-                    class="btn btn-ghost bg-white/80 backdrop-blur shadow-lg rounded-full px-6 gap-2 font-bold uppercase tracking-wide border border-gray-200 text-gray-600 hover:bg-white hover:text-primary">
+                    class="btn btn-ghost bg-white/80 backdrop-blur shadow-lg rounded-full px-3 md:px-6 gap-2 font-bold uppercase tracking-wide border border-gray-200 text-gray-600 hover:bg-white hover:text-primary transition-all text-xs md:text-sm h-10 min-h-[2.5rem] md:h-12">
                     <i class="fa-solid fa-eye"></i>
-                    Preview
+                    <span class="md:inline">Preview</span>
                 </button>
 
                 <!-- Publish Button (Purplish) -->
-                <button type="submit" form="survey-form" name="action" value="publish" class="btn btn-primary shadow-xl rounded-full px-6 gap-2 font-bold uppercase tracking-wide">
-                    <i class="fa-solid fa-rocket"></i> Publish
+                <button type="submit" form="survey-form" name="action" value="publish" class="btn btn-primary shadow-xl rounded-full px-4 md:px-6 gap-2 font-bold uppercase tracking-wide text-xs md:text-sm h-10 min-h-[2.5rem] md:h-12">
+                    <i class="fa-solid fa-rocket"></i> 
+                    <span class="md:inline">Publish</span>
                 </button>
             </div>
         {% else %}
             {% if user.is_authenticated %}
             <!-- Show this button on all other pages (Dashboard, etc) -->
-            <a class="btn btn-primary " id="primary-button" href="{% url 'CreateSurvey' %}">
+            <a class="btn btn-primary hidden md:flex" id="primary-button" href="{% url 'CreateSurvey' %}">
                 Create New Survey
             </a>
             {% endif %}
         {% endif %}
 
         {% if user.is_authenticated %}
-            <div class="dropdown dropdown-end" style="margin-right: 1rem; margin-left: 0.5rem;">
+            <div class="dropdown dropdown-end ml-4 md:ml-10">
                 <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar placeholder">
                     <div class="bg-primary text-primary-content rounded-full w-10">
                         <span class="text-xl">{{ user.username|slice:":1"|upper }}</span>

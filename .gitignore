@@ -6,6 +6,7 @@ __pycache__/
 *.so
 
 # Virtual environment
+venv/
 .venv/
 node_modules/
 survey/static/survey/output.css
