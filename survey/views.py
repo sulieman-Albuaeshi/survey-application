@@ -571,13 +571,13 @@ def GetChartData(request, uuid, question_id):
 @login_required
 def SurveyResponsesOverviewTable(request, uuid):
     """
-    Returns the HTML for the responses overview table (numeric values).
+    Returns the HTML for the responses overview table.
     """
     survey = get_object_or_404(Survey, uuid=uuid, created_by=request.user)
     # Exclude SectionHeader from the questions list
     questions = survey.questions.instance_of(Question).not_instance_of(SectionHeader).order_by('position')
     
-    responses_list = Response.objects.filter(survey=survey).order_by('-created_at').prefetch_related('answers__question')
+    responses_list = Response.objects.filter(survey=survey).prefetch_related('answers').order_by('-created_at')
     
     # Pagination
     paginator = Paginator(responses_list, 20)  # Show 20 responses per page
@@ -595,10 +595,7 @@ def SurveyResponsesOverviewTable(request, uuid):
             answer = response_answers.get(question.id)
             if answer:
                 # Use the new method we added to the models
-                numeric_value = question.get_numeric_answer(answer.answer_data)
-                row['cells'].append(numeric_value)
-            else:
-                row['cells'].append("-")
+                row['cells'].append(answer.answer_data if answer.answer_data is not None else "N/A")
         table_data.append(row)
         
     context = {

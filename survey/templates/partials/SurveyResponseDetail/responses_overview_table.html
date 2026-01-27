@@ -66,16 +66,15 @@
             </td>
             <!-- Date column removed -->
             {% for cell in row.cells %}
-            <td class="text-center px-4 py-4"> <!-- Vertical borders removed -->
+            <td class="p-3 align-top">
               {% if cell != "-" %}
-              <div
-                class="inline-flex items-center justify-center min-w-[2.5rem] p-2 rounded-lg text-xs font-bold bg-white border border-slate-200 text-slate-600 shadow-sm max-w-[150px] truncate transition-transform group-hover:scale-105"
-                title="{{ cell }}"
-              >
+              <div class="min-w-[140px] max-w-[400px] p-2 rounded-lg text-xs leading-relaxed bg-white border border-slate-200 text-slate-700 shadow-sm whitespace-normal break-words text-left mx-auto">
                 {{ cell }}
               </div>
               {% else %}
-              <span class="text-slate-200 text-lg font-light">-</span>
+              <div class="text-center py-2">
+                <span class="text-slate-200 text-lg font-light">-</span>
+              </div>
               {% endif %}
             </td>
             {% endfor %}
