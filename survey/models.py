@@ -104,28 +104,15 @@ class MultiChoiceQuestion(Question):
         
         return distribution
 
-    def get_numeric_answer(self, answer_data):
-        """Convert answer text to a single numeric value using binary representation"""
-        if not answer_data:
+    def get_numeric_answer(self, val):
+        """Convert answer text to a single numeric value using 0/1"""
+        if not val:
             return ""
-        
-        options = self.options
-        binary_sum = 0
-        
-        # Ensure answer_data is a list for uniform processing
-        selections = answer_data if isinstance(answer_data, list) else [answer_data]
-        
-        for val in selections:
-            try:
-                # Find index of the selection (0-based)
-                idx = options.index(val)
-                # Add 2^index to the sum (1, 2, 4, 8, etc.)
-                binary_sum += (1 << idx)
-            except ValueError:
-                # Value not in options, ignore
-                pass
-                
-        return str(binary_sum)
+    
+        if isinstance(val, list):
+            return ['1' if option in val else "0" for option in self.options]
+        else: 
+            return ['1' if val == option else '0' for option in self.options]
 
 
 class LikertQuestion(Question):
@@ -190,18 +177,12 @@ class LikertQuestion(Question):
 
         return distribution
     
-    #  TODO : Convert the values to numeric representation 
-    def get_numeric_answer(self, answer_data):
-        """Convert answer label to numeric value (1-based index)"""
-        if not answer_data:
+    def get_numeric_answer(self, val):
+        """Convert answer text to a single numeric value using 0/1"""
+        if not val:
             return ""
-        
-        val_str = str(answer_data)
-        if val_str in self.options:
-            return str(self.options.index(val_str) + 1)
-        
-        # Fallback if it's already a number
-        return val_str
+
+        return ['1' if val == option else '0' for option in self.options]
 
 
 class MatrixQuestion(Question):
@@ -232,15 +213,19 @@ class MatrixQuestion(Question):
                         
         return distribution
 
-    def get_numeric_answer(self, answer_data):
-        # Number of answered rows (best-effort)
-        if not answer_data:
+    def get_numeric_answer(self, val):
+        """convert each row to a single numeric value as a Like Question"""
+
+        if not val:
             return ""
-        if isinstance(answer_data, dict):
-            return str(len([v for v in answer_data.values() if v not in (None, "")]))
-        return "1"
-
-
+        
+        row = []
+        for i, row_label in enumerate(self.rows, start=1):
+            for col in self.columns:
+                key = f'{row_label}_row{i}'
+                selected_col = val.get(key) if isinstance(val, dict) else None
+                row.append("1" if (selected_col == col) else "0")
+        return row       
 class TextQuestion(Question):
     is_long_answer = models.BooleanField(default=False)
     min_length = models.IntegerField(null=True, blank=True)
@@ -250,7 +235,7 @@ class TextQuestion(Question):
 
     def get_numeric_answer(self, answer_data):
         # 1 if answered, 0 if not (simple completion metric)
-        return "1" if answer_data not in (None, "") else "0"
+        return answer_data
 
 
 class SectionHeader(Question):
@@ -328,11 +313,13 @@ class RankQuestion(Question):
         if not answer_data or isinstance(answer_data, list) or len(answer_data) == 0:
             return ""
         
+        row = []
         try:
-            # Return index of the first item in the ranking
-            first_choice = answer_data[max(answer_data, key=int)] # Get the top-ranked item 
-            if first_choice in self.options:
-                 return str(self.options.index(first_choice))
+            for op in self.options:
+                option_rank = answer_data.get(op) if isinstance(answer_data, dict) else None
+                row.append(option_rank if option_rank else "")
+            
+            return row
         except (ValueError, AttributeError):
             pass
         return ""
@@ -349,7 +336,7 @@ class RankQuestion(Question):
             # answer_data is expected to be a dict {'5': 'Option A', '4': 'Option B'}
             ranking_dict = answer.answer_data 
             if isinstance(ranking_dict, dict):
-                for score, item in ranking_dict.items():
+                for item, score in ranking_dict.items():
                         try:
                             stats[item]['sum'] += int(score)
                             stats[item]['count'] += 1
@@ -383,6 +370,7 @@ class Answer(models.Model):
     response = models.ForeignKey(Response, on_delete=models.CASCADE, related_name='answers')
     question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='answers')
     answer_data = models.JSONField(null=True, blank=True)
+    section = models.IntegerField()
     
     def __str__(self):
         return f"Answer for {self.question.label[:30]}: {self.answer_data}"
