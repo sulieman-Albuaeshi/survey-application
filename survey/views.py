@@ -470,6 +470,7 @@ def SurveyAnalytics(request, uuid):
     # 3. Handle Filtering
     selected_section_id = request.GET.get('section', 'all')
     questions_to_analyze = []
+    current_section_label = "All Sections"
 
     if selected_section_id == 'all':
         # Flatten all questions from all sections
@@ -480,6 +481,7 @@ def SurveyAnalytics(request, uuid):
         for section in sections:
             if section['id'] == selected_section_id:
                 questions_to_analyze = section['questions']
+                current_section_label = section['label']
                 break
     
     # Filter out TextQuestions and ensure we aren't analyzing things we shouldn't
@@ -574,6 +576,7 @@ def SurveyAnalytics(request, uuid):
         'total_responses': survey.response_count,
         'sections': sections,
         'selected_section': selected_section_id,
+        'current_section_label': current_section_label,
         'displayed_question_count': len(analytics_data),
     }
     

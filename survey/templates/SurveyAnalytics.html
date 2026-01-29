@@ -100,6 +100,26 @@
     </div>
 
     <!-- Question Analytics -->
+    
+    {% if current_section_label and current_section_label != "All Sections" %}
+    <div class="bg-white rounded-2xl shadow-sm border border-base-200 p-6 mb-8 flex items-center gap-5 break-inside-avoid print:shadow-none print:border-none print:p-0 print:mb-6 mt-6">
+        <div class="p-4 bg-primary/10 rounded-2xl print:hidden">
+            <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+            </svg>
+        </div>
+        <div class="flex-1">
+            <div class="flex items-center gap-3 mb-1">
+                <span class="badge badge-primary badge-outline font-medium text-xs uppercase tracking-wider print:hidden">Current Section</span>
+            </div>
+            <h2 class="text-3xl font-black text-base-content tracking-tight print:text-2xl print:mb-2">
+                {{ current_section_label }}
+            </h2>
+            <div class="h-1 w-20 bg-primary/30 rounded-full mt-2 print:bg-gray-800 print:hidden"></div>
+        </div>
+    </div>
+    {% endif %}
+
     {% include "partials/SurveyAnalytics/all_question_analytics.html" %}
 </div>
 
