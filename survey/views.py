@@ -444,15 +444,16 @@ def SurveyResponseDetail(request, uuid):
 def SurveyAnalytics(request, uuid):
     """Analytics and charts for a specific survey"""
     survey = get_object_or_404(Survey, uuid=uuid, created_by=request.user)
-    questions = survey.questions.all()
+    questions = survey.questions.exclude(sectionheader__isnull=False).exclude(textquestion__isnull=False).prefetch_related('answers').all()
     
     # Prepare analytics data for each question
     analytics_data = []
     
-    for question in questions:
+    for question in questions:  
         question_data = {
             'question': question,
             'type': type(question).__name__,
+            'total_question_answers': Answer.objects.filter(question=question).count()
         }
         
         if isinstance(question, MultiChoiceQuestion):
@@ -466,17 +467,29 @@ def SurveyAnalytics(request, uuid):
             # Get rating distribution and average
             likert_question = LikertQuestion.objects.get(pk=question.pk)
             distribution = likert_question.get_rating_distribution()
-            average = likert_question.get_average_rating()
             question_data['distribution'] = distribution
-            question_data['average'] = average
+
+            # Add Mean, Median, Interpretation, and T-Test
+            question_data['mean'] = likert_question.get_mean()
+            question_data['median'] = likert_question.get_median()
+            question_data['interpretation'] = likert_question.get_interpretation()
+            question_data['t_test'] = likert_question.get_t_test()
+            
             question_data['chart_type'] = 'bar'
             
         elif isinstance(question, RatingQuestion):
             rating_question = RatingQuestion.objects.get(pk=question.pk)
             distribution = rating_question.get_rating_distribution()
-            average = rating_question.get_average_rating()
+            
             question_data['distribution'] = distribution
-            question_data['average'] = average
+            question_data['average'] = rating_question.get_average_rating()
+            
+            # Add Mean, Median, and T-Test
+            question_data['mean'] = rating_question.get_mean()
+            question_data['median'] = rating_question.get_median()
+            question_data['interpretation'] = rating_question.get_interpretation()
+            question_data['t_test'] = rating_question.get_t_test()
+            
             question_data['chart_type'] = 'bar'
             
         elif isinstance(question, RankQuestion):
@@ -488,9 +501,27 @@ def SurveyAnalytics(request, uuid):
         elif isinstance(question, MatrixQuestion):
             mx_question = MatrixQuestion.objects.get(pk=question.pk)
             distribution = mx_question.get_matrix_distribution()
-            question_data['distribution'] = distribution
+            stats = mx_question.get_row_statistics()
+            
+            # Combine for template
+            rows_data = []
+            for row, cols in distribution.items():
+                row_stat = stats.get(row, {'mean': 0, 'median': 0, 'interpretation': 'N/A', 't_test': 0})
+                rows_data.append({
+                    'label': row,
+                    'cols': cols,
+                    'mean': row_stat['mean'],
+                    'median': row_stat['median'],
+                    'interpretation': row_stat.get('interpretation', 'N/A'),
+                    't_stat': row_stat.get('t_stat', 0)
+                })
+
+            question_data['matrix_rows'] = rows_data
+            # question_data['distribution'] = distribution # Optional, but matrix_rows covers it
+            question_data['columns'] = mx_question.columns
             # Matrix is special; chart.js needs stacked bar
             question_data['chart_type'] = 'stacked-bar'
+
         
         analytics_data.append(question_data)
     
@@ -525,7 +556,7 @@ def GetChartData(request, uuid, question_id):
         distribution = likert_question.get_rating_distribution()
         data['labels'] = [str(k) for k in distribution.keys()]
         data['values'] = list(distribution.values())
-        data['average'] = likert_question.get_average_rating()
+        data['average'] = likert_question.get_mean()
         
     elif isinstance(question, RatingQuestion):
         rating_question = RatingQuestion.objects.get(pk=question.pk)
@@ -678,14 +709,16 @@ def CopySurveyView(request, uuid):
     new_survey = Survey.objects.create(
         title=f"Copy of {original_survey.title}",
         description=original_survey.description,
-        created_by=CustomUser.objects.first(),
+        created_by=request.user,
         state='draft',
         question_count=original_survey.question_count,
     )
 
     # Copy questions
     for question in original_survey.questions.all():
-        question.pk = None  # Clear PK to create a new instance
+        question.pk = None
+        question.id = None
+        question._state.adding = True
         question.survey = new_survey
         question.save()
 
@@ -722,10 +755,20 @@ def survey_submit(request, uuid):
                     if question.NAME == 'Matrix Question':
                         answer_data = {}
                         for i, row_label in enumerate(question.rows, start=1):
-                            row_key = f'{row_label}_row{i}' # e.g., row-label_1_row1
-                            val = request.POST.get(row_key)
+                            # New unique key format matching template
+                            input_name = f'question_{question.position}_row_{i}'
+                            val = request.POST.get(input_name)
                             if val:
-                                answer_data[row_key] = val # Store { "Row Label": "Value" }
+                                answer_data[row_label] = val # Store { "Row Label": "Value" }
+                        
+                        # Fallback for legacy format support (optional, can be removed if fresh start)
+                        if not answer_data:
+                             for i, row_label in enumerate(question.rows, start=1):
+                                old_key = f'{row_label}_row{i}'
+                                val = request.POST.get(old_key)
+                                if val:
+                                    answer_data[row_label] = val
+
                         # If empty dict, set to None so validation catches it
                         if not answer_data: 
                             answer_data = None

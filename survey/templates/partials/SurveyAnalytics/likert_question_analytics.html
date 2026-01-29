@@ -6,10 +6,23 @@
         <!-- Likert Scale Analytics -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div>
-                <div >
-                    <div class="stat-title">Average Rating</div>
-                    <div class="stat-value text-primary">{{ data.average }}</div>
-                    <div class="stat-desc">out of {{ data.question.scale_max }}</div>
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-2 mb-4">
+                    <div class="text-center p-2 bg-gray-50 rounded-lg">
+                        <div class="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Mean</div>
+                        <div class="text-lg font-bold text-blue-600">{{ data.mean }}</div>
+                    </div>
+                    <div class="text-center p-2 bg-gray-50 rounded-lg">
+                        <div class="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Median</div>
+                        <div class="text-lg font-bold text-purple-600">{{ data.median }}</div>
+                    </div>
+                    <div class="text-center p-2 bg-gray-50 rounded-lg">
+                        <div class="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Interpretation</div>
+                        <div class="font-bold text-orange-600 text-lg mt-1 truncate max-w-[100px] mx-auto" title="{{ data.interpretation }}">{{ data.interpretation }}</div>
+                    </div>
+                    <div class="text-center p-2 bg-gray-50 rounded-lg">
+                        <div class="text-[10px] text-gray-500 uppercase font-bold tracking-wider">T-Test</div>
+                        <div class="text-lg font-bold text-green-600">{{ data.t_test|default:"-" }}</div>
+                    </div>
                 </div>
                 
                 <div class="mt-4 space-y-2">

@@ -1,31 +1,67 @@
 {% load static %}
-<div class="card bg-white shadow-lg border border-gray-200">
-    <div class="card-body">
-        <h3 class="text-xl font-semibold mb-6 text-center"><span class="text-primary font-bold">[{{ data.question.NAME }}]</span> {{ data.question.label }}</h3>
+<div class="card bg-base-100 shadow-xl border border-base-200 overflow-hidden">
+    <div class="card-body p-6">
+        <!-- Header -->
+        <div class="flex items-center gap-3 mb-6 border-b border-base-200 pb-4">
+             <div class="badge badge-primary font-bold p-3">{{ data.question.NAME }}</div>
+             <h3 class="text-xl font-bold text-base-content">{{ data.question.label }}</h3>
+        </div>
         
-        <!-- Matrix Question Analytics -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div>
-                 <h4 class="font-semibold text-gray-700 mb-3">Response Heatmap</h4>
-                 <div class="overflow-x-auto">
-                    <table class="table table-compact w-full text-center">
-                        <thead>
+        <!-- Matrix Analytics Layout -->
+        <div class="flex flex-col gap-8">
+            <!-- Table Section -->
+            <div class="w-full">
+                 <div class="flex justify-between items-center mb-4">
+                    <h4 class="font-bold text-lg text-base-content flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                        </svg>
+                        Detailed Breakdown
+                    </h4>
+                 </div>
+                 
+                 <div class="overflow-x-auto rounded-lg border border-base-200 box-shadow-sm">
+                    <table class="table table-zebra w-full">
+                        <thead class="bg-base-200 text-base-content uppercase text-xs tracking-wider font-bold">
                             <tr>
-                                <th></th> <!-- Corner -->
-                                {% for col in data.question.columns %}
-                                <th class="text-xs">{{ col }}</th>
+                                <th class="p-3 text-left w-1/4">Row Item</th>
+                                <!-- Option Columns -->
+                                {% for col in data.columns %}
+                                <th class="text-center text-gray-500">{{ col }}</th>
                                 {% endfor %}
+                                
+                                <!-- Statistics Headers (Highlighted) -->
+                                <th class="text-center bg-blue-50 text-blue-700 border-l border-base-300" title="Average Score">Mean</th>
+                                <th class="text-center bg-purple-50 text-purple-700" title="Median Score">Median</th>
+                                <th class="text-center bg-orange-50 text-orange-700" title="Standard Interpretation">Interp.</th>
+                                <th class="text-center bg-green-50 text-green-700" title="T-Test Value">T-Test</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for row, cols in data.distribution.items %}
-                            <tr>
-                                <th class="text-left text-xs">{{ row }}</th>
-                                {% for col_name, count in cols.items %}
-                                <td class="bg-blue-50/{{ count|default:0 }} hover:bg-blue-100">
-                                    {{ count }}
+                            {% for row in data.matrix_rows %}
+                            <tr class="hover text-sm">
+                                <th class="font-bold text-left p-3 text-gray-700">{{ row.label }}</th>
+                                
+                                <!-- Answer Counts -->
+                                {% for col_name, count in row.cols.items %}
+                                <td class="text-center text-gray-600">
+                                    {% if count > 0 %}
+                                    <span class="font-bold text-gray-900 bg-base-200 px-2 py-1 rounded-md">{{ count }}</span>
+                                    {% else %}
+                                    <span class="opacity-30">-</span>
+                                    {% endif %}
                                 </td>
                                 {% endfor %}
+                                
+                                <!-- Statistics Values -->
+                                <td class="text-center font-bold text-blue-600 bg-blue-50/30 border-l border-base-200 text-base">{{ row.mean }}</td>
+                                <td class="text-center font-bold text-purple-600 bg-purple-50/30 text-base">{{ row.median }}</td>
+                                <td class="text-center bg-orange-50/30">
+                                    <div class="badge badge-sm badge-ghost font-semibold whitespace-nowrap text-orange-700 border-orange-200 bg-orange-100 p-2 h-auto">
+                                        {{ row.interpretation }}
+                                    </div>
+                                </td>
+                                <td class="text-center font-mono text-[16px] text-green-600 bg-green-50/30">{{ row.t_stat }}</td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -33,11 +69,20 @@
                  </div>
             </div>
             
-            <div>
-                <!-- Stacked Bar Chart for Matrix -->
-                <canvas data-question-id="{{ data.question.id }}" 
-                        data-survey-uuid="{{ survey.uuid }}"
-                        width="400" height="250"></canvas>
+            <!-- Chart Section -->
+            <div class="flex flex-col w-full max-w-4xl mx-auto bg-base-50 rounded-xl p-4 border border-base-200">
+                <h4 class="font-bold text-sm text-gray-700 mb-2 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z" />
+                        <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z" />
+                    </svg>
+                    Visualization
+                </h4>
+                <div class="w-full flex items-center justify-center min-h-[200px] relative">
+                    <canvas data-question-id="{{ data.question.id }}" 
+                            data-survey-uuid="{{ survey.uuid }}"
+                            class="w-full h-full absolute inset-0"></canvas>
+                </div>
             </div>
         </div>
     </div>
