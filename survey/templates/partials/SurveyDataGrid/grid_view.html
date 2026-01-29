@@ -1,4 +1,5 @@
-<div id="survey-grid-container" class="max-w-[95%] mx-auto px-4 py-8">
+{% load i18n %}
+<div id="survey-grid-container" class="container mx-auto sm:px-6 py-8 w-full">
 <form method="POST" action="{% url 'export_survey_data' survey.uuid %}" id="survey-grid-form">
     {% csrf_token %}
     <input type="hidden" name="format" value="{{ format_type }}">
@@ -7,16 +8,17 @@
   <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
     <div>
         <nav class="flex mb-4" aria-label="Breadcrumb">
-            <a href="{% url 'SurveyResponseDetail' survey.uuid %}" class="group inline-flex items-center text-sm font-medium text-gray-500 hover:text-indigo-600 transition-colors">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-                </svg>
-                Back to Details
+            <a href="{% url 'SurveyResponseDetail' survey.uuid %}" 
+            class="group inline-flex items-center px-5 py-2 text-base font-semibold text-gray-600 bg-white border border-gray-200 rounded-full hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200 transition-all duration-300 shadow-sm hover:shadow-md">
+                <svg class="w-5 h-5 rtl:-scale-x-100 mr-2.5 transition-transform duration-300 ltr:group-hover:-translate-x-1 rtl:group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16l-4-4m0 0l4-4m-4 4h18"></path>
+                </svg>&nbsp;
+                {% trans "Back to Details" %}
             </a>
         </nav>
-        <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">Data Grid: {{ survey.title }}</h1>
+        <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">{% trans "Data Grid" %}: {{ survey.title }}</h1>
         <p class="mt-2 text-sm text-gray-500">
-            View and export all responses in tabular format.
+            {% trans "View and export all responses in tabular format." %}
         </p>
     </div>
 
@@ -28,17 +30,17 @@
                hx-target="#survey-grid-container"
                hx-swap="outerHTML"
                hx-push-url="true"
-               class="cursor-pointer px-5 py-2.5 text-sm font-medium border border-gray-200 rounded-l-lg hover:bg-gray-50 focus:z-10 focus:ring-2 focus:ring-indigo-500 transition-colors
+               class="cursor-pointer px-5 py-2.5 text-sm font-medium border border-gray-200 rounded-s-lg hover:bg-gray-50 focus:z-10 focus:ring-2 focus:ring-indigo-500 transition-colors
                {% if view_mode == 'flat' %}bg-indigo-50 text-indigo-700 border-indigo-200{% else %}bg-white text-gray-900{% endif %}">
-               All
+               {% trans "All" %}
             </a>
             <a hx-get="?format={{ format_type }}&view=sections" 
                hx-target="#survey-grid-container"
                hx-swap="outerHTML"
                hx-push-url="true"
-               class="cursor-pointer px-5 py-2.5 text-sm font-medium border-t border-b border-r border-gray-200 rounded-r-lg hover:bg-gray-50 focus:z-10 focus:ring-2 focus:ring-indigo-500 transition-colors
+               class="cursor-pointer px-5 py-2.5 text-sm font-medium border-t border-b border-r border-gray-200 rounded-e-lg hover:bg-gray-50 focus:z-10 focus:ring-2 focus:ring-indigo-500 transition-colors
                {% if view_mode == 'sections' %}bg-indigo-50 text-indigo-700 border-indigo-200{% else %}bg-white text-gray-900{% endif %}">
-               By Section
+               {% trans "By Section" %}
             </a>
         </div>
         {% endif %}
@@ -49,17 +51,17 @@
                hx-target="#survey-grid-container"
                hx-swap="outerHTML"
                hx-push-url="true"
-               class="cursor-pointer px-5 py-2.5 text-sm font-medium border border-gray-200 rounded-l-lg hover:bg-gray-50 focus:z-10 focus:ring-2 focus:ring-indigo-500 transition-colors
+               class="cursor-pointer px-5 py-2.5 text-sm font-medium border border-gray-200 rounded-s-lg hover:bg-gray-50 focus:z-10 focus:ring-2 focus:ring-indigo-500 transition-colors
                {% if format_type == 'raw' %}bg-indigo-50 text-indigo-700 border-indigo-200{% else %}bg-white text-gray-900{% endif %}">
-               Raw Data
+               {% trans "Raw Data" %}
             </a>
             <a hx-get="?format=numeric&view={{ view_mode }}" 
                hx-target="#survey-grid-container"
                hx-swap="outerHTML"
                hx-push-url="true"
-               class="cursor-pointer px-5 py-2.5 text-sm font-medium border-t border-b border-r border-gray-200 rounded-r-lg hover:bg-gray-50 focus:z-10 focus:ring-2 focus:ring-indigo-500 transition-colors
+               class="cursor-pointer px-5 py-2.5 text-sm font-medium border-t border-b border-r border-gray-200 rounded-e-lg hover:bg-gray-50 focus:z-10 focus:ring-2 focus:ring-indigo-500 transition-colors
                {% if format_type == 'numeric' %}bg-indigo-50 text-indigo-700 border-indigo-200{% else %}bg-white text-gray-900{% endif %}">
-               Numeric Data
+               {% trans "Numeric Data" %}
             </a>
         </div>
         
@@ -68,7 +70,7 @@
             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
             </svg>
-            Download CSV
+            {% trans "Download CSV" %}
         </button>
     </div>
   </div>
@@ -77,7 +79,7 @@
   {% if view_mode == 'sections' and has_sections %}
       <div class="space-y-8">
         {% for section in sections_data %}
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex flex-col">
+        <div class="bg-white sm:rounded-xl rounded-none shadow-sm border border-gray-200 border-x-0 sm:border-x overflow-hidden flex flex-col">
           <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
              <h3 class="text-lg font-bold text-gray-800">{{ section.title }}</h3>
           </div>
@@ -90,8 +92,10 @@
                             <th scope="col" class="sticky top-0 z-20 bg-gray-50 px-6 py-4 text-left shadow-sm border-b border-gray-200">
                                 <div class="relative min-w-[120px]">
                                     <!-- Hidden span to force width based on content -->
-                                    <span class="invisible whitespace-nowrap text-xs font-bold uppercase tracking-wider" aria-hidden="true">{{ col }}</span>
-                                    <input type="text" name="custom_headers" value="{{ col }}" 
+                                    <span class="invisible whitespace-nowrap text-xs font-bold uppercase tracking-wider" aria-hidden="true">
+                                        {% if col == 'Respondent' %}{% trans "Respondent" %}{% elif col == 'Submitted At' %}{% trans "Submitted At" %}{% else %}{{ col }}{% endif %}
+                                    </span>
+                                    <input type="text" name="custom_headers" value="{% if col == 'Respondent' %}{% trans "Respondent" %}{% elif col == 'Submitted At' %}{% trans "Submitted At" %}{% else %}{{ col }}{% endif %}" 
                                            class="absolute inset-0 w-full bg-transparent border-0 p-0 text-xs font-bold text-gray-700 uppercase tracking-wider focus:ring-0 focus:outline-none placeholder-gray-400" 
                                            aria-label="Column header" required>
                                 </div>
@@ -111,7 +115,7 @@
                         {% empty %}
                         <tr>
                             <td colspan="{{ section.header|length }}" class="px-6 py-12 text-center text-gray-500">
-                                No responses found for this section.
+                                {% trans "No responses found for this section." %}
                             </td>
                         </tr>
                         {% endfor %}
@@ -123,7 +127,7 @@
         {% endfor %}
       </div>
   {% else %}
-  <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex flex-col">
+  <div class="bg-white sm:rounded-xl rounded-none shadow-sm border border-gray-200 border-x-0 sm:border-x overflow-hidden flex flex-col">
       <div class="overflow-auto max-h-[65vh] relative">
         <div class="inline-block min-w-full align-middle">
             <table class="min-w-full divide-y divide-gray-200 border-separate border-spacing-0">
@@ -133,8 +137,10 @@
                         <th scope="col" class="sticky top-0 z-20 bg-gray-50 px-6 py-4 text-left shadow-sm border-b border-gray-200">
                             <div class="relative min-w-[120px]">
                                 <!-- Hidden span to force width based on content -->
-                                <span class="invisible whitespace-nowrap text-xs font-bold uppercase tracking-wider" aria-hidden="true">{{ col }}</span>
-                                <input type="text" name="custom_headers" value="{{ col }}" 
+                                <span class="invisible whitespace-nowrap text-xs font-bold uppercase tracking-wider" aria-hidden="true">
+                                    {% if col == 'Respondent' %}{% trans "Respondent" %}{% elif col == 'Submitted At' %}{% trans "Submitted At" %}{% else %}{{ col }}{% endif %}
+                                </span>
+                                <input type="text" name="custom_headers" value="{% if col == 'Respondent' %}{% trans "Respondent" %}{% elif col == 'Submitted At' %}{% trans "Submitted At" %}{% else %}{{ col }}{% endif %}" 
                                        class="absolute inset-0 w-full bg-transparent border-0 p-0 text-xs font-bold text-gray-700 uppercase tracking-wider focus:ring-0 focus:outline-none placeholder-gray-400" 
                                        aria-label="Column header" required>
                             </div>
@@ -154,7 +160,7 @@
                     {% empty %}
                     <tr>
                         <td colspan="{{ header|length }}" class="px-6 py-12 text-center text-gray-500">
-                            No responses found.
+                            {% trans "No responses found." %}
                         </td>
                     </tr>
                     {% endfor %}
@@ -177,16 +183,16 @@
                         hx-push-url="true"
                         hx-target="#survey-grid-container"
                         hx-swap="outerHTML"
-                        class="flex items-center justify-center h-full py-1.5 px-3 ml-0 text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 cursor-pointer">
+                        class="flex items-center justify-center h-full py-1.5 px-3 ml-0 text-gray-500 bg-white rounded-s-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 cursor-pointer">
                     <span class="sr-only">Previous</span>
-                    <svg class="w-5 h-5" aria-hidden="true" fill="currentColor" viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <svg class="w-5 h-5 rtl:-scale-x-100" aria-hidden="true" fill="currentColor" viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                         <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
                     </svg>
                 </button>
                 {% else %}
-                <button type="button" disabled class="flex items-center justify-center h-full py-1.5 px-3 ml-0 text-gray-500 bg-white rounded-l-lg border border-gray-300 cursor-not-allowed">
+                <button type="button" disabled class="flex items-center justify-center h-full py-1.5 px-3 ml-0 text-gray-500 bg-white rounded-s-lg border border-gray-300 cursor-not-allowed">
                     <span class="sr-only">Previous</span>
-                    <svg class="w-5 h-5" aria-hidden="true" fill="currentColor" viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <svg class="w-5 h-5 rtl:-scale-x-100" aria-hidden="true" fill="currentColor" viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                         <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
                     </svg>
                 </button>
@@ -223,16 +229,16 @@
                         hx-push-url="true"
                         hx-target="#survey-grid-container"
                         hx-swap="outerHTML"
-                        class="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 cursor-pointer">
+                        class="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-gray-500 bg-white rounded-e-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 cursor-pointer">
                     <span class="sr-only">Next</span>
-                    <svg class="w-5 h-5" aria-hidden="true" fill="currentColor" viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <svg class="w-5 h-5 rtl:-scale-x-100" aria-hidden="true" fill="currentColor" viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                         <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
                     </svg>
                 </button>
                 {% else %}
-                <button type="button" disabled class="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-gray-500 bg-white rounded-r-lg border border-gray-300 cursor-not-allowed">
+                <button type="button" disabled class="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-gray-500 bg-white rounded-e-lg border border-gray-300 cursor-not-allowed">
                     <span class="sr-only">Next</span>
-                    <svg class="w-5 h-5" aria-hidden="true" fill="currentColor" viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <svg class="w-5 h-5 rtl:-scale-x-100" aria-hidden="true" fill="currentColor" viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                         <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
                     </svg>
                 </button>
@@ -240,7 +246,7 @@
             </li>
         </ul>
         <div class="mt-2 px-4 py-1.5 text-xs font-medium text-gray-600 bg-white rounded-full border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200">
-            Showing <span class="text-indigo-600 font-bold">{{ page_obj.start_index }}</span> - <span class="text-indigo-600 font-bold">{{ page_obj.end_index }}</span> of <span class="text-gray-900 font-bold">{{ page_obj.paginator.count }}</span> responses
+            {% trans "Showing" %} <span class="text-indigo-600 font-bold">{{ page_obj.start_index }}</span> - <span class="text-indigo-600 font-bold">{{ page_obj.end_index }}</span> {% trans "of" %} <span class="text-gray-900 font-bold">{{ page_obj.paginator.count }}</span> {% trans "responses" %}
         </div>
     </nav>
     {% endif %}

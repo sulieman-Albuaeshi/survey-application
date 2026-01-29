@@ -1,3 +1,4 @@
+{% load i18n %}
 {% if responses.has_other_pages %}
 <div class="flex flex-col items-center justify-center gap-4 mt-6">
     <div class="join shadow-sm border border-slate-200 rounded-xl bg-white">
@@ -9,11 +10,11 @@
                 hx-push-url="true"
                 class="join-item btn btn-sm btn-ghost hover:bg-slate-50 text-slate-600 font-medium px-4 w-12"
             >
-                <i class="fa-solid fa-chevron-left text-xs"></i>
+                <i class="fa-solid fa-chevron-left rtl:rotate-180 text-xs"></i>
             </button>
         {% else %}
             <button class="join-item btn btn-sm btn-ghost disabled:bg-transparent disabled:text-slate-300 px-4 w-12" disabled>
-                 <i class="fa-solid fa-chevron-left text-xs"></i>
+                 <i class="fa-solid fa-chevron-left rtl:rotate-180 text-xs"></i>
             </button>
         {% endif %}
         
@@ -41,16 +42,16 @@
                 hx-push-url="true"
                 class="join-item btn btn-sm btn-ghost hover:bg-slate-50 text-slate-600 font-medium px-4 w-12"
             >
-                 <i class="fa-solid fa-chevron-right text-xs"></i>
+                 <i class="fa-solid fa-chevron-right rtl:rotate-180 text-xs"></i>
             </button>
         {% else %}
             <button class="join-item btn btn-sm btn-ghost disabled:bg-transparent disabled:text-slate-300 px-4 w-12" disabled>
-                <i class="fa-solid fa-chevron-right text-xs"></i>
+                <i class="fa-solid fa-chevron-right rtl:rotate-180 text-xs"></i>
             </button>
         {% endif %}
     </div>
     <div class="text-xs text-slate-400 font-medium">
-        Page {{ responses.number }} of {{ responses.paginator.num_pages }}
+        {% trans "Page" %} {{ responses.number }} {% trans "of" %} {{ responses.paginator.num_pages }}
     </div>
 </div>
 {% endif %}

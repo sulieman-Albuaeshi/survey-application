@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% include "partials/navbar.html" %}
+{% load i18n %}
 {% block content %}
 <div x-data="questionManager()" 
      @move-question="moveQuestion($event.detail.btn, $event.detail.direction)"
@@ -16,19 +17,19 @@
         <div class="lg:col-span-3 space-y-6 lg:sticky lg:top-4 h-fit">
                         <div class="bg-white shadow-md border card border-gray-200">
                 <div class="card-body p-6">
-                    <h2 class="text-2xl">Create New Survey</h2>
+                    <h2 class="text-2xl">{% trans "Create New Survey" %}</h2>
 
                     <div class="flex flex-col gap-4">
                         <div class="form-control w-full">
                             <label for="{{ form.title.id_for_label }}" class="label">
-                                <span class="text-gray-500">Survey Name</span>
+                                <span class="text-gray-500">{% trans "Survey Name" %}</span>
                             </label>
                             {{ form.title }}
                         </div>
                         
                         <div class="form-control w-full">
                             <label for="{{ form.description.id_for_label }}" class="label">
-                                <span class="text-gray-500 text-base">Description</span>
+                                <span class="text-gray-500 text-base">{% trans "Description" %}</span>
                             </label>
                             {{ form.description }}
                         </div>
@@ -36,19 +37,19 @@
                         <div class="divider my-0"></div>
 
                         <div class="flex flex-col">
-                            <p class="font-medium text-base mb-2 text-gray-500">Settings</p>
+                            <p class="font-medium text-base mb-2 text-gray-500">{% trans "Settings" %}</p>
                             
                             <div class="form-control my-1">
                                 <label class="label cursor-pointer justify-start gap-3">
                                     {{ form.shuffle_questions }}
-                                    <span class="label-text">Shuffle Questions</span>
+                                    <span class="label-text">{% trans "Shuffle Questions" %}</span>
                                 </label>
                             </div>
 
                             <div class="form-control my-1">
                                 <label class="label cursor-pointer justify-start gap-3">
                                     {{ form.anonymous_responses }}
-                                    <span class="label-text">Anonymous Responses</span>
+                                    <span class="label-text">{% trans "Anonymous Responses" %}</span>
                                 </label>
                             </div>
                         </div>
@@ -64,6 +65,15 @@
 
         <!-- Middle Column: Questions List -->
         <div class="lg:col-span-9 space-y-6" id="question_container" x-auto-animate>
+            {# Check for Question Type Translations #}
+            {% trans "Multi-Choice Question" as multi_choice_question %}
+            {% trans "Likert Question" as likert_question %}
+            {% trans "Matrix Question" as matrix_question %}
+            {% trans "Rating Question" as rating_question %}
+            {% trans "Ranking Question" as ranking_question %}
+            {% trans "Text Question" as text_question %}
+            {% trans "Section Header" as section_header %}
+
             {% for f in Question_formset.forms %}
                 {% if f.DELETE.value %}
                     <div style="display: none;">
@@ -80,25 +90,25 @@
                         {{ hidden }}
                     {% endfor %}
                     {{ f.id }}
-                    {% if f.question_type.value == 'Multi-Choice Question'%}
+                    {% if f.question_type.value == multi_choice_question %}
                         {% include "partials/Create_survey/Questions/Multi-Choice_Question.html" %}
                     {% endif %}
-                    {% if f.question_type.value == 'Likert Question' %}
+                    {% if f.question_type.value == likert_question %}
                         {% include "partials/Create_survey/Questions/Likert_Question.html" %}
                     {% endif %}
-                    {% if f.question_type.value == 'Matrix Question' %}
+                    {% if f.question_type.value == matrix_question %}
                         {% include "partials/Create_survey/Questions/Matrix_Question.html" %}
                     {% endif %}
-                    {% if f.question_type.value == 'Rating Question' %}
+                    {% if f.question_type.value == rating_question %}
                         {% include "partials/Create_survey/Questions/Rating_Question.html" %}
                     {% endif %}
-                    {% if f.question_type.value == 'Ranking Question' %}
+                    {% if f.question_type.value == ranking_question %}
                         {% include "partials/Create_survey/Questions/Ranking_Question.html" %}
                     {% endif %}
-                    {% if f.question_type.value == 'Text Question' %}
+                    {% if f.question_type.value == text_question %}
                         {% include "partials/Create_survey/Questions/Text_Question.html" %}
                     {% endif %}
-                    {% if f.question_type.value == 'Section Header' %}
+                    {% if f.question_type.value == section_header %}
                         {% include "partials/Create_survey/Questions/Section_Header.html" %}
                     {% endif %}
                 {% endwith %}
@@ -111,7 +121,7 @@
         <!-- Floating Save Button -->
         <div class="fixed bottom-6 right-6 z-50">
             <button type="submit" name="action" value="draft" class="btn btn-neutral shadow-xl rounded-full px-6 gap-2 font-bold uppercase tracking-wide">
-                <i class="fa-solid fa-floppy-disk"></i> Save Draft
+                <i class="fa-solid fa-floppy-disk"></i> {% trans "Save Draft" %}
             </button>
         </div>
         

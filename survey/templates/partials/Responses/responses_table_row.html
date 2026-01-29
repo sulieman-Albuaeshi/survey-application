@@ -1,3 +1,4 @@
+{% load i18n %}
 <tr class="bg-white hover:bg-gray-50">
     <td class="px-8 py-4 font-medium text-gray-900">
         {{ survey.title }}
@@ -6,15 +7,18 @@
         {{ survey.description }}
     </td>
     <td class="px-8 py-4 text-center">
+        <span id="survey-table-status-{{ survey.uuid }}" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider {{ survey.status_badge_class }} ">{{ survey.get_state_display }}</span>
+    </td>
+    <td class="px-8 py-4 text-center">
         <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary text-white">
             {{ survey.responses_count }}
         </span>
     </td>
-    <td class="px-8 py-4 text-gray-600">
+    <td class="px-8 py-4 text-gray-600 text-center">
         {% if survey.responses.first %}
             {{ survey.responses.first.created_at|date:"M d, Y" }}
         {% else %}
-            No responses yet
+            {% trans "No responses yet" %}
         {% endif %}
     </td>
     <td class="px-8 py-6 text-center">

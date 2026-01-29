@@ -1,15 +1,15 @@
+{% load i18n %}
 <!-- Table -->
 <div class="overflow-x-auto">
   <table class="w-full text-sm text-left text-gray-500">
     <thead class="text-xs text-gray-700 uppercase bg-gray-100 pb-7">
       <tr>
-        <th scope="col" class="px-4 py-3 w-[18%]">Survey Title</th>
-        <th scope="col" class="px-4 py-3 w-[32%]">Description</th>
-        <th scope="col" class="px-4 py-3 w-[15%] text-center">
-          Total Responses
-        </th>
-        <th scope="col" class="px-4 py-3">Last Response</th>
-        <th scope="col" class="text-center">Actions</th>
+        <th scope="col" class="px-4 py-3 w-[18%] text-center">{% trans "Title" %}</th>
+        <th scope="col" class="px-4 py-3 w-[32%] text-center">{% trans "Description" %}</th>
+        <th scope="col" class="px-8 py-3 w-[10%] text-center">{% trans "Status" %}</th>
+        <th scope="col" class="px-4 py-3 w-[15%] text-center">{% trans "Responses" %}</th>
+        <th scope="col" class="px-4 py-3 w-[15%] text-center">{% trans "Last Updated" %}</th>
+        <th scope="col" class="text-center">{% trans "Actions" %}</th>
       </tr>
     </thead>
     <tbody

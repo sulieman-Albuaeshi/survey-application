@@ -1,4 +1,6 @@
 {% load static %}
+{% load i18n %}
+{% get_current_language as LANGUAGE_CODE %}
 
 <div class="bg-white shadow-md border card border-gray-200 w-full question-card" id="question-{{ form.position.value }}">
     {{ form.polymorphic_ctype }}
@@ -8,7 +10,7 @@
     <div class="card-body relative p-6">
         {% include "partials/Create_survey/Questions/question_header_card.html" %}
         
-        <h1 class="textarea-xl font-medium text-gray-950 text-center p-1">Matrix / Likert Scale</h1>
+        <h1 class="textarea-xl font-medium text-gray-950 text-center p-1">{% trans "Matrix / Likert Scale" %}</h1>
         
         <!-- Header -->
         <div class="flex justify-between items-start mb-4">
@@ -25,7 +27,7 @@
             <div class="flex flex-col md:flex-row gap-4 items-start">
                 <div class="w-full">
                     <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1.5">
-                        Help text <span class="font-normal text-slate-400 normal-case">(Optional)</span>
+                        {% trans "Help text" %} <span class="font-normal text-slate-400 normal-case">({% trans "Optional" %})</span>
                     </label>
                     <div class="w-full">
                         {{ form.helper_text }}
@@ -50,7 +52,7 @@
                     
                     <div class="flex items-center justify-between mb-3">
                         <label class="block text-sm font-bold text-gray-700 uppercase tracking-wide">
-                            Row Items <span class="text-xs font-normal normal-case text-gray-400">(Questions)</span>
+                            {% trans "Row Items" %} <span class="text-xs font-normal normal-case text-gray-400">({% trans "Questions" %})</span>
                         </label>
                         <div class="flex justify-end gap-4">
                             <!-- Delete All Options Button -->
@@ -59,7 +61,7 @@
                                     @click="options = []"
                                     class="wiggle cursor-pointer text-xs text-red-500 hover:text-red-700 hover:underline font-semibold flex items-center gap-1 transition-colors">
                                     <i class="fa-solid fa-trash-can text-[10px] wiggle-icon"></i> 
-                                Delete
+                                {% trans "Delete" %}
                             </button>
                             <span class="badge badge-sm badge-ghost" x-text="options.length"></span>
                         </div>
@@ -72,7 +74,7 @@
                             
                             <!-- Empty State -->
                             <li x-show="options.length === 0" class="text-center text-xs text-gray-400 italic py-8 border-2 border-dashed border-gray-200 rounded-lg bg-white">
-                                No rows added yet.<br>Add questions like "Staff Service"
+                                {% trans "No rows added yet." %}<br>{% trans "Add questions like \"Staff Service\"" %}
                             </li>
                         </ul>
                     </div>
@@ -81,7 +83,7 @@
                     <div class="flex items-center gap-2 mt-auto pt-3 border-t border-gray-200">
                         <input type="text" x-model="newOption" @keydown.enter.prevent="addOption"
                                class="input input-bordered input-sm w-full bg-white focus:outline-none focus:border-primary" 
-                               placeholder="Type row question...">
+                               placeholder="{% trans "Type row question..." %}">
                         <button type="button" @click="addOption" class="btn btn-sm btn-primary btn-square">
                             <i class="fa-solid fa-plus"></i>
                         </button>
@@ -108,7 +110,7 @@
                     
                     <div class="flex items-center justify-between mb-3">
                         <label class="block text-sm font-bold text-gray-700 uppercase tracking-wide">
-                            Scale <span class="text-xs font-normal normal-case text-gray-400">(Columns)</span>
+                            {% trans "Scale" %} <span class="text-xs font-normal normal-case text-gray-400">({% trans "Columns" %})</span>
                         </label>
                         <div class="flex justify-end gap-4">
                             <!-- Delete All Options Button -->
@@ -117,13 +119,13 @@
                                         @click="options = []"
                                         class="wiggle cursor-pointer text-xs text-red-500 hover:text-red-700 hover:underline font-semibold flex items-center gap-1 transition-colors">
                                         <i class="fa-solid fa-trash-can text-[10px] wiggle-icon"></i> 
-                                    Delete
+                                    {% trans "Delete" %}
                             </button>
                             <!-- Quick Load Button -->
                             <button type="button" 
-                                    @click="options = ['Strongly Disagree', 'Disagree', 'Neutral', 'Agree', 'Strongly Agree']"
+                                    @click="options = [{% if LANGUAGE_CODE == 'ar' %}'غير موافق بشدة', 'غير موافق', 'محايد', 'موافق', 'موافق بشدة'{% else %}'Strongly Disagree', 'Disagree', 'Neutral', 'Agree', 'Strongly Agree'{% endif %}]"
                                     class="text-xs text-primary hover:text-primary-focus hover:underline font-semibold flex items-center gap-1">
-                                <i class="fa-solid fa-magic text-[10px]"></i> Load 1-5 Scale
+                                <i class="fa-solid fa-magic text-[10px]"></i> {% trans "Load 1-5 Scale" %}
                             </button>
                         </div>
                     </div>
@@ -135,7 +137,7 @@
 
                             <!-- Empty State -->
                             <li x-show="options.length === 0" class="text-center text-xs text-gray-400 italic py-8 border-2 border-dashed border-gray-200 rounded-lg bg-white">
-                                No scale options added.
+                                {% trans "No scale options added." %}
                             </li>
                         </ul>
                     </div>
@@ -144,7 +146,7 @@
                     <div class="flex items-center gap-2 mt-auto pt-3 border-t border-gray-200">
                         <input type="text" x-model="newOption" @keydown.enter.prevent="addOption"
                                class="input input-bordered input-sm w-full bg-white focus:outline-none focus:border-primary" 
-                               placeholder="Type scale option (e.g. Agree)...">
+                               placeholder="{% trans "Type scale option (e.g. Agree)..." %}">
                         <button type="button" @click="addOption" class="btn btn-sm btn-primary btn-square">
                             <i class="fa-solid fa-plus"></i>
                         </button>

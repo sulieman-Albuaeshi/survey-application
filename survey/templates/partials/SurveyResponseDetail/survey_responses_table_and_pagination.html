@@ -1,9 +1,10 @@
-<div id="survey-responses-container" class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md">
+{% load i18n %}
+<div id="survey-responses-container" class="bg-white sm:rounded-3xl rounded-none border border-slate-200 border-x-0 sm:border-x shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md">
     <!-- Header Content -->
     <div class="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-white">
         <div>
-            <h2 class="text-xl font-bold text-slate-800 tracking-tight">Individual Responses</h2>
-            <p class="text-sm text-slate-500 mt-1">Detailed list of all submitted responses</p>
+            <h2 class="text-xl font-bold text-slate-800 tracking-tight">{% trans "Individual Responses" %}</h2>
+            <p class="text-sm text-slate-500 mt-1">{% trans "Detailed list of all submitted responses" %}</p>
         </div>
         <!-- Optional: Add filters or buttons here if needed -->
     </div>
@@ -12,20 +13,20 @@
         <table class="table w-full border-collapse">
             <thead class="bg-slate-50/80 backdrop-blur-sm border-b border-slate-200 sticky top-0 z-10">
                 <tr>
-                    <th class="px-6 py-5 text-left text-xs font-extrabold text-slate-500 uppercase tracking-wider group cursor-pointer hover:text-primary transition-colors">
+                    <th class="px-6 py-5 text-center text-xs font-extrabold text-slate-500 uppercase tracking-wider group cursor-pointer hover:text-primary transition-colors">
                         #
                     </th>
-                    <th class="px-6 py-5 text-left text-xs font-extrabold text-slate-500 uppercase tracking-wider">
-                        Respondent
-                    </th>
-                    <th class="px-6 py-5 text-left text-xs font-extrabold text-slate-500 uppercase tracking-wider">
-                        Submitted At
-                    </th>
-                    <th class="px-6 py-5 text-left text-xs font-extrabold text-slate-500 uppercase tracking-wider">
-                        Status
+                    <th class="px-6 py-5 rtl:text-right ltr:text-left text-xs font-extrabold text-slate-500 uppercase tracking-wider">
+                        {% trans "Respondent" %}
                     </th>
                     <th class="px-6 py-5 text-center text-xs font-extrabold text-slate-500 uppercase tracking-wider">
-                        Actions
+                        {% trans "Submitted At" %}
+                    </th>
+                    <th class="px-6 py-5 text-center text-xs font-extrabold text-slate-500 uppercase tracking-wider">
+                        {% trans "Status" %}
+                    </th>
+                    <th class="px-6 py-5 text-center text-xs font-extrabold text-slate-500 uppercase tracking-wider">
+                        {% trans "Actions" %}
                     </th>
                 </tr>
             </thead>

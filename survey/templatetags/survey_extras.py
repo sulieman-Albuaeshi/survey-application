@@ -85,6 +85,18 @@ def group_by_sections(questions, shuffle_questions=False):
             'questions': current_questions,
         })
 
+    # Assign sequential display numbers ignoring SectionHeaders
+    display_counter = 1
+    for section in sections:
+        new_questions_list = []
+        for question in section['questions']:
+            new_questions_list.append({
+                'question': question,
+                'visual_index': display_counter
+            })
+            display_counter += 1
+        section['questions'] = new_questions_list
+
     return sections
 
 @register.filter()

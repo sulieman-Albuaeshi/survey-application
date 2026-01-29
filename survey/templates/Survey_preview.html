@@ -1,7 +1,7 @@
 
 {% extends "base.html" %}
 {% load survey_extras %}
-
+{% load i18n %}
 {% load static %}
 {% block navbar %}
 <!-- Custom Navbar for Preview Page -->
@@ -10,14 +10,14 @@
     <div class="navbar-start">
         <a href="{{ back_url|default:'#'}}" 
         class="btn btn-secondary btn-sm gap-2 rounded-full font-medium shadow-sm hover:shadow-md transition-all">
-            <i class="fa-solid fa-arrow-left"></i>
-            Go Back
+            <i class="fa-solid fa-arrow-left rtl:rotate-180"></i>
+            {% trans "Go Back" %}
         </a>
     </div>
         <!-- Center: Title (Optional) -->
     <div class="navbar-center hidden sm:flex">
         <span class="font-bold text-slate-700 text-lg">
-            Survey Preview
+            {% trans "Survey Preview" %}
         </span>
     </div>
      <!-- Right Side: Close Button -->
@@ -36,7 +36,7 @@
             <!-- Preview Banner -->
             <div class="alert bg-blue-50 border-blue-100 text-blue-800 shadow-sm rounded-lg flex items-center justify-center gap-3">
                 <i class="fa-solid fa-eye"></i>
-                <span class="font-medium text-sm">Preview Mode: Responses will not be saved.</span>
+                <span class="font-medium text-sm">{% trans "Preview Mode: Responses will not be saved." %}</span>
             </div>
         {% endblock %}
 
@@ -55,11 +55,10 @@
         <form onsubmit="event.preventDefault();" class="space-y-6" x-data="{ page: 0, total: {{ questions|group_by_sections:survey.shuffle_questions|length }} }">
             {% include "partials/survey_questions_display.html" %}
         </form>
-        </form>
         
         <!-- Branding Footer (Optional) -->
         <div class="text-center py-6">
-            <span class="text-slate-300 text-xs font-semibold uppercase tracking-widest">Powered by koko Survey</span>
+            <span class="text-slate-300 text-xs font-semibold uppercase tracking-widest">{% trans "Powered by" %} koko Survey</span>
         </div>
 
     </div>

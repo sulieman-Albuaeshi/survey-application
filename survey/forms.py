@@ -1,4 +1,5 @@
 from django import forms
+from django.utils.translation import gettext_lazy as _
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.forms import UserCreationForm
 from polymorphic.formsets import polymorphic_inlineformset_factory, PolymorphicFormSetChild
@@ -19,10 +20,16 @@ class SurveyForm(forms.ModelForm):
         model = models.Survey
         fields = ['title', 'description', 'shuffle_questions', 'anonymous_responses']
         widgets = {
-            'title': forms.TextInput(attrs={'class': 'input input-primary block', 'placeholder': 'e.g. Customer Satisfaction'}),
-            'description': forms.Textarea(attrs={'class': 'textarea textarea-primary w-full h-16', 'placeholder': 'e.g. This survey is about customer satisfaction.'}),
+            'title': forms.TextInput(attrs={'class': 'input input-primary block', 'placeholder': _('e.g. Customer Satisfaction')}),
+            'description': forms.Textarea(attrs={'class': 'textarea textarea-primary w-full h-16', 'placeholder': _('e.g. This survey is about customer satisfaction.')}),
             'shuffle_questions': forms.CheckboxInput(attrs={'class': 'toggle toggle-primary'}),
             'anonymous_responses': forms.CheckboxInput(attrs={'class': 'toggle toggle-primary'}),
+        }
+        labels = {
+            'title': _('Survey Name'),
+            'description': _('Description'),
+            'shuffle_questions': _('Shuffle Questions'),
+            'anonymous_responses': _('Anonymous Responses'),
         }
 
 class BaseQuestionForm(forms.ModelForm):
@@ -38,10 +45,15 @@ class BaseQuestionForm(forms.ModelForm):
         model = models.Question
         fields = ['label', 'helper_text', 'required', 'position']
         widgets = {
-            'label': forms.TextInput(attrs={'class': 'input input-md input-primary w-full', 'placeholder': 'Enter the label of the question'}),
-            'helper_text': forms.TextInput(attrs={'class': 'input input-sm input-info focus:ring-0 focus:ring-offset-0', 'placeholder': 'Enter the helper text of the question'}),
+            'label': forms.TextInput(attrs={'class': 'input input-md input-primary w-full', 'placeholder': _('Enter the label of the question')}),
+            'helper_text': forms.TextInput(attrs={'class': 'input input-sm input-info focus:ring-0 focus:ring-offset-0', 'placeholder': _('Enter the helper text of the question')}),
             'required': forms.CheckboxInput(attrs={'class': 'toggle toggle-primary'}),
             'position': forms.HiddenInput(),
+        }
+        labels = {
+            'label': _('Label'),
+            'helper_text': _('Helper Text'),
+            'required': _('Required'),
         }
        
 class MultiChoiceQuestionForm(BaseQuestionForm):
@@ -68,7 +80,13 @@ class MultiChoiceQuestionForm(BaseQuestionForm):
             'allow_multiple': forms.CheckboxInput(attrs={'class': 'toggle toggle-primary'}),
             'randomize_options': forms.CheckboxInput(attrs={'class': 'toggle toggle-primary'}),
             'the_minimum_number_of_options_to_be_selected': forms.NumberInput(attrs={'class': 'input input-sm input-info focus:ring-0 focus:ring-offset-0', 
-                                                                                    'placeholder': 'Enter the minimum number of options to be selected'}),
+                                                                                    'placeholder': _('Enter the minimum number of options to be selected')}),
+        }
+        labels = {
+            'options': _('Options'),
+            'allow_multiple': _('Allow Multiple Selections'),
+            'randomize_options': _('Randomize Options'),
+            'the_minimum_number_of_options_to_be_selected': _('Minimum Options Required'),
         }
     def clean(self):
         cleaned_data = super().clean()
@@ -81,12 +99,12 @@ class MultiChoiceQuestionForm(BaseQuestionForm):
         if not options:
             self.add_error(
                 'options',
-                "the Options field is required for a multiple choice question."
+                _("The Options field is required for a multiple choice question.")
             )
         elif len(options) <= 1:
             self.add_error(
                 'options',
-                "At least two options are required for a multiple choice question.",
+                _("At least two options are required for a multiple choice question."),
             )
 
 
@@ -96,11 +114,11 @@ class MultiChoiceQuestionForm(BaseQuestionForm):
             if min_selected >= len(options):
                 self.add_error(
                     'the_minimum_number_of_options_to_be_selected',
-                    "The minimum number of required options cannot be greater than the total number of available options.",)
+                    _("The minimum number of required options cannot be greater than the total number of available options."),)
             elif min_selected < 0:
                 self.add_error(
                     'the_minimum_number_of_options_to_be_selected',
-                    "The minimum number of required options cannot be negative.",)
+                    _("The minimum number of required options cannot be negative."),)
             
         return cleaned_data
 
@@ -147,12 +165,12 @@ class LikertQuestionForm(BaseQuestionForm):
         if not options:
             self.add_error(
                 'options',
-                "The Options field is required for a Likert question."
+                _("The Options field is required for a Likert question.")
             )
         elif len(options) <= 1:
             self.add_error(
                 'options',
-                "At least two options are required for a Likert question.",
+                _("At least two options are required for a Likert question."),
             )
 
         return cleaned_data
@@ -190,22 +208,22 @@ class MatrixQuestionForm(BaseQuestionForm):
         if not rows:
             self.add_error(
                 'rows',
-                "The Rows fields are required for a Matrix question."
+                _("The Rows fields are required for a Matrix question.")
             )
         elif len(rows) <= 1:
             self.add_error(
                 'rows',
-                "At least two rows are required for a Matrix question.",
+                _("At least two rows are required for a Matrix question."),
             )
         if not columns:
             self.add_error(
                 'columns',
-                "The Columns fields are required for a Matrix question."
+                _("The Columns fields are required for a Matrix question.")
             )
         elif len(columns) <= 1:
             self.add_error(
                 'columns',
-                "At least two columns are required for a Matrix question.",
+                _("At least two columns are required for a Matrix question."),
             )
 
 
@@ -245,29 +263,31 @@ class RatingQuestionForm(BaseQuestionForm):
             }),
             'min_label': forms.TextInput(attrs={
                 'class': 'input input-bordered input-sm w-full bg-white',
-                'placeholder': 'e.g. Poor',
+                'placeholder': _('e.g. Poor'),
                 'x-model': 'minLabel'
             }),
             'max_label': forms.TextInput(attrs={
                 'class': 'input input-bordered input-sm w-full bg-white',
-                'placeholder': 'e.g. Excellent',
+                'placeholder': _('e.g. Excellent'),
                 'x-model': 'maxLabel'
             }),
+        }
+        labels = {
+            'range_min': _('Range Minimum'),
+            'range_max': _('Range Maximum'),
+            'min_label': _('Minimum Label'),
+            'max_label': _('Maximum Label'),
         }
 
     def clean(self):
         cleaned_data = super().clean()
         min_val = cleaned_data.get('range_min')
         max_val = cleaned_data.get('range_max')
-
-        if self.cleaned_data.get('DELETE'):
-            return cleaned_data
-
         if min_val is not None and max_val is not None:
             if min_val >= max_val:
-                self.add_error('range_max', "Max value must be greater than Min value.")
+                self.add_error('range_max', _("Max value must be greater than Min value."))
             if (max_val - min_val) > 20: # Prevent crazy huge scales
-                self.add_error('range_max', "Scale range is too large (max 20 steps).")
+                self.add_error('range_max', _("Scale range is too large (max 20 steps)."))
         
         return cleaned_data
 
@@ -301,7 +321,7 @@ class RankQuestionForm(BaseQuestionForm):
 
         # 1. Validate Options
         if not options or len(options) < 2:
-            self.add_error('options', "You need at least two options to rank.")
+            self.add_error('options', _("You need at least two options to rank."))
 
         return cleaned_data
 
@@ -319,8 +339,8 @@ class TextQuestionForm(BaseQuestionForm):
         widgets = {
             **BaseQuestionForm.Meta.widgets,
             'is_long_answer': forms.CheckboxInput(attrs={'class': 'toggle toggle-primary'}),
-            'min_length': forms.NumberInput(attrs={'class': 'input input-sm input-info focus:ring-0 focus:ring-offset-0', 'placeholder': 'Min Length'}),
-            'max_length': forms.NumberInput(attrs={'class': 'input input-sm input-info focus:ring-0 focus:ring-offset-0', 'placeholder': 'Max Length'}),
+            'min_length': forms.NumberInput(attrs={'class': 'input input-sm input-info focus:ring-0 focus:ring-offset-0', 'placeholder': _('Min Length')}),
+            'max_length': forms.NumberInput(attrs={'class': 'input input-sm input-info focus:ring-0 focus:ring-offset-0', 'placeholder': _('Max Length')}),
         }
 
 
@@ -340,10 +360,10 @@ class SectionHeaderForm(BaseQuestionForm):
         fields = ['label',  'helper_text', 'position']
         widgets = {
             **BaseQuestionForm.Meta.widgets,
-            'label': forms.TextInput(attrs={'class': 'input input-md input-primary w-full font-semibold', 'placeholder': 'Section title'}),
+            'label': forms.TextInput(attrs={'class': 'input input-md input-primary w-full font-semibold', 'placeholder': _('Section Title')}),
             'helper_text': forms.TextInput(attrs={
                 'class': 'input input-bordered w-full',
-                'placeholder': 'Optional subtitle',
+                'placeholder': _('Optional subtitle'),
             }),
             'position': forms.HiddenInput(),
         }

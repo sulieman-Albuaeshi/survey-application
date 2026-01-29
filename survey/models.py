@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from polymorphic.models import PolymorphicModel
 import math
 import statistics
+from django.utils.translation import gettext_lazy as _
 
 import uuid
 
@@ -11,23 +12,27 @@ class CustomUser(AbstractUser):
 
 
 STATE_CHOICES = [
-    ("draft", "Draft"),
-    ("published", "Published"),
-    ("archived", "Archived"),
+    ("draft", _("Draft")),
+    ("published", _("Published")),
+    ("archived", _("Archived")),
 ]
 
 # Create your models here.
 class Survey(models.Model):
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, db_index=True, null=True)
-    title = models.CharField(max_length=100)
-    description = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    last_updated = models.DateTimeField(auto_now=True)
-    state = models.CharField(max_length=20, choices=STATE_CHOICES, default="draft")
-    created_by =  models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='surveys')
-    question_count = models.IntegerField(default=0)
-    shuffle_questions = models.BooleanField(default=False)
-    anonymous_responses = models.BooleanField(default=False)
+    title = models.CharField(max_length=100, verbose_name=_("Title"))
+    description = models.TextField(verbose_name=_("Description"))
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name=_("Created At"))
+    last_updated = models.DateTimeField(auto_now=True, verbose_name=_("Last Updated"))
+    state = models.CharField(max_length=20, choices=STATE_CHOICES, default="draft", verbose_name=_("State"))
+    created_by =  models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='surveys', verbose_name=_("Created By"))
+    question_count = models.IntegerField(default=0, verbose_name=_("Question Count"))
+    shuffle_questions = models.BooleanField(default=False, verbose_name=_("Shuffle Questions"))
+    anonymous_responses = models.BooleanField(default=False, verbose_name=_("Anonymous Responses"))
+
+    class Meta:
+        verbose_name = _("Survey")
+        verbose_name_plural = _("Surveys")
 
     @property
     def status_badge_class(self):
@@ -62,14 +67,16 @@ class Survey(models.Model):
 
 
 class Question(PolymorphicModel):
-    survey = models.ForeignKey(Survey, on_delete=models.CASCADE, related_name='questions')
-    label = models.TextField()
-    helper_text = models.TextField(null=True, blank=True)
-    required = models.BooleanField(default=False)
-    position = models.IntegerField()
+    survey = models.ForeignKey(Survey, on_delete=models.CASCADE, related_name='questions', verbose_name=_("Survey"))
+    label = models.TextField(verbose_name=_("Label"))
+    helper_text = models.TextField(null=True, blank=True, verbose_name=_("Helper Text"))
+    required = models.BooleanField(default=False, verbose_name=_("Required"))
+    position = models.IntegerField(verbose_name=_("Position"))
 
     class Meta:
         ordering = ['position']
+        verbose_name = _("Question")
+        verbose_name_plural = _("Questions")
 
     @classmethod
     def get_available_type_names(cls):
@@ -82,13 +89,13 @@ class Question(PolymorphicModel):
 
 
 class MultiChoiceQuestion(Question):
-    options = models.JSONField(default=list)
-    allow_multiple = models.BooleanField(default=True)
-    randomize_options = models.BooleanField(default=False)
-    show_as_dropdown = models.BooleanField(default=False)
-    show_as_rank_Question = models.BooleanField(default=False)
-    the_minimum_number_of_options_to_be_selected = models.IntegerField(default=1)
-    NAME = "Multi-Choice Question"
+    options = models.JSONField(default=list, verbose_name=_("Options"))
+    allow_multiple = models.BooleanField(default=True, verbose_name=_("Allow Multiple"))
+    randomize_options = models.BooleanField(default=False, verbose_name=_("Randomize Options"))
+    show_as_dropdown = models.BooleanField(default=False, verbose_name=_("Show as Dropdown"))
+    show_as_rank_Question = models.BooleanField(default=False, verbose_name=_("Show as Rank Question"))
+    the_minimum_number_of_options_to_be_selected = models.IntegerField(default=1, verbose_name=_("Minimum Options to Select"))
+    NAME = _("Multi-Choice Question")
 
 
     def get_answer_distribution(self):
@@ -118,9 +125,9 @@ class MultiChoiceQuestion(Question):
 
 
 class LikertQuestion(Question):
-    options = models.JSONField(default=list)
-    scale_max = models.IntegerField(default=5)
-    NAME = "Likert Question"
+    options = models.JSONField(default=list, verbose_name=_("Options"))
+    scale_max = models.IntegerField(default=5, verbose_name=_("Scale Max"))
+    NAME = _("Likert Question")
 
     def get_all_scores(self):
         """Helper to get all numeric scores (1-based index) from answers."""
@@ -254,10 +261,10 @@ class LikertQuestion(Question):
         return self.options[index]
 
 class MatrixQuestion(Question):
-    rows = models.JSONField(default=list)
-    columns = models.JSONField(default=list)
+    rows = models.JSONField(default=list, verbose_name=_("Rows"))
+    columns = models.JSONField(default=list, verbose_name=_("Columns"))
 
-    NAME = "Matrix Question"
+    NAME = _("Matrix Question")
 
     def get_row_statistics(self):
         """Returns statistics for each row: {'Row 1': {'mean': x, 'median': y}, ...}"""
@@ -370,11 +377,11 @@ class MatrixQuestion(Question):
                 row.append("1" if (selected_col == col) else "0")
         return row       
 class TextQuestion(Question):
-    is_long_answer = models.BooleanField(default=False)
-    min_length = models.IntegerField(null=True, blank=True)
-    max_length = models.IntegerField(null=True, blank=True)
+    is_long_answer = models.BooleanField(default=False, verbose_name=_("Is Long Answer"))
+    min_length = models.IntegerField(null=True, blank=True, verbose_name=_("Minimum Length"))
+    max_length = models.IntegerField(null=True, blank=True, verbose_name=_("Maximum Length"))
     
-    NAME = "Text Question"
+    NAME = _("Text Question")
 
     def get_numeric_answer(self, answer_data):
         # 1 if answered, 0 if not (simple completion metric)
@@ -384,7 +391,7 @@ class TextQuestion(Question):
 class SectionHeader(Question):
     """A page title / separator used to split a survey into sections."""
 
-    NAME = "Section Header"
+    NAME = _("Section Header")
 
     def get_numeric_answer(self, answer_data):
         # Section headers do not collect answers.
@@ -392,11 +399,11 @@ class SectionHeader(Question):
 
     
 class RatingQuestion(Question):
-    range_min = models.IntegerField(default=1)
-    range_max = models.IntegerField(default=5)
-    min_label = models.CharField(max_length=50, blank=True, null=True) # e.g. "Poor"
-    max_label = models.CharField(max_length=50, blank=True, null=True) # e.g. "Excellent"
-    NAME = "Rating Question"
+    range_min = models.IntegerField(default=1, verbose_name=_("Range Min"))
+    range_max = models.IntegerField(default=5, verbose_name=_("Range Max"))
+    min_label = models.CharField(max_length=50, blank=True, null=True, verbose_name=_("Min Label")) # e.g. "Poor"
+    max_label = models.CharField(max_length=50, blank=True, null=True, verbose_name=_("Max Label")) # e.g. "Excellent"
+    NAME = _("Rating Question")
 
     def get_all_scores(self):
         answers = Answer.objects.filter(question=self)
@@ -526,15 +533,15 @@ class RatingQuestion(Question):
         return distribution
 
 class RankQuestion(Question):
-    options = models.JSONField(default=list)
-    NAME = "Ranking Question"
+    options = models.JSONField(default=list, verbose_name=_("Options"))
+    NAME = _("Ranking Question")
 
     def get_numeric_answer(self, answer_data):
         """
-        Convert ranking answer to numeric value representing the top choice's index.
+        Returns the index (0-based) of the first choice in the options list.
+        This treats the #1 ranked item as the 'selected' value.
         """
-        
-        if not answer_data or isinstance(answer_data, list) or len(answer_data) == 0:
+        if not answer_data or not isinstance(answer_data, list) or len(answer_data) == 0:
             return ""
         
         row = []
@@ -551,7 +558,7 @@ class RankQuestion(Question):
     def get_average_ranks(self):
         """
         Returns a dict of {option_name: average_rank_position}.
-        hi number = Better rank (1st place, 2nd place, etc.)
+        Lower number = Better rank (1st place, 2nd place, etc.)
         """
         answers = Answer.objects.filter(question=self)
         stats = {opt: {'sum': 0, 'count': 0} for opt in self.options}
@@ -574,8 +581,8 @@ class RankQuestion(Question):
             else:
                 results[opt] = 0
         
-        # Sort by rank (highest score is best)
-        return dict(sorted(results.items(), key=lambda item: item[1], reverse=True))
+        # Sort by rank (lowest score is best)
+        return dict(sorted(results.items(), key=lambda item: item[1]))
 
 class Response(models.Model):
     survey = models.ForeignKey(Survey, on_delete=models.CASCADE, related_name='responses')

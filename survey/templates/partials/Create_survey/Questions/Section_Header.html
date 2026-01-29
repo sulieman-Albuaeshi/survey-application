@@ -1,3 +1,4 @@
+{% load i18n %}
 <div class="card section-header bg-white/90 backdrop-blur shadow-lg border border-gray-200/70 w-full group transition-all hover:shadow-xl">
     <div class="card-body p-6 relative">
         {% include "partials/Create_survey/Questions/question_header_card.html" %}
@@ -14,17 +15,17 @@
                 </div>
 
                 <div>
-                    <div class="text-sm font-semibold text-base-content/90">Section</div>
-                    <div class="text-xs text-base-content/60">Creates a new page title (no answer collected)</div>
+                    <div class="text-sm font-semibold text-base-content/90">{% trans "Section" %}</div>
+                    <div class="text-xs text-base-content/60">{% trans "Creates a new page title (no answer collected)" %}</div>
                 </div>
             </div>
 
-            <span class="badge badge-outline badge-info whitespace-nowrap">Page Break</span>
+            <span class="badge badge-outline badge-info whitespace-nowrap">{% trans "Page Break" %}</span>
         </div>
 
         <div class="mt-5 rounded-xl border border-primary/20 bg-primary/5 p-4">
             <label class="label pb-1">
-                <span class="label-text font-semibold">Section Title</span>
+                <span class="label-text font-semibold">{% trans "Section Title" %}</span>
             </label>
             <div class="mt-1">
                 {{ form.label }}
@@ -32,7 +33,7 @@
 
             {% if form.helper_text %}
                 <label class="label pt-4 pb-1">
-                    <span class="label-text">Subtitle (optional)</span>
+                    <span class="label-text">{% trans "Subtitle (optional)" %}</span>
                 </label>
                 <div class="mt-1">
                     {{ form.helper_text }}

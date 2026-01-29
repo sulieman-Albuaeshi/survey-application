@@ -1,68 +1,69 @@
+{% load i18n %}
 <dialog id="status_modal_{{ survey.uuid }}" class="modal" open>
     <div class="modal-box w-11/12 max-w-2xl p-8">
         <h3 class="font-bold text-lg text-info">
             {% if survey.state == 'published' %}
-                Unpublish Survey?
+                {% trans "Unpublish Survey?" %}
             {% elif survey.state == 'draft' %}
-                Publish Survey?
+                {% trans "Publish Survey?" %}
             {% elif survey.state == 'archived' %}
-                Restore Survey?
+                {% trans "Restore Survey?" %}
             {% endif %}
         </h3>
         
         <p class="py-4 mb-4">
-            Are you sure you want to change the status of <span class="font-bold text-gray-800">"{{ survey.title }}"</span> 
-            from <span class="badge badge-sm 
+            {% trans "Are you sure you want to change the status of" %} <span class="font-bold text-gray-800">"{{ survey.title }}"</span> 
+            {% trans "from" %} <span class="badge badge-sm 
                 {% if survey.state == 'published' %}badge-primary
                 {% elif survey.state == 'archived' %}badge bg-red-200
                 {% elif survey.state == 'draft' %}badge-warning
-                {% endif %}">{{ survey.state|title }}</span>
-            to <span class="badge badge-sm {% if survey.state == 'published' %}badge bg-red-200{% elif survey.state == 'archived' %} badge-warning {% elif survey.state == 'draft' %}badge-primary {% endif %}">
-                {% if survey.state == 'published' %} archived {% elif survey.state == 'archived' %} draft {% elif survey.state == 'draft'%} published {% endif %} </span>?
+                {% endif %}">{{ survey.get_state_display|title }}</span>
+            {% trans "to" %} <span class="badge badge-sm {% if survey.state == 'published' %}badge bg-red-200{% elif survey.state == 'archived' %} badge-warning {% elif survey.state == 'draft' %}badge-primary {% endif %}">
+                {% if survey.state == 'published' %} {% trans "Archived" %} {% elif survey.state == 'archived' %} {% trans "Draft" %} {% elif survey.state == 'draft'%} {% trans "Published" %} {% endif %} </span>{% trans "?" %}
         </p>
 
         {% if survey.state == 'published' %}
         <div class="alert alert-warning shadow-lg text-sm mb-4">
             <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
             <div>
-                <span class="font-bold">Warning:</span>
+                <span class="font-bold">{% trans "Warning:" %}</span>
                 <br>
-                Unpublishing will prevent users from accessing this survey immediately.
+                {% trans "Unpublishing will prevent users from accessing this survey immediately." %}
             </div>
         </div>
         {% elif survey.state == 'archived' %}
          <div class="alert alert-warning shadow-lg text-sm mb-4">
             <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
             <div>
-                <span class="font-bold">Restoring Archived Survey:</span>
+                <span class="font-bold">{% trans "Restoring Archived Survey:" %}</span>
                 <br>
-                Restoring will not automatically publish the survey. You will need to publish it separately.
+                {% trans "Restoring will not automatically publish the survey. You will need to publish it separately." %}
             </div>
         </div>       
         {% else %}
         <div class="alert alert-info shadow-lg text-sm mb-4">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
             <div>
-                <span class="font-bold">Note:</span>
+                <span class="font-bold">{% trans "Note:" %}</span>
                 <br>
-                Publishing will make this survey accessible to users.
+                {% trans "Publishing will make this survey accessible to users." %}
             </div>
         </div>
         {% endif %}
         <div class="modal-action">
             <form method="dialog">
-                <button class="btn btn-ghost" onclick="document.getElementById('status_modal_{{ survey.uuid }}').remove()">Cancel</button>
+                <button class="btn btn-ghost" onclick="document.getElementById('status_modal_{{ survey.uuid }}').remove()">{% trans "Cancel" %}</button>
             </form>
             
             <button class="btn {% if survey.state == 'published' %}btn-warning{% else %}btn-success{% endif %}"
                     hx-post="{% url 'ToggleSurveyStatus' survey.uuid %}"
                     hx-target="#status_modal_{{ survey.uuid }}"
                     hx-swap="outerHTML">
-                Confirm
+                {% trans "Confirm" %}
             </button>
         </div>
     </div>
     <form method="dialog" class="modal-backdrop">
-        <button onclick="document.getElementById('status_modal_{{ survey.uuid }}').remove()">close</button>
+        <button onclick="document.getElementById('status_modal_{{ survey.uuid }}').remove()">{% trans "Close" %}</button>
     </form>
 </dialog>

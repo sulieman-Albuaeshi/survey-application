@@ -1,4 +1,6 @@
 {% load static %}
+{% load i18n %}
+{% get_current_language as LANGUAGE_CODE %}
 <div class="bg-white shadow-md border card border-gray-200 w-full question-card group" id="question-{{ form.position.value }}">
     {{ form.polymorphic_ctype }}
     {{ form.position }}
@@ -7,7 +9,7 @@
     <div class="card-body relative p-6">
         {% include "partials/Create_survey/Questions/question_header_card.html" %}
         
-        <h1 class="textarea-xl font-medium text-gray-950 text-center p-1">Rating Question</h1>
+        <h1 class="textarea-xl font-medium text-gray-950 text-center p-1">{% trans "Rating Question" %}</h1>
         
         <!-- Question Label -->
         <div class="flex justify-between items-start mb-4">
@@ -23,7 +25,7 @@
             <div class="flex flex-col md:flex-row gap-4 items-start">
                 <div class="w-full">
                     <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1.5">
-                        Help text <span class="font-normal text-slate-400 normal-case">(Optional)</span>
+                        {% trans "Help text" %} <span class="font-normal text-slate-400 normal-case">({% trans "Optional" %})</span>
                     </label>
                     <div class="w-full">
                         {{ form.helper_text }}
@@ -36,8 +38,8 @@
         <div x-data="{ 
                 minVal: {{ form.range_min.value|default:1 }}, 
                 maxVal: {{ form.range_max.value|default:5 }},
-                maxLabel: '{{ form.max_label.value|default:"Excellent" }}',
-                minLabel: '{{ form.min_label.value|default:"Poor" }}',
+                maxLabel: '{{ form.max_label.value|default:_("Excellent") }}',
+                minLabel: '{{ form.min_label.value|default:_("Poor") }}',
              }" 
              class="flex flex-col gap-4">
 
@@ -46,7 +48,7 @@
                 
                 <div class="flex items-center justify-between mb-3">
                     <label class="block text-sm font-bold text-gray-700 uppercase tracking-wide">
-                        Rating Scale Setup
+                        {% trans "Rating Scale Setup" %}
                     </label>
                 </div>
 
@@ -55,12 +57,12 @@
                     
                     <!-- Range Values -->
                     <div class="space-y-4">
-                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide">Range Values</label>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide">{% trans "Range Values" %}</label>
                         <div class="flex items-center gap-3">
                             <div class="w-20">
                                 {{ form.range_min }} <!-- Input for Min (e.g. 1) -->
                             </div>
-                            <span class="text-slate-400 font-bold">to</span>
+                            <span class="text-slate-400 font-bold">{% trans "to" %}</span>
                             <div class="w-20">
                                 {{ form.range_max }} <!-- Input for Max (e.g. 5, 10) -->
                             </div>
@@ -73,14 +75,14 @@
 
                     <!-- Range Labels (Optional) -->
                     <div class="space-y-4">
-                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide">Labels (Optional)</label>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide">{% trans "Labels (Optional)" %}</label>
                         <div class="flex flex-col gap-2">
                             <div class="flex items-center gap-2">
-                                <span class="text-xs text-slate-400 w-8">Min:</span>
+                                <span class="text-xs text-slate-400 w-8">{% trans "Min:" %}</span>
                                 {{ form.min_label }}
                             </div>
                             <div class="flex items-center gap-2">
-                                <span class="text-xs text-slate-400 w-8">Max:</span>
+                                <span class="text-xs text-slate-400 w-8">{% trans "Max:" %}</span>
                                 {{ form.max_label }}
                             </div>
                         </div>
@@ -89,7 +91,7 @@
 
                 <!-- Visual Preview Area -->
                 <div class="border-t border-slate-200 pt-4 mt-2">
-                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wide mb-3">Preview</label>
+                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wide mb-3">{% trans "Preview" %}</label>
                     
                     <div class="flex items-center justify-between px-2">
                         <!-- Rating Stars / Numbers Preview -->

@@ -1,4 +1,13 @@
 {% load survey_extras %}
+{% load i18n %}
+{# Check for Question Type Translations #}
+{% trans "Multi-Choice Question" as multi_choice_question %}
+{% trans "Likert Question" as likert_question %}
+{% trans "Matrix Question" as matrix_question %}
+{% trans "Rating Question" as rating_question %}
+{% trans "Ranking Question" as ranking_question %}
+{% trans "Text Question" as text_question %}
+
 {% for section in questions|group_by_sections:survey.shuffle_questions %}
 <div x-data="surveySection"
         x-show="page === {{ forloop.counter0 }}" 
@@ -25,7 +34,7 @@
                     </div>
                     <div class="hidden md:flex items-center gap-2 text-slate-400">
                         <span class="badge badge-primary badge-outline badge-lg gap-2 text-xs font-bold uppercase tracking-widest pl-3">
-                            SECTION {{ forloop.counter }} Of {{ questions|group_by_sections:survey.shuffle_questions|length }}
+                            {% trans "Section" %} {{ forloop.counter }} {% trans "of" %} {{ questions|group_by_sections:survey.shuffle_questions|length }}
                         </span>
                     </div>
                 </div>
@@ -34,18 +43,19 @@
     {% endif %}
 
     <!-- Questions in this Section -->
-    {% for q in section.questions %}
+    {% for wrapped_q in section.questions %}
+    {% with q=wrapped_q.question visual_index=wrapped_q.visual_index %}
     <div class="card bg-white shadow-sm border border-slate-200/60 rounded-2xl transition-all duration-300 hover:shadow-md hover:border-slate-300">
         <div class="card-body p-6 md:p-8">
             <!-- Header: Question Text & Badges -->
             <div class="flex flex-col gap-3 mb-6">
                 <div class="flex items-start justify-between gap-4">
                     <h3 class="text-xl md:text-2xl font-bold text-slate-800 leading-snug">
-                        <span class="text-slate-300 font-normal mr-2 text-lg">Q{{ q.position }}</span> 
-                        {{ q.label|default:"Question" }} 
+                        <span class="text-slate-300 font-normal mr-2 text-lg">{% trans "Q" %}{{ visual_index }}</span> 
+                        {{ q.label|default:_("Question") }} 
                     </h3>
                     {% if q.required %}
-                        <div class="tooltip tooltip-left" data-tip="Required">
+                        <div class="tooltip tooltip-left" data-tip="{% trans "Required" %}">
                             <span class="w-2 h-2 rounded-full bg-red-500 block mt-2 shadow-[0_0_8px_rgba(239,68,68,0.6)]"></span>
                         </div>
                     {% endif %}
@@ -60,7 +70,7 @@
             </div>
 
             <!-- 1. MULTI-CHOICE -->
-            {% if q.NAME == 'Multi-Choice Question' %}
+            {% if q.NAME == multi_choice_question %}
             <div class="flex flex-col gap-3" 
                 {% if q.required and q.allow_multiple %}data-required-checkbox-group{% endif %}
                 {% if q.allow_multiple %}data-min-required="{{ q.the_minimum_number_of_options_to_be_selected }}"{% endif %}>
@@ -82,11 +92,11 @@
             {% if q.allow_multiple and q.the_minimum_number_of_options_to_be_selected > 1 %}
                  <p class="text-xs text-info mb-2 flex items-center gap-1">
                     <i class="fa-solid fa-circle-info"></i>
-                    Please select at least {{ q.the_minimum_number_of_options_to_be_selected }} options.
+                    {% trans "Please select at least" %} {{ q.the_minimum_number_of_options_to_be_selected }} {% trans "options." %}
                  </p>
             {% endif %}
             <!-- 2. LIKERT -->
-            {% elif q.NAME == 'Likert Question' %}
+            {% elif q.NAME == likert_question %}
                 <div class="mt-4">
                     <div class="flex flex-wrap sm:flex-nowrap justify-between items-center gap-4 py-4 px-2">
                         {% for option in q.options %}
@@ -101,7 +111,7 @@
                 </div>
             
             <!-- 3. TEXT -->
-            {% elif q.NAME == 'Text Question' %}
+            {% elif q.NAME == text_question %}
                 <div class="form-control mt-2 group-focus-within:text-primary">
                     {% if q.is_long_answer %}
                         <textarea name="question_{{ q.position }}" class="textarea textarea-bordered textarea-lg w-full min-h-[120px] focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all placeholder:text-slate-300 text-slate-700 leading-relaxed bg-slate-50 focus:bg-white" 
@@ -119,7 +129,7 @@
                 </div>
 
             <!-- 4. MATRIX -->
-            {% elif q.NAME == 'Matrix Question' %}
+            {% elif q.NAME == matrix_question %}
                 <div class="overflow-x-auto -mx-4 sm:mx-0 rounded-xl border border-slate-200 bg-slate-50/30">
                     <table class="table w-full">
                         <thead class="bg-slate-50/80 border-b border-slate-200">
@@ -148,7 +158,7 @@
                 </div>
 
             <!-- 5. RATING -->
-            {% elif q.NAME == 'Rating Question' %}
+            {% elif q.NAME == rating_question %}
                     <div class="mt-4 px-1" x-data="{ rating: null, hover: null }">
                     <div class="flex justify-between items-end mb-4 px-1">
                         <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">{{ q.min_label|default:'Low' }}</span>
@@ -168,7 +178,7 @@
                 </div>
 
             <!-- 6. RANKING -->
-            {% elif q.NAME == 'Ranking Question' %}
+            {% elif q.NAME == ranking_question %}
             <div class="mt-4" 
                     x-data="{ 
                     options: [
@@ -204,6 +214,7 @@
             {% endif %}
         </div>
     </div>
+    {% endwith %}
     {% endfor %}
 
     <!-- Navigation Buttons -->
@@ -216,8 +227,8 @@
              class="bg-red-50 border border-red-200 rounded-lg p-3 flex items-start gap-3 w-full animate-pulse">
             <i class="fa-solid fa-circle-exclamation text-red-500 mt-0.5"></i>
             <div>
-                <h4 class="text-sm font-semibold text-red-700">Incomplete Section</h4>
-                <p class="text-xs text-red-600 mt-1">Please answer all required questions marked with a red dot <span class="w-1.5 h-1.5 rounded-full bg-red-500 inline-block align-middle mx-0.5"></span> to proceed.</p>
+                <h4 class="text-sm font-semibold text-red-700">{% trans "Incomplete Section" %}</h4>
+                <p class="text-xs text-red-600 mt-1">{% trans "Please answer all required questions marked with a red dot" %} <span class="w-1.5 h-1.5 rounded-full bg-red-500 inline-block align-middle mx-0.5"></span> {% trans "to proceed." %}</p>
             </div>
         </div>
 
@@ -225,21 +236,21 @@
             <button type="button" class="btn btn-ghost hover:bg-slate-200 gap-2 text-slate-500" 
                     x-show="page > 0" 
                     @click="window.scrollTo({top: 0, behavior: 'smooth'}); page--">
-                <i class="fa-solid fa-arrow-left"></i> Previous
+                <i class="fa-solid fa-arrow-left rtl:rotate-180"></i> {% trans "Previous" %}
             </button>
             
             <button type="button" class="btn btn-primary btn-lg px-8 rounded-xl shadow-lg shadow-primary/25 hover:shadow-primary/40 gap-3 disabled:bg-slate-200 disabled:text-slate-400 disabled:shadow-none disabled:border-slate-200" 
                     x-show="page < total - 1" 
                     :disabled="!isValid"
                     @click="window.scrollTo({top: 0, behavior: 'smooth'}); page++">
-                Next Section <i class="fa-solid fa-arrow-right"></i>
+                {% trans "Next Section" %} <i class="fa-solid fa-arrow-right rtl:rotate-180"></i>
             </button>
 
             <!-- Submit Button -->
             <button type="submit" class="btn btn-primary btn-lg px-10 rounded-xl shadow-xl shadow-primary/30 hover:shadow-primary/50 hover:-translate-y-1 transition-all gap-3 bg-gradient-to-r from-primary to-primary-focus border-0 disabled:from-slate-300 disabled:to-slate-300 disabled:shadow-none disabled:text-slate-500" 
                 x-show="page === total - 1"
                 :disabled="!isValid">
-                Submit Survey <i class="fa-solid fa-paper-plane"></i>
+                {% trans "Submit Survey" %} <i class="fa-solid fa-paper-plane"></i>
             </button>
         </div>
     </div>

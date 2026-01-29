@@ -1,3 +1,4 @@
+{% load i18n %}
 <nav aria-label="Table navigation"
      id="pagination-controls"
      hx-swap-oob="true">
@@ -11,9 +12,9 @@
                         hx-target=".survey-table-body"
                         hx-swap="innerHTML"
                         {% endif %}
-                        class="flex items-center justify-center h-full py-1.5 px-3 ml-0 text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 {% if not page.has_previous %}cursor-not-allowed {% else %} cursor-pointer {% endif %}">
+                        class="flex items-center justify-center h-full py-1.5 px-3 ms-0 text-gray-500 bg-white rounded-s-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 {% if not page.has_previous %}cursor-not-allowed {% else %} cursor-pointer {% endif %}">
                     <span class="sr-only">Previous</span>
-                    <svg class="w-5 h-5"
+                    <svg class="w-5 h-5 rtl:rotate-180"
                          aria-hidden="true"
                          fill="currentColor"
                          viewbox="0 0 20 20"
@@ -48,9 +49,9 @@
                         hx-target=".survey-table-body"
                         hx-swap="innerHTML"
                         {% endif %}
-                        class="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 {% if not page.has_next %}cursor-not-allowed {% else %} cursor-pointer {% endif %}">
+                        class="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-gray-500 bg-white rounded-e-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 {% if not page.has_next %}cursor-not-allowed {% else %} cursor-pointer {% endif %}">
                     <span class="sr-only">Next</span>
-                    <svg class="w-5 h-5"
+                    <svg class="w-5 h-5 rtl:rotate-180"
                          aria-hidden="true"
                          fill="currentColor"
                          viewbox="0 0 20 20"
@@ -61,7 +62,7 @@
             </li>
         </ul>
         <div class="mt-2 px-4 py-1.5 text-xs font-medium text-gray-600 bg-white rounded-full border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200">
-            Showing <span class="text-indigo-600 font-bold">{{ page.start_index }}</span> - <span class="text-indigo-600 font-bold">{{ page.end_index }}</span> of <span class="text-gray-900 font-bold">{{ page.paginator.count }}</span> surveys
+            {% trans "Showing" %} <span class="text-indigo-600 font-bold">{{ page.start_index }}</span> - <span class="text-indigo-600 font-bold">{{ page.end_index }}</span> {% trans "of" %} <span class="text-gray-900 font-bold">{{ page.paginator.count }}</span> {% trans "surveys"%}
         </div>
     </div>
 </nav>

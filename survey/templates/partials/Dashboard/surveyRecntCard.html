@@ -1,4 +1,5 @@
-{% load survey_extras %}
+{% load survey_extras %} 
+{% load i18n %}
 <div class="card w-full bg-white shadow-sm hover:shadow-lg transition-all duration-300 border border-base-200 h-[260px] group">
     <div class="card-body p-5 flex flex-col h-full">
         <!-- Header: Title & Status -->
@@ -9,13 +10,13 @@
             <!-- Status Badge Placeholder (Target for OOB swap) -->
             <span id="survey-status-badge-{{ survey.uuid }}" 
                   class="badge badge-md font-medium border-0 py-3 px-3 {{ survey.status_badge_class }}">
-                {{ survey.state|title }}
+                {{ survey.get_state_display|title }}
             </span>
         </div>
 
         <!-- Description (Moved above time as requested) -->
         <p class="text-sm text-base-content/70 mt-2 line-clamp-2" title="{{ survey.description }}">
-            {{ survey.description|default:"No description provided." }}
+            {{ survey.description|default:_("No description provided.") }}
         </p>
         
         <!-- UUID Placeholder (Always present for OOB swap) -->
@@ -26,7 +27,7 @@
                 <span class="text-xs font-mono text-base-content/60 truncate max-w-[200px] select-all cursor-text" title="{{survey.uuid}}">{{survey.uuid}}</span>
                 <button class="btn btn-ghost btn-xs btn-square h-5 w-5 min-h-0"
                         @click.stop="navigator.clipboard.writeText(window.location.origin + text); copied = true; setTimeout(() => copied = false, 2000)"
-                        title="Copy survey link">
+                        title="{% trans 'Copy survey link' %}">
                     <!-- Copy Icon -->
                     <svg x-show="!copied" class="w-3.5 h-3.5 text-base-content/50 group-hover/copy:text-primary transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
@@ -45,7 +46,7 @@
             <svg class="w-3 h-3 mr-1.5 opacity-70" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <span class="font-medium">Updated {{ survey.last_updated|timesince }} ago</span>
+            <span class="font-medium">{% trans "Last Updated " %}{{ survey.last_updated|timesince }} {% trans " ago" %}</span>
         </div>
 
         <!-- Footer -->
@@ -79,7 +80,7 @@
                         hx-target="#modal-container"
                         hx-swap="innerHTML"
                         class="btn btn-sm btn-warning xl:max-2xl:btn-xs">
-                        End Survey
+                        {% trans "End Survey" %}
                     </button>
                 {% elif survey.state == 'draft' %}
                     <button 
@@ -87,7 +88,7 @@
                         hx-target="#modal-container"
                         hx-swap="innerHTML"
                         class="btn btn-sm btn-primary xl:max-2xl:btn-xs">
-                        Start Survey
+                        {% trans "Start Survey" %}
                     </button>
                 {% elif survey.state == 'archived' %}
                     <button 
@@ -95,7 +96,7 @@
                         hx-target="#modal-container"
                         hx-swap="innerHTML"
                         class="btn btn-sm bg-red-200 xl:max-2xl:btn-xs">
-                        Restore
+                        {% trans "Restore" %}
                     </button>
                 {% endif %}
             </div>

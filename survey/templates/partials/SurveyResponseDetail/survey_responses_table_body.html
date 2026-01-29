@@ -1,31 +1,32 @@
+{% load i18n %}
 {% for response in responses %}
-<tr class="group hover:bg-slate-50 transition-all duration-200 ease-in-out border-l-4 border-l-transparent hover:border-l-primary hover:shadow-sm relative">
+<tr class="group hover:bg-slate-50 transition-all duration-200 ease-in-out border-l-4 rtl:border-l-0 rtl:border-r-4 ltr:border-l-transparent rtl:border-r-transparent ltr:hover:border-l-primary rtl:hover:border-r-primary hover:shadow-sm relative">
   <!-- Index -->
-  <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-slate-400 group-hover:text-primary transition-colors">
+  <td class="px-6 py-5 min-w-[180px] whitespace-nowrap text-center text-sm font-bold text-slate-400 group-hover:text-primary transition-colors">
     {{ forloop.counter | add:responses.start_index | add:-1 }}
   </td>
   
   <!-- Respondent -->
-  <td class="px-6 py-4">
+  <td class="px-6 py-5">
     <div class="flex items-center gap-4">
       {% if response.respondent %}
         <div class="h-11 w-11 rounded-2xl bg-gradient-to-br from-primary to-primary-focus text-white flex items-center justify-center font-bold text-lg shadow-lg shadow-primary/20 ring-2 ring-white group-hover:scale-105 transition-transform duration-300">
             {{ response.respondent.username|slice:":1"|upper }}
         </div>
-        <div>
+        <div class="text-start">
             <p class="font-bold text-slate-800 text-sm mb-0.5">{{ response.respondent.username }}</p>
             <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-600">
-                Member
+                {% trans "Member" %}
             </span>
         </div>
       {% else %}
-        <div class="h-11 w-11 rounded-2xl bg-slate-200 text-slate-500 flex items-center justify-center shadow-inner ring-2 ring-white">
+        <div class="h-11 w-11 rounded-2xl bg-slate-200 text-slate-500 flex-shrink-0 flex items-center justify-center shadow-inner ring-2 ring-white">
             <i class="fa-solid fa-user-secret text-lg"></i>
         </div>
-        <div>
-             <p class="font-bold text-slate-600 text-sm mb-0.5 italic">Anonymous</p>
+        <div class="text-start">
+             <p class="font-bold text-slate-600 text-sm mb-0.5 italic">{% trans "Anonymous" %}</p>
              <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-500">
-                Guest
+                {% trans "Guest" %}
             </span>
         </div>
       {% endif %}
@@ -33,8 +34,8 @@
   </td>
 
   <!-- Date -->
-  <td class="px-6 py-4">
-    <div class="flex flex-col">
+  <td class="px-6 py-5 text-center">
+    <div class="flex flex-col items-center">
         <span class="text-sm font-semibold text-slate-700">
             {{ response.created_at|date:"M d, Y" }}
         </span>
@@ -45,113 +46,35 @@
   </td>
 
   <!-- Status -->
-  <td class="px-6 py-4">
+  <td class="px-6 py-5 text-center">
     {% if response.completed %}
         <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-emerald-100/60 text-emerald-700 border border-emerald-200/50">
             <span class="relative flex h-2 w-2">
               <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
             </span>
-            Completed
+            {% trans "Completed" %}
         </div>
     {% else %}
         <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-amber-100/60 text-amber-700 border border-amber-200/50">
              <div class="w-2 h-2 rounded-full bg-amber-500"></div>
-            Incomplete
+            {% trans "Incomplete" %}
         </div>
     {% endif %}
   </td>
 
   <!-- Actions -->
-  <td class="px-6 py-4 text-center">
+  <td class="px-6 py-5 text-center">
     <button
-      class="btn btn-sm btn-ghost btn-circle text-slate-400 hover:text-primary hover:bg-primary/10 transition-all duration-200 tooltip tooltip-left font-normal"
-      data-tip="View Details"
-      onclick="viewResponse{{ response.id }}.showModal()"
+      class="btn btn-sm btn-ghost btn-circle text-slate-400 hover:text-primary hover:bg-primary/10 transition-all duration-200 tooltip ltr:tooltip-left rtl:tooltip-right font-normal"
+      data-tip="{% trans "View Details" %}"
+      hx-get="{% url 'GetResponseDetail' response.id %}"
+      hx-target="#response_detail_modal"
+      hx-swap="innerHTML"
+      onclick="response_detail_modal.showModal()"
     >
         <i class="fa-regular fa-eye text-lg"></i>
     </button>
-
-    <!-- ====== MODERN MODAL DESIGN ====== -->
-    <dialog id="viewResponse{{ response.id }}" class="modal backdrop-blur-sm">
-      <div class="modal-box w-11/12 max-w-4xl p-0 overflow-hidden bg-white shadow-2xl rounded-2xl scrollbar-hide">
-        
-        <!-- Sticky Header -->
-        <div class="bg-white/80 px-8 py-5 border-b border-slate-100 flex items-center justify-between sticky top-0 z-20 backdrop-blur-xl supports-[backdrop-filter]:bg-white/60">
-            <div class="flex items-center gap-4">
-                 {% if response.respondent %}
-                    <div class="h-10 w-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-extrabold text-lg">
-                        {{ response.respondent.username|slice:":1"|upper }}
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-lg text-slate-800 leading-tight">Response Details</h3>
-                        <p class="text-xs text-slate-500 font-medium">by <span class="text-primary">{{ response.respondent.username }}</span></p>
-                    </div>
-                {% else %}
-                    <div class="h-10 w-10 rounded-lg bg-slate-100 text-slate-500 flex items-center justify-center">
-                         <i class="fa-solid fa-user-secret text-lg"></i>
-                    </div>
-                     <div>
-                        <h3 class="font-bold text-lg text-slate-800 leading-tight">Response Details</h3>
-                        <p class="text-xs text-slate-500 font-medium">Anonymous</p>
-                    </div>
-                {% endif %}
-            </div>
-            
-            <form method="dialog">
-                <button class="btn btn-sm btn-circle btn-ghost text-slate-400 hover:text-red-500 transition-colors">
-                  <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-            </form>
-        </div>
-
-        <!-- Modal Body (Scrollable) -->
-        <div class="px-8 py-6 bg-slate-50/30 max-h-[70vh] overflow-y-auto custom-scrollbar">
-          
-          <div class="grid grid-cols-1 gap-6">
-            {% for answer in response.answers.all %}
-              <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow duration-200 group/card relative overflow-hidden">
-                <div class="absolute left-0 top-0 bottom-0 w-1 bg-slate-200 group-hover/card:bg-primary transition-colors"></div>
-                
-                <h4 class="font-bold text-slate-700 mb-3 text-sm flex items-start gap-2">
-                  <span class="inline-flex items-center justify-center h-6 w-6 rounded bg-slate-100 text-slate-500 text-xs font-bold shrink-0 mt-0.5">
-                    {{ answer.question.position }}
-                  </span>
-                  <span class="leading-relaxed"><span class="text-primary font-bold">[{{ answer.question.NAME }}]</span> {{ answer.question.label }}</span>
-                </h4>
-                
-                <div class="pl-8">
-                  {% if answer.answer_data is not None %}
-                    <div class="text-slate-600 bg-slate-50 rounded-lg p-3 text-sm border border-slate-100 font-medium">
-                        {{ answer.answer_data }}
-                    </div>
-                  {% else %}
-                    <div class="flex items-center gap-2 text-slate-400 italic text-sm p-2">
-                        <i class="fa-regular fa-circle-xmark"></i>
-                        <span>Skipped / No answer provided</span>
-                    </div>
-                  {% endif %}
-                </div>
-              </div>
-            {% endfor %}
-          </div>
-          
-        </div>
-
-        <!-- Sticky Footer -->
-        <div class="bg-gray-50 px-8 py-4 border-t border-slate-200 flex justify-end gap-3 sticky bottom-0 z-20">
-           <form method="dialog">
-            <button class="btn btn-primary px-8 btn-sm shadow-lg shadow-primary/30">Close</button>
-          </form>
-        </div>
-        
-      </div>
-      <form method="dialog" class="modal-backdrop bg-slate-900/40 backdrop-blur-[2px]">
-        <button>close</button>
-      </form>
-    </dialog>
-    <!-- ====== END MODAL ====== -->
-
   </td>
 </tr>
 {% empty %}
@@ -161,8 +84,8 @@
       <div class="h-20 w-20 bg-slate-100 rounded-full flex items-center justify-center mb-4 text-slate-300">
           <i class="fa-solid fa-clipboard-question text-4xl"></i>
       </div>
-      <p class="text-lg font-bold text-slate-600">No responses yet</p>
-      <p class="text-sm text-slate-400 mt-1 max-w-xs text-center">Once people start taking your survey, their responses will appear here.</p>
+      <p class="text-lg font-bold text-slate-600">{% trans "No responses yet" %}</p>
+      <p class="text-sm text-slate-400 mt-1 max-w-xs text-center">{% trans "Once people start taking your survey, their responses will appear here." %}</p>
     </div>
   </td>
 </tr>

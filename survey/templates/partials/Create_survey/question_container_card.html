@@ -1,4 +1,5 @@
 {% load static %}
+{% load i18n %}
 <div class="bg-white shadow-xs card w-full border-2 border-dashed border-gray-200 transition-colors duration-200"
      id="question_container_add"
      :class="{ 'border-primary bg-gray-50': isDragging }">
@@ -19,17 +20,17 @@
                alt="Add question icon" />
                
           <h2 class="text-xl md:text-2xl font-bold text-gray-800">
-            <span class="hidden lg:inline">Drag Question Here To Start</span>
-            <span class="lg:hidden">Add New Question</span>
+            <span class="hidden lg:inline">{% trans "Drag Question Here To Start" %}</span>
+            <span class="lg:hidden">{% trans "Add New Question" %}</span>
           </h2>
           
           <p class="text-gray-500 max-w-prose">
-            <span class="hidden lg:inline">Drag a question type from the library or click below to add one manually.</span>
-            <span class="lg:hidden">Tap the button below to select a question type.</span>
+            <span class="hidden lg:inline">{% trans "Drag a question type from the library or click below to add one manually." %}</span>
+            <span class="lg:hidden">{% trans "Tap the button below to select a question type." %}</span>
           </p>
           
           <button type="button" class="btn btn-primary btn-wide" onclick="add_question_modal.showModal()">
-            <i class="fa-solid fa-plus"></i> Add Question
+            <i class="fa-solid fa-plus"></i> {% trans "Add Question" %}
           </button>
      </div>
 </div>

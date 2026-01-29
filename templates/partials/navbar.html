@@ -1,16 +1,18 @@
+{% load static %}
+{% load i18n %}
 <div class="navbar bg-base-100 shadow-md z-50 sticky top-0">
     <div class="navbar-start">
         <!-- Mobile Dropdown menu -->
         <div class="dropdown">
             <div tabindex="0" role="button" class="btn btn-ghost lg:hidden">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 rtl:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16" />
                 </svg>
             </div>
             <ul tabindex="0" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
-                <li><a href="{% url 'Dashboard' %}">My Survey</a></li>
-                <li><a href="{% url 'CreateSurvey' %}">Create Survey</a></li>
-                <li><a href="{% url 'Responses' %}">Responses</a></li>
+                <li><a href="{% url 'Dashboard' %}">{% trans "My Survey" %}</a></li>
+                <li><a href="{% url 'CreateSurvey' %}">{% trans "Create Survey" %}</a></li>
+                <li><a href="{% url 'Responses' %}">{% trans "Responses" %}</a></li>
             </ul>
         </div>
         
@@ -26,18 +28,49 @@
     <div class="navbar-center hidden lg:flex">
         {% if user.is_authenticated %}
         <ul class="menu menu-horizontal px-1">
-            <li><a href="{% url 'Dashboard' %}">My Survey</a></li>
-            <li><a href="{% url 'CreateSurvey' %}">Create Survey</a></li>
-            <li><a href="{% url 'Responses' %}">Responses</a></li>
+            <li><a href="{% url 'Dashboard' %}">{% trans "My Survey" %}</a></li>
+            <li><a href="{% url 'CreateSurvey' %}">{% trans "Create Survey" %}</a></li>
+            <li><a href="{% url 'Responses' %}">{% trans "Responses" %}</a></li>
         </ul>
         {% endif %}
     </div>
 
     <!-- UPDATED NAVBAR END -->
-    <div class="navbar-end">
+    <div class="navbar-end gap-2 md:gap-6 md:rtl:ml-[4rem] md:ltr:mr-[4rem]">
+        <!-- Language Switcher -->
+        <div class="dropdown dropdown-end">
+            <div tabindex="0" role="button" class="btn btn-ghost gap-2 px-2 md:px-4">
+                <i class="fa-solid fa-globe text-lg"></i>
+                <span class="hidden md:inline">{% trans "Language" %}</span>
+            </div>
+            <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52 mt-4">
+                {% get_current_language as LANGUAGE_CODE %}
+                {% get_available_languages as LANGUAGES %}
+                {% get_language_info_list for LANGUAGES as languages %}
+                
+                {% for language in languages %}
+                <li>
+                    <form action="{% url 'set_language' %}" method="post" class="p-0 hover:bg-transparent block w-full">
+                        {% csrf_token %}
+                        <input name="next" type="hidden" value="{{ request.get_full_path }}">
+                        <input name="language" type="hidden" value="{{ language.code }}">
+                        <button type="submit" class="flex w-full items-center justify-between px-4 py-2 hover:bg-base-200 rounded-lg">
+                            <span class="flex items-center gap-2">
+                                {{ language.name_local }}
+                            </span>
+                            {% if language.code == LANGUAGE_CODE %}
+                            <i class="fa-solid fa-check text-success text-sm"></i>
+                            {% endif %}
+                        </button>
+                    </form>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        
         {% if request.resolver_match.url_name == 'CreateSurvey' or request.resolver_match.url_name == 'EditSurvey' or request.resolver_match.url_name == 'Copy' %}
             <!-- Show these buttons ONLY on the Create Survey page -->
-            <div class="flex items-center gap-2 md:gap-3">
+            <div class="flex items-center gap-4 md:gap-3">
                 <!-- Preview Button -->
                 <button
                     type="submit"
@@ -47,39 +80,39 @@
                     formtarget="_self"
                     class="btn btn-ghost bg-white/80 backdrop-blur shadow-lg rounded-full px-3 md:px-6 gap-2 font-bold uppercase tracking-wide border border-gray-200 text-gray-600 hover:bg-white hover:text-primary transition-all text-xs md:text-sm h-10 min-h-[2.5rem] md:h-12">
                     <i class="fa-solid fa-eye"></i>
-                    <span class="md:inline">Preview</span>
+                    <span class="hidden md:inline">{% trans "Preview" %}</span>
                 </button>
 
                 <!-- Publish Button (Purplish) -->
                 <button type="submit" form="survey-form" name="action" value="publish" class="btn btn-primary shadow-xl rounded-full px-4 md:px-6 gap-2 font-bold uppercase tracking-wide text-xs md:text-sm h-10 min-h-[2.5rem] md:h-12">
                     <i class="fa-solid fa-rocket"></i> 
-                    <span class="md:inline">Publish</span>
+                    <span class="hidden md:inline">{% trans "Publish" %}</span>
                 </button>
             </div>
         {% else %}
             {% if user.is_authenticated %}
             <!-- Show this button on all other pages (Dashboard, etc) -->
             <a class="btn btn-primary hidden md:flex" id="primary-button" href="{% url 'CreateSurvey' %}">
-                Create New Survey
+                {% trans "Create New Survey" %}
             </a>
             {% endif %}
         {% endif %}
 
         {% if user.is_authenticated %}
-            <div class="dropdown dropdown-end ml-4 md:ml-10">
+            <div class="dropdown dropdown-end">
                 <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar placeholder">
                     <div class="bg-primary text-primary-content rounded-full w-10">
                         <span class="text-xl">{{ user.username|slice:":1"|upper }}</span>
                     </div>
                 </div>
                 <!-- Controls position: 'right: 0' aligns it perfectly under the avatar's right edge. Increase this number to move it left. -->
-                <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52 border border-base-200" style="z-index: 9999; right: -2rem;">
+                <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52 mt-4">
                     <li class="px-4 py-2 font-bold text-center border-b border-base-200 mb-2">{{ user.username }}</li>
                     <li class="mt-1">
                         <form action="{% url 'logout' %}" method="post" class="p-0 hover:bg-transparent">
                             {% csrf_token %}
                             <button type="submit" class="flex w-full items-center justify-between gap-2 text-error font-medium hover:bg-error/10 active:bg-error/20 rounded-lg px-4 py-2 transition-all duration-200">
-                                Logout
+                                {% trans "Logout" %}
                                 <i class="fa-solid fa-arrow-right-from-bracket"></i>
                             </button>
                         </form>
@@ -87,8 +120,8 @@
                 </ul>
             </div>
         {% else %}
-            <a href="{% url 'login' %}" class="btn btn-ghost">Login</a>
-            <a href="{% url 'signup' %}" class="btn btn-primary">Sign Up</a>
+            <a href="{% url 'login' %}" class="btn btn-ghost">{% trans "Login" %}</a>
+            <a href="{% url 'signup' %}" class="btn btn-primary">{% trans "Sign Up" %}</a>
         {% endif %}
     </div>
 </div>
