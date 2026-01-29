@@ -444,12 +444,55 @@ def SurveyResponseDetail(request, uuid):
 def SurveyAnalytics(request, uuid):
     """Analytics and charts for a specific survey"""
     survey = get_object_or_404(Survey, uuid=uuid, created_by=request.user)
-    questions = survey.questions.exclude(sectionheader__isnull=False).exclude(textquestion__isnull=False).prefetch_related('answers').all()
     
-    # Prepare analytics data for each question
+    # 1. Fetch ALL questions to determine sections
+    all_questions = survey.questions.all().order_by('position')
+    
+    # 2. Organize into sections
+    sections = []
+    # Create a default "General" or first section
+    current_section = {'id': 'initial', 'label': 'General / Introduction', 'questions': []}
+    sections.append(current_section)
+    
+    for q in all_questions:
+        if isinstance(q, SectionHeader):
+            # Start a new section
+            current_section = {'id': str(q.id), 'label': q.label, 'questions': []}
+            sections.append(current_section)
+        else:
+            # Add to current section
+            current_section['questions'].append(q)
+            
+    # Remove empty initial section if the first question is a SectionHeader
+    if not sections[0]['questions'] and len(sections) > 1:
+        sections.pop(0)
+
+    # 3. Handle Filtering
+    selected_section_id = request.GET.get('section', 'all')
+    questions_to_analyze = []
+
+    if selected_section_id == 'all':
+        # Flatten all questions from all sections
+        for section in sections:
+            questions_to_analyze.extend(section['questions'])
+    else:
+        # Find the specific section
+        for section in sections:
+            if section['id'] == selected_section_id:
+                questions_to_analyze = section['questions']
+                break
+    
+    # Filter out TextQuestions and ensure we aren't analyzing things we shouldn't
+    # (TextQuestion exclusion was in the original query)
+    questions_to_analyze = [
+        q for q in questions_to_analyze 
+        if not isinstance(q, TextQuestion) and not isinstance(q, SectionHeader)
+    ]
+    
+    # 4. Prepare analytics data (Logic mostly unchanged, just iterating over filtered list)
     analytics_data = []
     
-    for question in questions:  
+    for question in questions_to_analyze:  
         question_data = {
             'question': question,
             'type': type(question).__name__,
@@ -458,7 +501,7 @@ def SurveyAnalytics(request, uuid):
         
         if isinstance(question, MultiChoiceQuestion):
             # Get distribution for multiple choice
-            mc_question = MultiChoiceQuestion.objects.get(pk=question.pk)
+            mc_question = MultiChoiceQuestion.objects.get(pk=question.pk) 
             distribution = mc_question.get_answer_distribution()
             question_data['distribution'] = distribution
             question_data['chart_type'] = 'bar'
@@ -478,7 +521,7 @@ def SurveyAnalytics(request, uuid):
             question_data['chart_type'] = 'bar'
             
         elif isinstance(question, RatingQuestion):
-            rating_question = RatingQuestion.objects.get(pk=question.pk)
+            rating_question = RatingQuestion.objects.get(pk=question.pk) 
             distribution = rating_question.get_rating_distribution()
             
             question_data['distribution'] = distribution
@@ -493,13 +536,13 @@ def SurveyAnalytics(request, uuid):
             question_data['chart_type'] = 'bar'
             
         elif isinstance(question, RankQuestion):
-            rank_question = RankQuestion.objects.get(pk=question.pk)
+            rank_question = RankQuestion.objects.get(pk=question.pk) 
             distribution = rank_question.get_average_ranks()
             question_data['distribution'] = distribution
             question_data['chart_type'] = 'bar'
 
         elif isinstance(question, MatrixQuestion):
-            mx_question = MatrixQuestion.objects.get(pk=question.pk)
+            mx_question = MatrixQuestion.objects.get(pk=question.pk) 
             distribution = mx_question.get_matrix_distribution()
             stats = mx_question.get_row_statistics()
             
@@ -529,6 +572,9 @@ def SurveyAnalytics(request, uuid):
         'survey': survey,
         'analytics_data': analytics_data,
         'total_responses': survey.response_count,
+        'sections': sections,
+        'selected_section': selected_section_id,
+        'displayed_question_count': len(analytics_data),
     }
     
     return render(request, 'SurveyAnalytics.html', context)
@@ -572,7 +618,7 @@ def GetChartData(request, uuid, question_id):
         # We might want to sort by rank (which is already sorted in the method)
         data['labels'] = list(distribution.keys())
         data['values'] = list(distribution.values())
-        data['y_label'] = 'Average Rank Position (Lower is Better)'
+        data['y_label'] = 'Average Rank Position (higher is Better)'
 
     elif isinstance(question, MatrixQuestion):
         mx_question = MatrixQuestion.objects.get(pk=question.pk)

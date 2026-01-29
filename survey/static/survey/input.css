@@ -63,3 +63,37 @@
 .wiggle:hover .wiggle-icon {
   animation: wiggle 0.3s ease-in-out infinite;
 }
+
+@media print {
+  @page {
+      margin: 25mm; /* Increased margin */
+      size: auto;
+  }
+  .navbar { display: none !important; }
+  body {
+      background-color: white !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+  }
+  
+  /* Ensure specific elements don't split across pages */
+  .card, canvas, .chart-container, .break-inside-avoid {
+      break-inside: avoid !important;
+      page-break-inside: avoid !important;
+  }
+  
+  /* Minimize question divs */
+  .card-body {
+      padding: 1.5rem !important; /* Reduced padding from default */
+  }
+  .text-xl {
+      font-size: 1.1rem !important; /* Smaller titles */
+  }
+
+  /* Hide buttons and navigation */
+  .print\:hidden {
+      display: none !important;
+  }
+}
