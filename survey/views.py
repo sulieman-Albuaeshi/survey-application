@@ -731,30 +731,20 @@ def survey_submit(request, uuid):
                     if question.NAME == 'Matrix Question':
                         answer_data = {}
                         for i, row_label in enumerate(question.rows, start=1):
-                            # New unique key format matching template
-                            input_name = f'question_{question.position}_row_{i}'
-                            val = request.POST.get(input_name)
+                            old_key = f'{row_label}_row{i}'
+                            val = request.POST.get(old_key)
                             if val:
-                                answer_data[row_label] = val # Store { "Row Label": "Value" }
-                        
-                        # Fallback for legacy format support (optional, can be removed if fresh start)
-                        if not answer_data:
-                             for i, row_label in enumerate(question.rows, start=1):
-                                old_key = f'{row_label}_row{i}'
-                                val = request.POST.get(old_key)
-                                if val:
-                                    answer_data[row_label] = val
+                                answer_data[row_label] = val
+                            else:
+                                answer_data[row_label] = 'N\A'
 
-                        # If empty dict, set to None so validation catches it
-                        if not answer_data: 
-                            answer_data = None
 
                     elif question.NAME == 'Ranking Question':
                         if values:
                             # Save as dict where key is the rank (1-based)
                             answer_data = {val: str(i) for i, val in enumerate(values[::-1], start=1)}
                         else:
-                            answer_data = None
+                            answer_data = 'N\A'
 
                     else:
                         if len(values) > 1:
@@ -762,7 +752,7 @@ def survey_submit(request, uuid):
                         elif len(values) == 1:
                             answer_data = values[0] # Single string handling
                         else:
-                            answer_data = None
+                            answer_data = "N/A"
                     
                     # 2. Server-side Validation
                     if question.required and not answer_data:
