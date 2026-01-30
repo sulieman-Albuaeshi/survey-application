@@ -1,0 +1,44 @@
+{% load i18n %}
+<div id="response-tabs-container" class="bg-white sm:rounded-3xl rounded-none shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] border border-gray-100 border-x-0 sm:border-x overflow-hidden">
+    <!-- Tabs Header -->
+    <div class="p-6 border-b border-gray-100 flex justify-center">
+      <div role="tablist" class="inline-flex items-center p-1.5 bg-gray-100 rounded-full gap-2">
+        <a
+          hx-get="{% url 'SurveyResponseDetail' survey.uuid %}"
+          hx-target="#response-tabs-container"
+          hx-swap="outerHTML"
+          hx-push-url="true"
+          class="cursor-pointer inline-flex items-center px-8 py-3 text-sm font-bold rounded-full transition-all duration-300 gap-3 
+          {% if active_tab == 'individual' or not active_tab %}bg-white text-indigo-600 shadow-md transform scale-105{% else %}text-gray-500 hover:text-indigo-600 hover:bg-white hover:shadow-sm{% endif %}"
+        >
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+          </svg>
+          {% trans "Individual Responses" %}
+        </a>
+        <a
+          hx-get="{% url 'SurveyResponsesOverviewTable' survey.uuid %}"
+          hx-target="#response-tabs-container"
+          hx-swap="outerHTML"
+          hx-headers='{"X-Tab-Switch": "true"}'
+          hx-push-url="true"
+          class="cursor-pointer inline-flex items-center px-8 py-3 text-sm font-bold rounded-full transition-all duration-300 gap-3 
+          {% if active_tab == 'overview' %}bg-white text-indigo-600 shadow-md transform scale-105{% else %}text-gray-500 hover:text-indigo-600 hover:bg-white hover:shadow-sm{% endif %}"
+        >
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+          {% trans "Responses Overview" %}
+        </a>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div>
+      {% if active_tab == 'individual' or not active_tab %}
+        {% include "partials/SurveyResponseDetail/survey_responses_table_and_pagination.html" %}
+      {% elif active_tab == 'overview' %}
+        {% include "partials/SurveyResponseDetail/responses_overview_table.html" %}
+      {% endif %}
+    </div>
+</div>

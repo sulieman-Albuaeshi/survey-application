@@ -454,8 +454,13 @@ def SurveyResponseDetail(request, uuid):
     }
     
     is_htmx = request.headers.get('HX-Request') == 'true'
+    hx_target = request.headers.get('HX-Target')
     
     if is_htmx:
+        if hx_target == 'response-tabs-container':
+            context['active_tab'] = 'individual'
+            return render(request, 'partials/SurveyResponseDetail/response_tabs.html', context)
+            
         # عند طلب htmx، نرسل فقط الجزء الذي يحتاج إلى التحديث (الجدول وشريط التنقل)
         return render(request, 'partials/SurveyResponseDetail/survey_responses_table_and_pagination.html', context)
     
@@ -631,6 +636,12 @@ def SurveyResponsesOverviewTable(request, uuid):
         'table_data': table_data,
         'page_obj': page_obj,
     }
+    
+    # Check if this is a tab switch request
+    if request.headers.get('X-Tab-Switch') == 'true':
+        context['active_tab'] = 'overview'
+        return render(request, 'partials/SurveyResponseDetail/response_tabs.html', context)
+        
     return render(request, 'partials/SurveyResponseDetail/responses_overview_table.html', context)
 
 @require_POST
@@ -774,7 +785,7 @@ def survey_submit(request, uuid):
                     
                     # 2. Server-side Validation
                     if question.required and not answer_data:
-                        redirect_url = reverse('Survey_Start', args=[survey.uuid])
+                        redirect_url = reverse('survey_start', args=[survey.uuid])
                         return redirect(redirect_url)
 
                     if answer_data is not None:
