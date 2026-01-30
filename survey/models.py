@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from polymorphic.models import PolymorphicModel
+import math
+import statistics
 from django.utils.translation import gettext_lazy as _
 
 import uuid
@@ -127,40 +129,67 @@ class LikertQuestion(Question):
     scale_max = models.IntegerField(default=5, verbose_name=_("Scale Max"))
     NAME = _("Likert Question")
 
-    def get_average_rating(self):
-        """Calculate average rating for this question"""
+    def get_all_scores(self):
+        """Helper to get all numeric scores (1-based index) from answers."""
+        scores = []
         answers = Answer.objects.filter(question=self)
-        if not answers.exists():
-            return 0
-        
-        total = 0
-        count = 0
-        options_list = self.options # Expecting a list of strings
-        
         for answer in answers:
-            try:
-                # Direct string matching
-                val_str = str(answer.answer_data)
-                
-                # Check if it's in the options list
-                if val_str in options_list:
-                    # Map to 1-based index (Strongly Disagree -> 1, ..., Strongly Agree -> 5)
-                    val = options_list.index(val_str) + 1
-                    total += val
-                    count += 1
-                else:
-                     # Fallback for legacy numeric data or unexpected values
-                     val = float(int(answer.answer_data['position']))
-                     total += val
-                     count += 1
+            val_str = str(answer.answer_data)
+            if val_str in self.options:
+                scores.append(self.options.index(val_str) + 1)
+        return scores
 
-            except (ValueError, TypeError):
-                continue
+    def get_mean(self):
+        scores = self.get_all_scores()
+        return round(statistics.mean(scores), 2) if scores else 0
+
+    def get_median(self):
+        scores = self.get_all_scores()
+        return round(statistics.median(scores), 2) if scores else 0
+
+    def get_statistic(self):
+        """Return mean, median and CI as a dict."""
+        return {
+            'mean': self.get_mean(),
+            'median': self.get_median(),
+            'ci': self.get_confidence_interval()
+        }
+
+    def get_confidence_interval(self):
+        """95% Confidence Interval for the Mean"""
+        scores = self.get_all_scores()
+        n = len(scores)
+        if n < 2:
+            return None
         
-        if count == 0:
-            return 0
+        mean = statistics.mean(scores)
+        std_dev = statistics.stdev(scores)
+        
+        if std_dev == 0:
+             return f"{mean} - {mean}"
+             
+        # Z-score for 95% confidence is 1.96
+        margin_of_error = 1.96 * (std_dev / math.sqrt(n))
+        lower = round(mean - margin_of_error, 2)
+        upper = round(mean + margin_of_error, 2)
+        
+        return f"{lower} - {upper}"
+
+    def get_t_test(self, hypothetical_mean=3.0):
+        """One-sample T-test against neutral midpoint (default 3.0 for 5-pt scale)"""
+        scores = self.get_all_scores()
+        n = len(scores)
+        if n < 2:
+            return None
             
-        return round(total / count, 2)
+        mean = statistics.mean(scores)
+        std_dev = statistics.stdev(scores)
+        
+        if std_dev == 0:
+            return 0 # Avoid division by zero
+            
+        t_stat = (mean - hypothetical_mean) / (std_dev / math.sqrt(n))
+        return round(t_stat, 2)
     
     def get_rating_distribution(self):
         """Get distribution of ratings"""
@@ -191,12 +220,116 @@ class LikertQuestion(Question):
 
         return ['1' if val == option else '0' for option in self.options]
 
+    def get_interpretation(self):
+        """
+        Returns text interpretation of mean score based on interval formula:
+        (Max Score - Min Score) / Number of Options.
+        Example: (5 - 1) / 5 = 0.80 per option.
+        Range 1: 1.00 - 1.79 (Strongly Disagree)
+        Range 2: 1.80 - 2.59 (Disagree)
+        ...etc
+        """
+        scores = self.get_all_scores()
+        if not scores:
+            return "N/A"
+            
+        mean = statistics.mean(scores)
+        count = len(self.options)
+        if count == 0:
+            return "N/A"
+            
+        # Formula: Interval = (Max - Min) / Count
+        # Standard Likert Scale: Min=1, Max=Count
+        min_score = 1
+        max_score = count
+        interval = (max_score - min_score) / count
+        
+        if interval == 0:
+            return self.options[0]
+            
+        # Determine index based on the user's formula
+        # Index = floor((Mean - Min) / Interval)
+        raw_index = (mean - min_score) / interval
+        index = int(raw_index)
+        
+        # Clamp index to handle edge case of Mean == Max Score
+        if index >= count:
+            index = count - 1
+        if index < 0:
+            index = 0
+            
+        return self.options[index]
 
 class MatrixQuestion(Question):
     rows = models.JSONField(default=list, verbose_name=_("Rows"))
     columns = models.JSONField(default=list, verbose_name=_("Columns"))
 
     NAME = _("Matrix Question")
+
+    def get_row_statistics(self):
+        """Returns statistics for each row: {'Row 1': {'mean': x, 'median': y}, ...}"""
+        answers = Answer.objects.filter(question=self)
+        row_scores = {row: [] for row in self.rows}
+        
+        for ans in answers:
+            data = ans.answer_data 
+            if isinstance(data, dict):
+                for key, col_val in data.items():
+                    # Match key to row
+                    matched_row = None
+                    if key in self.rows:
+                        matched_row = key
+                    else:
+                        # Try matching 'Row Label_rowX' format
+                        for row in self.rows:
+                             if key.startswith(f"{row}_row"):
+                                 matched_row = row
+                                 break
+                    
+                    if matched_row and col_val in self.columns:
+                        row_scores[matched_row].append(self.columns.index(col_val) + 1)
+                        
+        result = {}
+        for row, scores in row_scores.items():
+            if scores:
+                interpretation = "N/A"
+                try:
+                    std_dev = statistics.stdev(scores)
+                    mean = statistics.mean(scores)
+                    t_stat = 0
+                    
+                    if len(scores) > 1 and std_dev > 0:
+                        midpoint = 3.0 
+                        t_stat = (mean - midpoint) / (std_dev / math.sqrt(len(scores)))
+                    
+                    # Calculate Interpretation using (Max-Min)/Count formula
+                    if self.columns:
+                        count = len(self.columns)
+                        min_score = 1
+                        max_score = count
+                        interval = (max_score - min_score) / count
+                        
+                        if interval > 0:
+                            raw_index = (mean - min_score) / interval
+                            index = int(raw_index)
+                            if index >= count: index = count - 1
+                            if index < 0: index = 0
+                            interpretation = self.columns[index]
+
+                except statistics.StatisticsError:
+                    std_dev = 0
+                    t_stat = 0
+                    interpretation = "N/A"
+                    
+                result[row] = {
+                    'mean': round(statistics.mean(scores), 2),
+                    'median': round(statistics.median(scores), 2),
+                    'interpretation': interpretation, # Replaces CI
+                    't_stat': round(t_stat, 2)
+                }
+            else:
+                 result[row] = {'mean': 0, 'median': 0, 'interpretation': 'N/A', 't_stat': 0}
+        return result
 
     def get_matrix_distribution(self):
         """
@@ -212,11 +345,21 @@ class MatrixQuestion(Question):
         distribution = {row: {col: 0 for col in self.columns} for row in self.rows}
         
         for ans in answers:
-            data = ans.answer_data # Expected: {'Row 1': 'Col A', 'Row 2': 'Col B'}
+            data = ans.answer_data # Expected: {'Row 1': 'Col A', 'Row 2': 'Col B'} or {'Row 1_row1': ...}
             if isinstance(data, dict):
-                for row_key, col_val in data.items():
-                    if row_key in distribution and col_val in distribution[row_key]:
-                        distribution[row_key][col_val] += 1
+                for key, col_val in data.items():
+                    # Match key to row
+                    matched_row = None
+                    if key in distribution:
+                        matched_row = key
+                    else:
+                        for row in self.rows:
+                             if key.startswith(f"{row}_row"):
+                                 matched_row = row
+                                 break
+
+                    if matched_row and col_val in distribution[matched_row]:
+                        distribution[matched_row][col_val] += 1
                         
         return distribution
 
@@ -262,6 +405,87 @@ class RatingQuestion(Question):
     max_label = models.CharField(max_length=50, blank=True, null=True, verbose_name=_("Max Label")) # e.g. "Excellent"
     NAME = _("Rating Question")
 
+    def get_all_scores(self):
+        answers = Answer.objects.filter(question=self)
+        scores = []
+        for answer in answers:
+            try:
+                scores.append(float(answer.answer_data))
+            except (ValueError, TypeError):
+                continue
+        return scores
+
+    def get_mean(self):
+        scores = self.get_all_scores()
+        return round(statistics.mean(scores), 2) if scores else 0
+
+    def get_median(self):
+        scores = self.get_all_scores()
+        return round(statistics.median(scores), 2) if scores else 0
+
+    def get_statistic(self):
+        """Return mean, median and CI as a dict."""
+        return {
+            'mean': self.get_mean(),
+            'median': self.get_median(),
+            'ci': self.get_confidence_interval()
+        }
+
+    def get_interpretation(self):
+        """
+        Returns text interpretation (numeric value) based on interval formula:
+        (Max - Min) / Count.
+        """
+        scores = self.get_all_scores()
+        if not scores:
+            return "N/A"
+            
+        mean = statistics.mean(scores)
+        
+        # Calculate number of options in the range (e.g. 1 to 5 is 5 options)
+        num_options = self.range_max - self.range_min + 1
+        if num_options == 0:
+            return "N/A"
+
+        # Formula: Interval = (Max Score - Min Score) / Number of Options
+        interval = (self.range_max - self.range_min) / num_options
+        
+        if interval == 0:
+             return str(self.range_min)
+
+        # Determine index corresponding to the mean
+        # index = floor((Mean - Min) / Interval)
+        raw_index = (mean - self.range_min) / interval
+        index = int(raw_index)
+        
+        # Clamp index
+        if index >= num_options:
+            index = num_options - 1
+        if index < 0:
+            index = 0
+            
+        # Map index back to the rating value
+        result_value = self.range_min + index
+        
+        return str(result_value)
+
+    def get_t_test(self):
+        """One-sample T-test against the range midpoint"""
+        scores = self.get_all_scores()
+        n = len(scores)
+        if n < 2:
+            return None
+            
+        midpoint = (self.range_min + self.range_max) / 2
+        mean = statistics.mean(scores)
+        std_dev = statistics.stdev(scores)
+        
+        if std_dev == 0:
+            return 0
+            
+        t_stat = (mean - midpoint) / (std_dev / math.sqrt(n))
+        return round(t_stat, 2)
+    
     def get_numeric_answer(self, answer_data):
         """Returns the rating value directly."""
         if answer_data is None or answer_data == "":

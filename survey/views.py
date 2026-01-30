@@ -476,20 +476,66 @@ def GetResponseDetail(request, response_id):
 def SurveyAnalytics(request, uuid):
     """Analytics and charts for a specific survey"""
     survey = get_object_or_404(Survey, uuid=uuid, created_by=request.user)
-    questions = survey.questions.all()
     
-    # Prepare analytics data for each question
+    # 1. Fetch ALL questions to determine sections
+    all_questions = survey.questions.all().order_by('position')
+    
+    # 2. Organize into sections
+    sections = []
+    # Create a default "General" or first section
+    current_section = {'id': 'initial', 'label': 'General / Introduction', 'questions': []}
+    sections.append(current_section)
+    
+    for q in all_questions:
+        if isinstance(q, SectionHeader):
+            # Start a new section
+            current_section = {'id': str(q.id), 'label': q.label, 'questions': []}
+            sections.append(current_section)
+        else:
+            # Add to current section
+            current_section['questions'].append(q)
+            
+    # Remove empty initial section if the first question is a SectionHeader
+    if not sections[0]['questions'] and len(sections) > 1:
+        sections.pop(0)
+
+    # 3. Handle Filtering
+    selected_section_id = request.GET.get('section', 'all')
+    questions_to_analyze = []
+    current_section_label = "All Sections"
+
+    if selected_section_id == 'all':
+        # Flatten all questions from all sections
+        for section in sections:
+            questions_to_analyze.extend(section['questions'])
+    else:
+        # Find the specific section
+        for section in sections:
+            if section['id'] == selected_section_id:
+                questions_to_analyze = section['questions']
+                current_section_label = section['label']
+                break
+    
+    # Filter out TextQuestions and ensure we aren't analyzing things we shouldn't
+    # (TextQuestion exclusion was in the original query)
+    questions_to_analyze = [
+        q for q in questions_to_analyze 
+        if not isinstance(q, TextQuestion) and not isinstance(q, SectionHeader)
+    ]
+    
+    # 4. Prepare analytics data (Logic mostly unchanged, just iterating over filtered list)
     analytics_data = []
     
-    for question in questions:
+    for question in questions_to_analyze:  
         question_data = {
             'question': question,
             'type': type(question).__name__,
+            'total_question_answers': Answer.objects.filter(question=question).count()
         }
         
         if isinstance(question, MultiChoiceQuestion):
             # Get distribution for multiple choice
-            mc_question = MultiChoiceQuestion.objects.get(pk=question.pk)
+            mc_question = MultiChoiceQuestion.objects.get(pk=question.pk) 
             distribution = mc_question.get_answer_distribution()
             question_data['distribution'] = distribution
             question_data['chart_type'] = 'bar'
@@ -498,31 +544,61 @@ def SurveyAnalytics(request, uuid):
             # Get rating distribution and average
             likert_question = LikertQuestion.objects.get(pk=question.pk)
             distribution = likert_question.get_rating_distribution()
-            average = likert_question.get_average_rating()
             question_data['distribution'] = distribution
-            question_data['average'] = average
+
+            # Add Mean, Median, Interpretation, and T-Test
+            question_data['mean'] = likert_question.get_mean()
+            question_data['median'] = likert_question.get_median()
+            question_data['interpretation'] = likert_question.get_interpretation()
+            question_data['t_test'] = likert_question.get_t_test()
+            
             question_data['chart_type'] = 'bar'
             
         elif isinstance(question, RatingQuestion):
-            rating_question = RatingQuestion.objects.get(pk=question.pk)
+            rating_question = RatingQuestion.objects.get(pk=question.pk) 
             distribution = rating_question.get_rating_distribution()
-            average = rating_question.get_average_rating()
+            
             question_data['distribution'] = distribution
-            question_data['average'] = average
+            question_data['average'] = rating_question.get_average_rating()
+            
+            # Add Mean, Median, and T-Test
+            question_data['mean'] = rating_question.get_mean()
+            question_data['median'] = rating_question.get_median()
+            question_data['interpretation'] = rating_question.get_interpretation()
+            question_data['t_test'] = rating_question.get_t_test()
+            
             question_data['chart_type'] = 'bar'
             
         elif isinstance(question, RankQuestion):
-            rank_question = RankQuestion.objects.get(pk=question.pk)
+            rank_question = RankQuestion.objects.get(pk=question.pk) 
             distribution = rank_question.get_average_ranks()
             question_data['distribution'] = distribution
             question_data['chart_type'] = 'bar'
 
         elif isinstance(question, MatrixQuestion):
-            mx_question = MatrixQuestion.objects.get(pk=question.pk)
+            mx_question = MatrixQuestion.objects.get(pk=question.pk) 
             distribution = mx_question.get_matrix_distribution()
-            question_data['distribution'] = distribution
+            stats = mx_question.get_row_statistics()
+            
+            # Combine for template
+            rows_data = []
+            for row, cols in distribution.items():
+                row_stat = stats.get(row, {'mean': 0, 'median': 0, 'interpretation': 'N/A', 't_test': 0})
+                rows_data.append({
+                    'label': row,
+                    'cols': cols,
+                    'mean': row_stat['mean'],
+                    'median': row_stat['median'],
+                    'interpretation': row_stat.get('interpretation', 'N/A'),
+                    't_stat': row_stat.get('t_stat', 0)
+                })
+
+            question_data['matrix_rows'] = rows_data
+            # question_data['distribution'] = distribution # Optional, but matrix_rows covers it
+            question_data['columns'] = mx_question.columns
             # Matrix is special; chart.js needs stacked bar
             question_data['chart_type'] = 'stacked-bar'
+
         
         analytics_data.append(question_data)
     
@@ -530,6 +606,10 @@ def SurveyAnalytics(request, uuid):
         'survey': survey,
         'analytics_data': analytics_data,
         'total_responses': survey.response_count,
+        'sections': sections,
+        'selected_section': selected_section_id,
+        'current_section_label': current_section_label,
+        'displayed_question_count': len(analytics_data),
     }
     
     return render(request, 'SurveyAnalytics.html', context)
@@ -557,7 +637,7 @@ def GetChartData(request, uuid, question_id):
         distribution = likert_question.get_rating_distribution()
         data['labels'] = [str(k) for k in distribution.keys()]
         data['values'] = list(distribution.values())
-        data['average'] = likert_question.get_average_rating()
+        data['average'] = likert_question.get_mean()
         
     elif isinstance(question, RatingQuestion):
         rating_question = RatingQuestion.objects.get(pk=question.pk)
@@ -573,7 +653,7 @@ def GetChartData(request, uuid, question_id):
         # We might want to sort by rank (which is already sorted in the method)
         data['labels'] = list(distribution.keys())
         data['values'] = list(distribution.values())
-        data['y_label'] = 'Average Rank Position (Lower is Better)'
+        data['y_label'] = 'Average Rank Position (higher is Better)'
 
     elif isinstance(question, MatrixQuestion):
         mx_question = MatrixQuestion.objects.get(pk=question.pk)
@@ -716,14 +796,16 @@ def CopySurveyView(request, uuid):
     new_survey = Survey.objects.create(
         title=f"Copy of {original_survey.title}",
         description=original_survey.description,
-        created_by=CustomUser.objects.first(),
+        created_by=request.user,
         state='draft',
         question_count=original_survey.question_count,
     )
 
     # Copy questions
     for question in original_survey.questions.all():
-        question.pk = None  # Clear PK to create a new instance
+        question.pk = None
+        question.id = None
+        question._state.adding = True
         question.survey = new_survey
         question.save()
 
@@ -760,10 +842,20 @@ def survey_submit(request, uuid):
                     if question.NAME == 'Matrix Question':
                         answer_data = {}
                         for i, row_label in enumerate(question.rows, start=1):
-                            row_key = f'{row_label}_row{i}' # e.g., row-label_1_row1
-                            val = request.POST.get(row_key)
+                            # New unique key format matching template
+                            input_name = f'question_{question.position}_row_{i}'
+                            val = request.POST.get(input_name)
                             if val:
-                                answer_data[row_key] = val # Store { "Row Label": "Value" }
+                                answer_data[row_label] = val # Store { "Row Label": "Value" }
+                        
+                        # Fallback for legacy format support (optional, can be removed if fresh start)
+                        if not answer_data:
+                             for i, row_label in enumerate(question.rows, start=1):
+                                old_key = f'{row_label}_row{i}'
+                                val = request.POST.get(old_key)
+                                if val:
+                                    answer_data[row_label] = val
+
                         # If empty dict, set to None so validation catches it
                         if not answer_data: 
                             answer_data = None
