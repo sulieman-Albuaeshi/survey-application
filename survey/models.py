@@ -401,7 +401,7 @@ class RatingQuestion(Question):
         scores = []
         for answer in answers:
             try:
-                if answer.answer_data is '':
+                if answer.answer_data == '':
                     continue
                 scores.append(float(answer.answer_data))
             except (ValueError, TypeError):
@@ -496,7 +496,7 @@ class RatingQuestion(Question):
         count = 0
         for answer in answers:
             try:
-                if answer.answer_data is '':
+                if answer.answer_data == '':
                     continue
                 val = float(answer.answer_data)
                 total += val
@@ -520,7 +520,7 @@ class RatingQuestion(Question):
         
         for answer in answers:
             try:
-                if answer.answer_data is '':
+                if answer.answer_data == '':
                     continue
                 val = int(float(answer.answer_data))
                 if val in distribution:

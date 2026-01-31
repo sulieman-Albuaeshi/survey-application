@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load socialaccount %}
+
+{% if is_respondent %}
+  {% block navbar %}
+  <div class="navbar bg-white/90 backdrop-blur-md border-b border-slate-200 sticky top-0 z-50 justify-center h-16" x-data="{ scrolled: false }" @scroll.window="scrolled = (window.pageYOffset > 20)">
+   <div class="flex items-center gap-2 transition-all duration-300" :class="{ 'scale-90': scrolled }">
+       <!-- Clean Logo / Brand -->
+       <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-primary-focus flex items-center justify-center text-white font-bold shadow-lg shadow-primary/30">
+           <i class="fa-solid fa-square-check"></i>
+       </div>
+       <span class="text-xl font-bold text-slate-800 tracking-tight">koko <span class="text-primary">Survey</span></span>
+    </div>
+  </div>  
+  {% endblock navbar %}
+{% endif %}
+
+{% block content %}
+<div class="min-h-screen bg-base-200 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+  <div class="card w-full max-w-md bg-base-100 shadow-xl">
+    <div class="card-body p-8">
+      <div class="text-center mb-6">
+        <h2 class="text-3xl font-bold text-base-content">
+            {% if is_respondent %}
+              {% trans "Create Account" %}
+            {% else %}
+              <span class="text-primary">Surveyor</span> Sign Up
+            {% endif %}
+        </h2>
+        <p class="mt-2 text-sm text-base-content/70">
+            {% if is_respondent %}
+              {% trans "Join to participate in surveys" %}
+            {% else %}
+              {% trans "Start creating your own surveys today" %}
+            {% endif %}
+        </p>
+      </div>
+
+      <form method="post" class="space-y-4">
+        {% csrf_token %} 
+        
+        {% if redirect_field_value %}
+        <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+        {% endif %}
+
+        {% if form.non_field_errors %}
+        <div class="alert alert-error shadow-lg text-sm">
+            <span>{{ form.non_field_errors }}</span>
+        </div>
+        {% endif %}
+
+        {% for field in form %}
+        <div class="form-control w-full">
+          <label class="label">
+            <span class="label-text font-medium">{{ field.label }}</span>
+          </label>
+          <input
+            type="{{ field.field.widget.input_type }}"
+            name="{{ field.name }}"
+            value="{{ field.value|default_if_none:'' }}"
+            placeholder="{{ field.label }}"
+            class="input input-bordered w-full focus:input-primary transition-all {% if field.errors %}input-error{% endif %}"
+            {% if field.field.required %}required{% endif %}
+            {% if field.help_text %}title="{{ field.help_text }}"{% endif %}
+          />
+          {% if field.errors %}
+            <label class="label py-0 mt-1">
+                {% for error in field.errors %}
+                <span class="label-text-alt text-error">{{ error }}</span>
+                {% endfor %}
+            </label>
+          {% endif %}
+          
+          {% if field.help_text and not field.errors %}
+          <label class="label py-0 mt-1">
+            <span class="label-text-alt text-base-content/60">{{ field.help_text }}</span>
+          </label>
+          {% endif %}
+        </div>
+        {% endfor %}
+
+        <div class="mt-6">
+          <button type="submit" class="btn btn-primary w-full shadow-lg">{% trans "Sign Up" %}</button>
+        </div>
+      </form>
+
+      {% if is_respondent %}
+        <div class="divider text-base-content/50 text-sm">{% trans "OR" %}</div>
+        
+        <a href="{% provider_login_url "google" next=redirect_field_value %}"
+            class="btn btn-outline btn-block flex items-center gap-2 hover:bg-base-200 hover:border-base-300 transition-colors">
+            <svg viewBox="0 0 48 48" class="w-5 h-5">
+            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.61l6.85-6.85C35.9 2.38 30.47 0 24 0 14.6 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+            <path fill="#4285F4" d="M46.1 24.5c0-1.63-.15-3.2-.43-4.73H24v9.01h12.43c-.54 2.9-2.16 5.36-4.6 7.04l7.1 5.51c4.16-3.84 6.17-9.5 6.17-16.83z"/>
+            <path fill="#FBBC05" d="M10.54 28.41c-.48-1.43-.76-2.96-.76-4.41s.27-2.98.76-4.41l-7.98-6.19C.92 16.46 0 20.12 0 24s.92 7.54 2.56 10.59l7.98-6.18z"/>
+            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.9-5.81l-7.1-5.51c-1.97 1.32-4.49 2.1-8.8 2.1-6.26 0-11.57-4.22-13.46-9.91l-7.98 6.18C6.51 42.62 14.6 48 24 48z"/>
+            </svg>
+            <span class="normal-case">{% trans "Sign up with Google" %}</span>
+        </a>
+      {% endif %}
+
+      <div class="mt-6 text-center text-sm">
+        <span class="text-base-content/70">{% trans "Already have an account?" %}</span>
+        {% if is_respondent %}
+         <a href="{% url 'respondent_login' %}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}" class="link link-primary font-semibold ml-1">{% trans "Login" %}</a>
+        {% else %}
+         <a href="{% url 'account_login' %}" class="link link-primary font-semibold ml-1">{% trans "Login" %}</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

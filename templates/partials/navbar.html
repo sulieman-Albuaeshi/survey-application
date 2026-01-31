@@ -109,7 +109,7 @@
                 <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52 mt-4">
                     <li class="px-4 py-2 font-bold text-center border-b border-base-200 mb-2">{{ user.username }}</li>
                     <li class="mt-1">
-                        <form action="{% url 'logout' %}" method="post" class="p-0 hover:bg-transparent">
+                        <form action="{% url 'account_logout' %}" method="post" class="p-0 hover:bg-transparent">
                             {% csrf_token %}
                             <button type="submit" class="flex w-full items-center justify-between gap-2 text-error font-medium hover:bg-error/10 active:bg-error/20 rounded-lg px-4 py-2 transition-all duration-200">
                                 {% trans "Logout" %}
@@ -120,8 +120,8 @@
                 </ul>
             </div>
         {% else %}
-            <a href="{% url 'login' %}" class="btn btn-ghost">{% trans "Login" %}</a>
-            <a href="{% url 'signup' %}" class="btn btn-primary">{% trans "Sign Up" %}</a>
+            <a href="{% url 'account_login' %}" class="btn btn-ghost">{% trans "Login" %}</a>
+            <a href="{% url 'account_signup' %}" class="btn btn-primary">{% trans "Sign Up" %}</a>
         {% endif %}
     </div>
 </div>
