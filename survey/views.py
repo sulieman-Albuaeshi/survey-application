@@ -738,6 +738,7 @@ def survey_submit(request, uuid):
                             else:
                                 answer_data[row_label] = ""  # some default value
 
+
                     # TODO: handle if the question was skipped
                     elif question.NAME == 'Ranking Question':
                         if values:
