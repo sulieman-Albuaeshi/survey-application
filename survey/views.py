@@ -718,7 +718,8 @@ def survey_submit(request, uuid):
     if request.method == 'POST':
         try:
             with transaction.atomic():
-                response = Response.objects.create(survey=survey)
+                respondent = request.user if request.user.is_authenticated else None
+                response = Response.objects.create(survey=survey, respondent=respondent)
                 
                 section_index = 1
                 for question in survey.questions.all():   
