@@ -136,45 +136,30 @@ class LikertQuestion(Question):
                 scores.append(self.options.index(val_str) + 1)
         return scores
 
-    def get_mean(self):
-        scores = self.get_all_scores()
+    def get_mean(self, scores=None):
+        if scores is None:
+            scores = self.get_all_scores()
         return round(statistics.mean(scores), 2) if scores else 0
 
-    def get_median(self):
-        scores = self.get_all_scores()
+    def get_median(self, scores=None):
+        if scores is None:
+            scores = self.get_all_scores()
         return round(statistics.median(scores), 2) if scores else 0
 
     def get_statistic(self):
         """Return mean, median and CI as a dict."""
+        score = self.get_all_scores()
         return {
-            'mean': self.get_mean(),
-            'median': self.get_median(),
-            'ci': self.get_confidence_interval()
+            'mean': self.get_mean(score),
+            'median': self.get_median(score),
+            'interpretation': self.get_interpretation(score),
+            't_test': self.get_t_test(scores=score)
         }
 
-    def get_confidence_interval(self):
-        """95% Confidence Interval for the Mean"""
-        scores = self.get_all_scores()
-        n = len(scores)
-        if n < 2:
-            return None
-        
-        mean = statistics.mean(scores)
-        std_dev = statistics.stdev(scores)
-        
-        if std_dev == 0:
-             return f"{mean} - {mean}"
-             
-        # Z-score for 95% confidence is 1.96
-        margin_of_error = 1.96 * (std_dev / math.sqrt(n))
-        lower = round(mean - margin_of_error, 2)
-        upper = round(mean + margin_of_error, 2)
-        
-        return f"{lower} - {upper}"
-
-    def get_t_test(self, hypothetical_mean=3.0):
+    def get_t_test(self, scores=None, hypothetical_mean=3.0):
         """One-sample T-test against neutral midpoint (default 3.0 for 5-pt scale)"""
-        scores = self.get_all_scores()
+        if scores is None:
+            scores = self.get_all_scores()
         n = len(scores)
         if n < 2:
             return None
@@ -215,7 +200,7 @@ class LikertQuestion(Question):
 
         return ['1' if val == option else '0' for option in self.options]
 
-    def get_interpretation(self):
+    def get_interpretation(self, score=None):
         """
         Returns text interpretation of mean score based on interval formula:
         (Max Score - Min Score) / Number of Options.
@@ -224,11 +209,18 @@ class LikertQuestion(Question):
         Range 2: 1.80 - 2.59 (Disagree)
         ...etc
         """
-        scores = self.get_all_scores()
+        if score is None:
+            scores = self.get_all_scores()
+        elif isinstance(score, list):
+            scores = score
+        else:
+            scores = [score]
+
         if not scores:
             return "N/A"
             
-        mean = statistics.mean(scores)
+        mean = self.get_mean(scores)
+        
         count = len(self.options)
         if count == 0:
             return "N/A"
@@ -408,29 +400,33 @@ class RatingQuestion(Question):
                 continue
         return scores
 
-    def get_mean(self):
-        scores = self.get_all_scores()
+    def get_mean(self, scores=None):
+        if scores is None:
+            scores = self.get_all_scores()
         return round(statistics.mean(scores), 2) if scores else 0
 
-    def get_median(self):
-        scores = self.get_all_scores()
+    def get_median(self, scores=None):
+        if scores is None:
+            scores = self.get_all_scores()
         return round(statistics.median(scores), 2) if scores else 0
 
     def get_statistic(self):
         """Return mean, median and CI as a dict."""
+        scores = self.get_all_scores()
         return {
-            'mean': self.get_mean(),
-            'median': self.get_median(),
-            'ci': self.get_confidence_interval(),
-            't_stat': self.get_t_test()
+            'mean': self.get_mean(scores),
+            'median': self.get_median(scores),
+            'interpretation': self.get_interpretation(scores),
+            't_test': self.get_t_test(scores=scores)
         }
 
-    def get_interpretation(self):
+    def get_interpretation(self, scores=None):
         """
         Returns text interpretation (numeric value) based on interval formula:
         (Max - Min) / Count.
         """
-        scores = self.get_all_scores()
+        if scores is None:
+            scores = self.get_all_scores()
         if not scores:
             return "N/A"
             
@@ -463,9 +459,10 @@ class RatingQuestion(Question):
         
         return str(result_value)
 
-    def get_t_test(self):
+    def get_t_test(self, scores=None):
         """One-sample T-test against the range midpoint"""
-        scores = self.get_all_scores()
+        if scores is None:
+            scores = self.get_all_scores()
         n = len(scores)
         if n < 2:
             return None

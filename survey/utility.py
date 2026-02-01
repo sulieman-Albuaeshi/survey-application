@@ -341,20 +341,14 @@ def get_question_analytics(question):
         data['chart_type'] = 'bar'
         
     elif isinstance(question, LikertQuestion):
+        data.update(question.get_statistic())
         data['distribution'] = question.get_rating_distribution()
-        data['mean'] = question.get_mean()
-        data['median'] = question.get_median()
-        data['interpretation'] = question.get_interpretation()
-        data['t_test'] = question.get_t_test()
         data['chart_type'] = 'bar'
         
     elif isinstance(question, RatingQuestion):
+        data.update(question.get_statistic())
         data['distribution'] = question.get_rating_distribution()
         data['average'] = question.get_average_rating()
-        data['mean'] = question.get_mean()
-        data['median'] = question.get_median()
-        data['interpretation'] = question.get_interpretation()
-        data['t_test'] = question.get_t_test()
         data['chart_type'] = 'bar'
         
     elif isinstance(question, RankQuestion):
