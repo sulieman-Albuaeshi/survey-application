@@ -43,9 +43,15 @@
             <td class="px-6 py-5 text-center">
               <div class="flex items-center gap-4">
                 {% if row.response.respondent %}
-                  <div class="h-11 w-11 rounded-2xl bg-gradient-to-br from-primary to-primary-focus text-white flex items-center justify-center font-bold text-lg shadow-lg shadow-primary/20 ring-2 ring-white group-hover:scale-105 transition-transform duration-300">
+                  {% with social=row.response.respondent.socialaccount_set.first %}
+                  {% if social and social.get_avatar_url %}
+                    <img src="{{ social.get_avatar_url }}" alt="{{ row.response.respondent.username }}" class="h-11 w-11 rounded-2xl object-cover shadow-lg shadow-primary/20 ring-2 ring-white group-hover:scale-105 transition-transform duration-300">
+                  {% else %}
+                    <div class="h-11 w-11 rounded-2xl bg-gradient-to-br from-primary to-primary-focus text-white flex items-center justify-center font-bold text-lg shadow-lg shadow-primary/20 ring-2 ring-white group-hover:scale-105 transition-transform duration-300">
                       {{ row.response.respondent.username|slice:":1"|upper }}
-                  </div>
+                    </div>
+                  {% endif %}
+                  {% endwith %}
                   <div>
                       <p class="font-bold text-slate-800 text-sm mb-0.5">{{ row.response.respondent.username }}</p>
                       <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-600">
