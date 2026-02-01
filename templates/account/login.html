@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load account socialaccount %}
+
+{% if not is_respondent %}
+  {% block navbar %}
+  <div class="navbar bg-white/90 backdrop-blur-md border-b border-slate-200 sticky top-0 z-50 justify-center h-16" x-data="{ scrolled: false }" @scroll.window="scrolled = (window.pageYOffset > 20)">
+   <div class="flex items-center gap-2 transition-all duration-300" :class="{ 'scale-90': scrolled }">
+       <!-- Clean Logo / Brand -->
+       <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-primary-focus flex items-center justify-center text-white font-bold shadow-lg shadow-primary/30">
+           <i class="fa-solid fa-square-check"></i>
+       </div>
+       <span class="text-xl font-bold text-slate-800 tracking-tight">koko <span class="text-primary">Survey</span></span>
+    </div>
+  </div>  
+  {% endblock navbar %}
+{% endif %}
+
+{% block content %}
+<div class="min-h-screen bg-base-200 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+  <div class="card w-full max-w-md bg-base-100 shadow-xl">
+    <div class="card-body p-8">
+      <div class="text-center mb-6">
+        <h2 class="text-3xl font-bold text-base-content">
+            {% if is_respondent %}
+              {% trans "Welcome Back" %}
+            {% else %}
+              <span class="text-primary">Surveyor</span> Login
+            {% endif %}
+        </h2>
+        <p class="mt-2 text-sm text-base-content/70">
+            {% if is_respondent %}
+              {% trans "Login to continue to the survey" %}
+            {% else %}
+              {% trans "Manage your surveys and responses" %}
+            {% endif %}
+        </p>
+      </div>
+      
+      <!-- The Action URL must be account_login -->
+      <form class="space-y-4" method="POST" action="{% url 'account_login' %}">
+        {% csrf_token %}
+        
+        {% if redirect_field_value %}
+        <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+        {% endif %}
+        
+        <!-- Errors -->
+        {% if form.errors %}
+        <div class="alert alert-error shadow-lg text-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            <span>{{ form.non_field_errors|default:"Please verify your credentials." }}</span>
+        </div>
+        {% endif %}
+
+        <!-- Username / Email Field -->
+        <div class="form-control w-full">
+          <label class="label"><span class="label-text font-medium">{% trans "Login" %}</span></label>
+          <input type="text" name="login" placeholder="{% trans 'Username or Email' %}" 
+                 class="input input-bordered w-full focus:input-primary transition-all" required autofocus />
+        </div>
+
+        <!-- Password Field -->
+        <div class="form-control w-full">
+          <label class="label"><span class="label-text font-medium">{% trans "Password" %}</span></label>
+          <input type="password" name="password" placeholder="{% trans 'Password' %}" 
+                 class="input input-bordered w-full focus:input-primary transition-all" required />
+            <label class="label">
+                <a href="{% url 'account_reset_password' %}" class="label-text-alt link link-hover text-primary">{% trans "Forgot password?" %}</a>
+            </label>
+        </div>
+
+        <!-- Button -->
+        <div class="mt-6">
+          <button type="submit" class="btn btn-primary w-full shadow-lg">{% trans "Sign In" %}</button>
+        </div>
+      </form>
+
+      
+      {% if is_respondent %}
+      <div class="divider text-base-content/50 text-sm">{% trans "OR" %}</div>
+
+      <div class="mb-4 text-center">
+      <a href="{% provider_login_url "google" process="login" next=redirect_field_value %}"
+        class="btn btn-outline btn-block flex items-center gap-2 hover:bg-base-200 hover:border-base-300 transition-colors">
+
+        <!-- Google SVG icon -->
+        <span class="w-5 h-5 flex items-center justify-center">
+          <svg viewBox="0 0 48 48" class="w-5 h-5">
+            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.61l6.85-6.85C35.9 2.38 30.47 0 24 0 14.6 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+            <path fill="#4285F4" d="M46.1 24.5c0-1.63-.15-3.2-.43-4.73H24v9.01h12.43c-.54 2.9-2.16 5.36-4.6 7.04l7.1 5.51c4.16-3.84 6.17-9.5 6.17-16.83z"/>
+            <path fill="#FBBC05" d="M10.54 28.41c-.48-1.43-.76-2.96-.76-4.41s.27-2.98.76-4.41l-7.98-6.19C.92 16.46 0 20.12 0 24s.92 7.54 2.56 10.59l7.98-6.18z"/>
+            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.9-5.81l-7.1-5.51c-1.97 1.32-4.49 2.1-8.8 2.1-6.26 0-11.57-4.22-13.46-9.91l-7.98 6.18C6.51 42.62 14.6 48 24 48z"/>
+          </svg>
+        </span>
+
+        <!-- Text -->
+        <span class="normal-case">{% trans "Continue with Google" %}</span>
+      </a>
+      </div>
+      {% endif %}
+
+      <div class="mt-6 text-center text-sm">
+        {% if is_respondent %}
+            <span class="text-base-content/70">{% trans "Don't have an account?" %}</span>
+            <a href="{% url 'respondent_signup' %}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}" class="link link-primary font-semibold ml-1">{% trans "Sign up" %}</a>
+        {% else %}
+            <div class="divider"></div>
+            <a href="{% url 'account_signup' %}" class="btn btn-outline btn-sm w-full">{% trans "Create New Surveyor Account" %}</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

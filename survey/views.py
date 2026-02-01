@@ -20,25 +20,22 @@ from django.urls import reverse
 from .utility import normalize_formset_indexes, get_dashboard_surveys, get_survey_export_data,organize_survey_sections, get_question_analytics, get_correlation_table, get_survey_data_by_sections
 from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 import zipfile
 import io
 from django.shortcuts import render
-
+from allauth.account.views import LoginView, SignupView
 
 
 # Create your views here.
-class SignUpView(CreateView):
-    form_class = CustomUserCreationForm
-    success_url = reverse_lazy('Dashboard')
-    template_name = 'registration/signup.html'
+class RespondentLoginView(LoginView):
+    template_name = 'account/login.html'
+    extra_context = {'is_respondent': True}
 
-    def form_valid(self, form):
-        # Save user and log them in
-        user = form.save()
-        login(self.request, user)
-        return redirect(self.success_url)
+class RespondentSignupView(SignupView):
+    template_name = 'account/signup.html'
+    extra_context = {'is_respondent': True}
 
 @login_required
 def create_survey(request):
@@ -712,14 +709,10 @@ def ToggleSurveyStatusConfirm(request, uuid):
 def survey_Start_View(request, uuid):
     """View to start taking the survey."""
     survey = get_object_or_404(Survey, uuid=uuid, state='published')
-    
-    # Check if user has already submitted the survey
-    if request.user.is_authenticated:
-        if Response.objects.filter(survey=survey, respondent=request.user).exists():
-            return render(request, 'Thanks.html', {'survey': survey, 'message': 'You have already submitted this survey.'})
-    elif request.session.get(f'survey_submitted_{survey.uuid}'):
-        return render(request, 'Thanks.html', {'survey': survey, 'message': 'You have already submitted this survey.'})
-
+    if not survey.anonymous_responses and not request.user.is_authenticated:
+        login_url = reverse('respondent_login')
+        next_url = request.path
+        return redirect(f"{login_url}?next={next_url}")
     questions = survey.questions.all().order_by('position')
     
     context = {
@@ -781,22 +774,12 @@ def survey_submit(request, uuid):
     """Submit the survey responses."""
     survey = get_object_or_404(Survey, uuid=uuid)
 
-    # Check if user has already submitted the survey (validation)
-    if request.user.is_authenticated:
-        if Response.objects.filter(survey=survey, respondent=request.user).exists():
-            return render(request, 'Thanks.html', {'survey': survey, 'message': 'You have already submitted this survey.'})
-    elif request.session.get(f'survey_submitted_{survey.uuid}'):
-        return render(request, 'Thanks.html', {'survey': survey, 'message': 'You have already submitted this survey.'})
-
     if request.method == 'POST':
         try:
             with transaction.atomic():
-                respondent = None
-                if request.user.is_authenticated and not survey.anonymous_responses:
-                    respondent = request.user
-                
+                respondent = request.user if request.user.is_authenticated else None
                 response = Response.objects.create(survey=survey, respondent=respondent)
-                
+
                 section_index = 1
                 for question in survey.questions.all():   
                     if isinstance(question, SectionHeader):
@@ -847,8 +830,8 @@ def survey_submit(request, uuid):
         except Exception as e:
             # Handle exceptions, possibly logging or user feedback
             return HttpResponse("An error occurred while submitting the survey.", status=500)
-            
-        request.session[f'survey_submitted_{survey.uuid}'] = True
+        if request.user.is_authenticated:
+            logout(request)
         return render(request, 'Thanks.html', {'survey': survey})
 
 def export_survey_data(request, uuid):

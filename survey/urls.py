@@ -7,8 +7,10 @@ from . import views
 urlpatterns = [
     path('', RedirectView.as_view(pattern_name='Dashboard'), name='home'),
     path('__debug__/', include('debug_toolbar.urls')),
-    path('accounts/', include('django.contrib.auth.urls')),
-    path('signup/', views.SignUpView.as_view(), name='signup'),
+    path('accounts/', include('allauth.urls')),
+    path('respondent/login/', views.RespondentLoginView.as_view(), name='respondent_login'),
+    path('respondent/signup/', views.RespondentSignupView.as_view(), name='respondent_signup'),
+    # path('signup/', views.SignUpView.as_view(), name='signup'),
     path('Dashboard', views.Index, name='Dashboard'),
     path('Dashboard/<int:page_number>', views.Index, name='Dashboard_Page'),
     path('CreateSurvey', views.create_survey, name='CreateSurvey'),
