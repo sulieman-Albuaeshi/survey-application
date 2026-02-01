@@ -403,7 +403,7 @@ def get_correlation_table(survey, questions_id: list = None):
     # ---------------------------------------------------------
     # 2. CALCULATE CORRELATION
     # ---------------------------------------------------------
-    correlation_matrix = df_clean.corr()
+    correlation_matrix = df_clean.corr().fillna(0)
     
     if correlation_matrix.empty:
         return None

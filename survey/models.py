@@ -139,12 +139,12 @@ class LikertQuestion(Question):
     def get_mean(self, scores=None):
         if scores is None:
             scores = self.get_all_scores()
-        return round(statistics.mean(scores), 2) if scores else 0
+        return round(statistics.mean(scores), 3) if scores else 0
 
     def get_median(self, scores=None):
         if scores is None:
             scores = self.get_all_scores()
-        return round(statistics.median(scores), 2) if scores else 0
+        return round(statistics.median(scores), 3) if scores else 0
 
     def get_statistic(self):
         """Return mean, median and CI as a dict."""
@@ -403,12 +403,12 @@ class RatingQuestion(Question):
     def get_mean(self, scores=None):
         if scores is None:
             scores = self.get_all_scores()
-        return round(statistics.mean(scores), 2) if scores else 0
+        return round(statistics.mean(scores), 3) if scores else 0
 
     def get_median(self, scores=None):
         if scores is None:
             scores = self.get_all_scores()
-        return round(statistics.median(scores), 2) if scores else 0
+        return round(statistics.median(scores), 3) if scores else 0
 
     def get_statistic(self):
         """Return mean, median and CI as a dict."""
