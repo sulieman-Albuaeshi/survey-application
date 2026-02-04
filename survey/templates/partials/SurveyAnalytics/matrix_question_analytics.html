@@ -1,4 +1,5 @@
 {% load static %}
+{% load i18n %}
 <div class="card bg-white shadow-xl border border-base-200 overflow-hidden break-inside-avoid">
     <div class="card-body p-6">
         <!-- Header -->
@@ -8,10 +9,22 @@
                  <h3 class="text-xl font-bold text-base-content">{{ data.question.label }}</h3>
             </div>
             <div class="print:hidden">
-                <label class="group flex items-center gap-2 p-2 rounded-lg border border-transparent hover:border-gray-200 hover:bg-gray-50 cursor-pointer transition-all duration-200" title="Include in correlation analysis">
-                    <span class="text-sm font-medium text-gray-500 group-hover:text-primary transition-colors">Include in correlation analysis</span>
+                <label class="group flex items-center gap-2 p-2 rounded-lg border border-transparent hover:border-gray-200 hover:bg-gray-50 cursor-pointer transition-all duration-200" title="{% trans "Include in correlation analysis" %}">
+                    <span class="text-sm font-medium text-gray-500 group-hover:text-primary transition-colors">{% trans "Include in correlation analysis" %}</span>
                     <input type="checkbox" name="correlation_question" value="{{ data.question.id }}" class="toggle toggle-primary toggle-sm" />
                 </label>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div class="text-center p-3 bg-blue-50/50 rounded-xl border border-blue-100">
+                <div class="text-[14px] text-blue-500 uppercase font-bold tracking-wider mb-1">{% trans "Responses" %}</div>
+                <div class="text-2xl font-bold text-blue-600">{{ data.total_question_answers }}</div>
+            </div>
+
+            <div class="text-center p-3 bg-purple-50/50 rounded-xl border border-purple-100">
+                <div class="text-[14px] text-purple-500 uppercase font-bold tracking-wider mb-1">{% trans "Percentage of Question Respondents" %}</div>
+                <div class="text-2xl font-bold text-purple-600">{% widthratio data.total_question_answers total_responses 100 %} %</div>
             </div>
         </div>
         
@@ -24,7 +37,7 @@
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
                             <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
                         </svg>
-                        Detailed Breakdown
+                        {% trans "Detailed Breakdown" %}
                     </h4>
                  </div>
                  
@@ -32,23 +45,26 @@
                     <table class="table table-zebra w-full">
                         <thead class="bg-base-200 text-base-content uppercase text-xs tracking-wider font-bold">
                             <tr>
-                                <th class="p-3 text-left w-1/4">Row Item</th>
+                                <th class="p-3 ltr:text-left rtl:text-right w-1/4">{% trans "Row Item" %}</th>
                                 <!-- Option Columns -->
                                 {% for col in data.columns %}
                                 <th class="text-center text-gray-500">{{ col }}</th>
                                 {% endfor %}
                                 
                                 <!-- Statistics Headers (Highlighted) -->
-                                <th class="text-center bg-blue-50 text-blue-700 border-l border-base-300" title="Average Score">Mean</th>
-                                <th class="text-center bg-purple-50 text-purple-700" title="Median Score">Median</th>
-                                <th class="text-center bg-orange-50 text-orange-700" title="Standard Interpretation">Interp.</th>
-                                <th class="text-center bg-green-50 text-green-700" title="T-Test Value">T-Test</th>
+                                <th class="text-center bg-blue-50 text-blue-700 border-l border-base-300" title="{% trans "Average Score" %}">{% trans "Mean" %}</th>
+                                <th class="text-center bg-purple-50 text-purple-700" title="{% trans "Median Score" %}">{% trans "Median" %}</th>
+                                <th class="text-center bg-orange-50 text-orange-700" title="{% trans "Standard Interpretation" %}">{% trans "Interp." %}</th>
+                                <th class="text-center bg-green-50 text-green-700" title="{% trans "T-Test Value" %}">{% trans "T-Test" %}</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for row in data.matrix_rows %}
                             <tr class="hover text-sm">
-                                <th class="font-bold text-left p-3 text-gray-700">{{ row.label }}</th>
+                                <th class="font-bold ltr:text-left rtl:text-right p-3 text-gray-700">
+                                    {{ row.label }}
+                                    <div class="text-[10px] text-gray-400 font-normal mt-1">{% trans "Responses" %}: {{ row.total_responses }}</div>
+                                </th>
                                 
                                 <!-- Answer Counts -->
                                 {% for col_name, count in row.cols.items %}
@@ -84,7 +100,7 @@
                         <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z" />
                         <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z" />
                     </svg>
-                    Visualization
+                    {% trans "Visualization" %}
                 </h4>
                 <div class="w-full flex items-center justify-center min-h-[400px] relative print:min-h-[300px]">
                     <canvas data-question-id="{{ data.question.id }}" 

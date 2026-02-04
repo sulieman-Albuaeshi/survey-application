@@ -1,3 +1,4 @@
+{% load i18n %}
 <div id="correlation-analysis" class="card bg-white shadow-lg border border-gray-200 mt-8 break-inside-avoid">
     <div class="card-body">
         <div class="flex items-center justify-between mb-6">
@@ -8,8 +9,8 @@
                     </svg>
                 </div>
                 <div>
-                    <h3 class="text-xl font-bold text-gray-800">Feature Correlation Analysis</h3>
-                    <p class="text-sm text-gray-500">Visualizing relationships between question responses</p>
+                    <h3 class="text-xl font-bold text-gray-800">{% trans "Feature Correlation Analysis" %}</h3>
+                    <p class="text-sm text-gray-500">{% trans "Visualizing relationships between question responses" %}</p>
                 </div>
             </div>
             <!-- Update Button -->
@@ -24,7 +25,7 @@
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 group-[.htmx-request]:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                 </svg>
-                Generate Correlation
+                {% trans "Generate Correlation" %}
             </button>
         </div>
 
@@ -40,8 +41,8 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
                         </svg>
                     </div>
-                    <p class="text-gray-500 font-medium text-lg mb-2">Build Your Correlation Matrix</p>
-                    <p class="text-sm text-gray-400 mb-6 max-w-md">Select "Compare" on at least 2 questions above, then click the button below to visualize their statistical relationship.</p>
+                    <p class="text-gray-500 font-medium text-lg mb-2">{% trans "Build Your Correlation Matrix" %}</p>
+                    <p class="text-sm text-gray-400 mb-6 max-w-md">{% trans "Select \"Compare\" on at least 2 questions above, then click the button below to visualize their statistical relationship." %}</p>
                     
                     <button class="btn btn-primary print:hidden group"
                             hx-get="{% url 'correlation_table' survey.uuid %}" 
@@ -54,9 +55,9 @@
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 group-[.htmx-request]:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                         </svg>
-                        Generate Correlation
+                        {% trans "Generate Correlation" %}
                     </button>
-                    <p class="text-xs text-gray-300 mt-4 italic">Requires sufficient numerical data in responses</p>
+                    <p class="text-xs text-gray-300 mt-4 italic">{% trans "Requires sufficient numerical data in responses" %}</p>
                 </div>
             {% endif %}
         </div>

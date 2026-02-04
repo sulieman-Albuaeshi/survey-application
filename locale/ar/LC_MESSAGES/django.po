@@ -1050,3 +1050,198 @@ msgstr "لم يتم العثور على ردود لهذا القسم."
 #: .\survey\templates\partials\SurveyDataGrid/grid_view.html:159
 msgid "No responses found."
 msgstr "لم يتم العثور على ردود."
+
+#: .\survey\templates\SurveyAnalystics.html:43
+msgid "Show All Sections"
+msgstr "عرض جميع الأقسام"
+
+#: .\survey\templates\SurveyAnalystics.html:58
+msgid "Export Report"
+msgstr "تصدير تقرير"
+
+#: .\survey\templates\SurveyAnalystics.html:82
+msgid "Completion Rate"
+msgstr "معدل الإكمال"
+
+#: .\survey\templates\SurveyAnalystics.html:91
+msgid "Last Response"
+msgstr "آخر رد"
+
+#: .\survey\templates\SurveyAnalystics.html:114
+msgid "Current Section"
+msgstr "القسم الحالي"
+
+#: .\survey\templates\partials\SurveyAnalystics\all_question_analytics.html:18
+msgid "Analystics not available for this question type"
+msgstr "التحليلات غير متوفرة لهذا النوع من الأسئلة"
+
+#: .\survey\templates\partials\SurveyAnalytics\likert_question_analytics.html:12
+msgid "Include in correlation analysis"
+msgstr "تضمين في تحليل الارتباط"
+
+#: .\survey\templates\partials\SurveyAnalytics\likert_question_analytics.html:22
+msgid "Mean"
+msgstr "المتوسط"
+
+#: .\survey\templates\partials\SurveyAnalytics\likert_question_analytics.html:26
+msgid "Median"
+msgstr "الوسيط"
+
+#: .\survey\templates\partials\SurveyAnalytics\likert_question_analytics.html:30
+msgid "Interp."
+msgstr "التفسير"
+
+#: .\survey\templates\partials\SurveyAnalytics\likert_question_analytics.html:34
+msgid "T-Test"
+msgstr "اختبار - T"
+
+#: .\survey\templates\partials\SurveyAnalytics\likert_question_analytics.html:48
+msgid "Rating Distribution"
+msgstr "توزيع التقييم"
+
+#: .\survey\templates\partials\SurveyAnalytics\likert_question_analytics.html:77
+msgid "Visualization"
+msgstr "التصوير البياني"
+
+#: .\survey\templates\partials\SurveyAnalytics\likert_question_analytics.html:76
+msgid "Percentage of Question Respondents"
+msgstr "نسبة المستجيبين للسؤال"
+
+#: .\survey\templates\partials\SurveyAnalytics\matrix_question_analytics.html:28
+msgid "Detailed Breakdown"
+msgstr "تفصيل مفصل"
+
+#: .\survey\templates\partials\SurveyAnalytics\matrix_question_analytics.html:36
+msgid "Row Item"
+msgstr "عنصر الصف"
+
+#: .\survey\templates\partials\SurveyAnalytics\matrix_question_analytics.html:43
+msgid "Average Score"
+msgstr "متوسط النقاط"
+
+#: .\survey\templates\partials\SurveyAnalytics\matrix_question_analytics.html:44
+msgid "Median Score"
+msgstr "النقاط الوسيطة"
+
+#: .\survey\templates\partials\SurveyAnalytics\matrix_question_analytics.html:45
+msgid "Standard Interpretation"
+msgstr "التفسير القياسي"
+
+#: .\survey\templates\partials\SurveyAnalytics\matrix_question_analytics.html:46
+msgid "T-Test Value"
+msgstr "قيمة اختبار - T"
+
+#: .\survey\templates\partials\SurveyAnalytics\multichoice_question_analytics.html:27
+msgid "Response Statistics"
+msgstr "إحصائيات الردود"
+
+#: .\survey\templates\partials\SurveyAnalytics\multichoice_question_analytics.html:33
+msgid "Option"
+msgstr "خيار"
+
+#: .\survey\templates\partials\SurveyAnalytics\multichoice_question_analytics.html:34
+msgid "Count"
+msgstr "عدد"
+
+#: .\survey\templates\partials\SurveyAnalytics\multichoice_question_analytics.html:35
+msgid "Distribution"
+msgstr "التوزيع"
+
+#: .\survey\templates\partials\SurveyAnalytics\multichoice_question_analytics.html:63
+msgid "No data available to display"
+msgstr "لا توجد بيانات متاحة للعرض"
+
+#: .\survey\templates\partials\SurveyAnalytics\rating_question_analytics.html:47
+msgid "Rating Frequency"
+msgstr "تكرار التقييم"
+
+#: .\survey\templates\partials\SurveyAnalytics\rating_question_analytics.html:55
+msgid "stars"
+msgstr "نجوم"
+
+#: .\survey\templates\partials\SurveyAnalytics\rank_question_analytics.html:36
+msgid "A higher average score indicates a better ranking position (closer to 1st place)."
+msgstr "يشير متوسط النقاط الأعلى إلى موقع ترتيب أفضل (أقرب إلى المركز الأول)."
+
+#: .\survey\templates\partials\SurveyAnalytics\rank_question_analytics.html:41
+msgid "Performance Leaderboard"
+msgstr "لوحة المتصدرين للأداء"
+
+#: .\survey\templates\partials\SurveyAnalytics\rank_question_analytics.html:78
+msgid "Average"
+msgstr "المتوسط"
+
+#: .\survey\templates\partials\SurveyAnalytics\rank_question_analytics.html:78
+msgid "Top Ranked"
+msgstr "الأعلى ترتيبًا"
+
+#: .\survey\templates\partials\SurveyAnalytics\correlation_table.html:11
+msgid "Feature Correlation Analysis"
+msgstr "تحليل ارتباط الميزات"
+
+#: .\survey\templates\partials\SurveyAnalytics\correlation_table.html:12
+msgid "Visualizing relationships between question responses"
+msgstr "تصوير العلاقات بين ردود الأسئلة"
+
+#: .\survey\templates\partials\SurveyAnalytics\correlation_table.html:27
+msgid "Generate Correlation"
+msgstr "توليد الارتباط"
+
+#: .\survey\templates\partials\SurveyAnalytics\correlation_table.html:43
+msgid "Build Your Correlation Matrix"
+msgstr "بناء مصفوفة الارتباط الخاصة بك"
+
+#: .\survey\templates\partials\SurveyAnalytics\correlation_table.html:44
+msgid "Select \"Compare\" on at least 2 questions above, then click the button below to visualize their statistical relationship."
+msgstr "حدد \"مقارنة\" على سؤالين على الأقل أعلاه، ثم انقر على الزر أدناه لتصور العلاقة الإحصائية بينهما."
+
+#: .\survey\templates\partials\SurveyAnalytics\correlation_table.html:59
+msgid "Requires sufficient numerical data in responses"
+msgstr "يتطلب بيانات رقمية كافية في الردود"
+
+#: .\survey\templates\Thanks.html:35
+msgid "Thank You!"
+msgstr "شكراً لك!"
+
+#: .\survey\templates\Thanks.html:38
+msgid "Your response to"
+msgstr "ردك على"
+
+msgid "has been successfully recorded."
+msgstr "تم تسجيله بنجاح."
+
+#: .\survey\templates\Thanks.html:44
+msgid "We appreciate your time and effort in sharing your feedback with us."
+msgstr "نحن نقدر وقتك وجهدك في مشاركة ملاحظاتك معنا."
+
+#: .\survey\templates\partials\Create_survey\option_button.html:31
+msgid "Move Up"
+msgstr "التحرك للأعلى"
+
+#: .\survey\templates\partials\Create_survey\option_button.html:43
+msgid "Move Down"
+msgstr "التحرك للأسفل"
+
+#: .\survey\templates\partials\Create_survey\option_button.html:58
+msgid "Delete Option"
+msgstr "حذف الخيار"
+
+#: .\survey\templates\partials\survey_questions_display.html:290
+msgid "Please rank all remaining options."
+msgstr "يرجى ترتيب جميع الخيارات المتبقية."
+
+#: .\survey\templates\partials\survey_questions_display.html:228
+msgid "Your Ranking"
+msgstr "ترتيبك"
+
+#: .\survey\templates\partials\survey_questions_display.html:230
+msgid "item(s) ranked"
+msgstr "عنصر/عناصر تم ترتيبها"
+
+#: .\survey\templates\partials\survey_questions_display.html:240
+msgid "Tap options below to add them here in order"
+msgstr "انقر على الخيارات أدناه لإضافتها هنا بالترتيب"
+
+#: .\survey\templates\partials\survey_questions_display.html:273
+msgid "Available Options"
+msgstr "الخيارات المتاحة"

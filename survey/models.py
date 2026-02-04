@@ -27,6 +27,7 @@ class Survey(models.Model):
     state = models.CharField(max_length=20, choices=STATE_CHOICES, default="draft", verbose_name=_("State"))
     created_by =  models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='surveys', verbose_name=_("Created By"))
     question_count = models.IntegerField(default=0, verbose_name=_("Question Count"))
+    view_count = models.IntegerField(default=0, verbose_name=_("View Count"))
     shuffle_questions = models.BooleanField(default=False, verbose_name=_("Shuffle Questions"))
     anonymous_responses = models.BooleanField(default=False, verbose_name=_("Anonymous Responses"))
 
@@ -61,8 +62,10 @@ class Survey(models.Model):
         }
     
     def get_completion_rate(self):
-        """Calculate completion rate (placeholder)"""
-        return 100 if self.response_count > 0 else 0
+        """Calculate completion rate: (Responses / Views) * 100"""
+        if self.view_count > 0:
+            return round((self.response_count / self.view_count) * 100, 2)
+        return 0
     
     def get_avg_response_time(self):
         """Calculate average response time (placeholder)"""
@@ -105,15 +108,22 @@ class MultiChoiceQuestion(Question):
     def get_answer_distribution(self):
         """Get distribution of answers for this question"""
         answers = Answer.objects.filter(question=self)
-        distribution = {}
+        
+        # Initialize with 0 for all existing options
+        distribution = {option: 0 for option in self.options}
         
         for answer in answers:
             answer_data = answer.answer_data
+            if not answer_data: # Skip None or empty string
+                continue
+                
             if isinstance(answer_data, list):
                 for item in answer_data:
-                    distribution[item] = distribution.get(item, 0) + 1
+                    if item in distribution:
+                        distribution[item] += 1
             else:
-                distribution[answer_data] = distribution.get(answer_data, 0) + 1
+                if answer_data in distribution:
+                    distribution[answer_data] += 1
         
         return distribution
 
@@ -563,19 +573,23 @@ class RankQuestion(Question):
     def get_average_ranks(self):
         """
         Returns a dict of {option_name: average_rank_position}.
-        Lower number = Better rank (1st place, 2nd place, etc.)
+        weighted score = (number of options - rank) + 1
+        Higher number = Better rank
         """
         answers = Answer.objects.filter(question=self)
         stats = {opt: {'sum': 0, 'count': 0} for opt in self.options}
+        num_options = len(self.options)
         
         for answer in answers:
-            # answer_data is expected to be a dict {'5': 'Option A', '4': 'Option B'}
+            # answer_data is expected to be a dict {'Option A': '1', 'Option B': '2'}
             ranking_dict = answer.answer_data 
             if isinstance(ranking_dict, dict):
                 for item, score in ranking_dict.items():
                         try:
-                            stats[item]['sum'] += int(score)
-                            stats[item]['count'] += 1
+                            if item in stats:
+                                weight = int(score)
+                                stats[item]['sum'] += weight
+                                stats[item]['count'] += 1
                         except (ValueError, TypeError):
                             pass
         
@@ -586,8 +600,8 @@ class RankQuestion(Question):
             else:
                 results[opt] = 0
         
-        # Sort by rank (lowest score is best)
-        return dict(sorted(results.items(), key=lambda item: item[1]))
+        # Sort by weight (highest score is best)
+        return dict(sorted(results.items(), key=lambda item: item[1], reverse=True))
 
 class Response(models.Model):
     survey = models.ForeignKey(Survey, on_delete=models.CASCADE, related_name='responses')

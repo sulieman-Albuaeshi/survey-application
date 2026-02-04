@@ -27,12 +27,12 @@
                 <button class="btn btn-ghost" onclick="document.getElementById('delete_modal_{{ survey.uuid }}').remove()">{% trans "Cancel" %}</button>
             </form>
             
-            <a class="btn btn-error" 
-                    href="{% url 'DeleteSurvey' survey.uuid %}"
-                    {% comment %} onclick="document.getElementById('delete_modal_{{ survey.uuid }}').remove()" {% endcomment %}
-                    >
-                {% trans "Yes, Delete it" %}
-            </a>
+            <form action="{% url 'DeleteSurvey' survey.uuid %}" method="post" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-error">
+                    {% trans "Yes, Delete it" %}
+                </button>
+            </form>
         </div>
     </div>
     <form method="dialog" class="modal-backdrop">

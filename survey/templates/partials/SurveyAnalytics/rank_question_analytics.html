@@ -1,4 +1,5 @@
 {% load static %}
+{% load i18n %}
 <div class="card bg-white shadow-lg border border-gray-200 break-inside-avoid">
     <div class="card-body">
         <!-- Header -->
@@ -8,23 +9,36 @@
                  <h3 class="text-xl font-bold text-base-content">{{ data.question.label }}</h3>
             </div>
             <div class="print:hidden">
-                <label class="group flex items-center gap-2 p-2 rounded-lg border border-transparent hover:border-gray-200 hover:bg-gray-50 cursor-pointer transition-all duration-200" title="Include in correlation analysis">
-                    <span class="text-sm font-medium text-gray-500 group-hover:text-primary transition-colors">Include in correlation analysis</span>
+                <label class="group flex items-center gap-2 p-2 rounded-lg border border-transparent hover:border-gray-200 hover:bg-gray-50 cursor-pointer transition-all duration-200" title="{% trans "Include in correlation analysis" %}">
+                    <span class="text-sm font-medium text-gray-500 group-hover:text-primary transition-colors">{% trans "Include in correlation analysis" %}</span>
                     <input type="checkbox" name="correlation_question" value="{{ data.question.id }}" class="toggle toggle-primary toggle-sm" />
                 </label>
             </div>
         </div>        
         <!-- Ranking Question Analytics -->
+
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div class="text-center p-3 bg-blue-50/50 rounded-xl border border-blue-100">
+                <div class="text-[14px] text-blue-500 uppercase font-bold tracking-wider mb-1">{% trans "Responses" %}</div>
+                <div class="text-2xl font-bold text-blue-600">{{ data.total_question_answers }}</div>
+            </div>
+
+            <div class="text-center p-3 bg-purple-50/50 rounded-xl border border-purple-100">
+                <div class="text-[14px] text-purple-500 uppercase font-bold tracking-wider mb-1">{% trans "Percentage of Question Respondents" %}</div>
+                <div class="text-2xl font-bold text-purple-600">{% widthratio data.total_question_answers total_responses 100 %} %</div>
+            </div>
+        </div>
+
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div>
                 <div class="flex items-center gap-2 text-sm text-gray-500 mb-6 bg-blue-50/50 p-3 rounded-xl border border-blue-100">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-blue-500 w-5 h-5 flex-shrink-0"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    <span><strong>Note:</strong> A higher average score indicates a better ranking position (closer to 1st place).</span>
+                    <span><strong>{% trans "Note:" %}</strong> {% trans "A higher average score indicates a better ranking position (closer to 1st place)." %}</span>
                 </div>
 
                 <h4 class="font-bold text-gray-800 mb-4 flex items-center gap-2 text-lg">
                     <svg class="w-5 h-5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
-                    Performance Leaderboard
+                    {% trans "Performance Leaderboard" %}
                 </h4>
                 
                 <div class="flex flex-col gap-3">
@@ -54,14 +68,14 @@
                             {% if forloop.counter == 1 %}
                                 <div class="text-xs text-yellow-600 font-medium flex items-center gap-1">
                                     <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
-                                    Top Ranked
+                                    {% trans "Top Ranked" %}
                                 </div>
                             {% endif %}
                         </div>
 
                         <!-- Avg Score -->
                         <div class="flex-none text-right pl-4 border-l border-gray-100">
-                             <div class="text-[0.65rem] text-gray-400 uppercase tracking-wider font-bold mb-0.5">Average</div>
+                             <div class="text-[0.65rem] text-gray-400 uppercase tracking-wider font-bold mb-0.5">{% trans "Average" %}</div>
                              <div class="text-xl font-black tabular-nums tracking-tight
                                 {% if forloop.counter == 1 %} text-yellow-600
                                 {% elif forloop.counter == 2 %} text-slate-600
@@ -82,7 +96,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
                     </svg>
-                    Visualization
+                    {% trans "Visualization" %}
                 </h4>
                 <div class="bg-white rounded-xl p-4 border border-gray-200 h-full flex items-center justify-center min-h-[300px]">
                     <canvas id="chart-{{ data.question.id }}"

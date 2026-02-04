@@ -38,8 +38,19 @@ class BaseQuestionForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if self.instance and self.instance.pk:
-            if hasattr(self.instance, 'NAME'):
-                self.initial['question_type'] = self.instance.NAME
+            # Map class names to English keys used in templates/views
+            class_name = self.instance.__class__.__name__
+            mapped_key = class_name
+            
+            if class_name == 'MultiChoiceQuestion': mapped_key = 'Multi-Choice Question'
+            elif class_name == 'LikertQuestion': mapped_key = 'Likert Question'
+            elif class_name == 'MatrixQuestion': mapped_key = 'Matrix Question'
+            elif class_name == 'RatingQuestion': mapped_key = 'Rating Question'
+            elif class_name == 'RankQuestion': mapped_key = 'Ranking Question'
+            elif class_name == 'TextQuestion': mapped_key = 'Text Question'
+            elif class_name == 'SectionHeader': mapped_key = 'Section Header'
+            
+            self.initial['question_type'] = mapped_key
 
     class Meta:
         model = models.Question

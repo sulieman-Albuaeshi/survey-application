@@ -65,14 +65,8 @@
 
         <!-- Middle Column: Questions List -->
         <div class="lg:col-span-9 space-y-6" id="question_container" x-auto-animate>
-            {# Check for Question Type Translations #}
-            {% trans "Multi-Choice Question" as multi_choice_question %}
-            {% trans "Likert Question" as likert_question %}
-            {% trans "Matrix Question" as matrix_question %}
-            {% trans "Rating Question" as rating_question %}
-            {% trans "Ranking Question" as ranking_question %}
-            {% trans "Text Question" as text_question %}
-            {% trans "Section Header" as section_header %}
+            {# Check for Question Type Translations - Removed as we use fixed English keys for logic now #}
+
 
             {% for f in Question_formset.forms %}
                 {% if f.DELETE.value %}
@@ -90,25 +84,25 @@
                         {{ hidden }}
                     {% endfor %}
                     {{ f.id }}
-                    {% if f.question_type.value == multi_choice_question %}
+                    {% if f.question_type.value == "Multi-Choice Question" %}
                         {% include "partials/Create_survey/Questions/Multi-Choice_Question.html" %}
                     {% endif %}
-                    {% if f.question_type.value == likert_question %}
+                    {% if f.question_type.value == "Likert Question" %}
                         {% include "partials/Create_survey/Questions/Likert_Question.html" %}
                     {% endif %}
-                    {% if f.question_type.value == matrix_question %}
+                    {% if f.question_type.value == "Matrix Question" %}
                         {% include "partials/Create_survey/Questions/Matrix_Question.html" %}
                     {% endif %}
-                    {% if f.question_type.value == rating_question %}
+                    {% if f.question_type.value == "Rating Question" %}
                         {% include "partials/Create_survey/Questions/Rating_Question.html" %}
                     {% endif %}
-                    {% if f.question_type.value == ranking_question %}
+                    {% if f.question_type.value == "Ranking Question" %}
                         {% include "partials/Create_survey/Questions/Ranking_Question.html" %}
                     {% endif %}
-                    {% if f.question_type.value == text_question %}
+                    {% if f.question_type.value == "Text Question" %}
                         {% include "partials/Create_survey/Questions/Text_Question.html" %}
                     {% endif %}
-                    {% if f.question_type.value == section_header %}
+                    {% if f.question_type.value == "Section Header" %}
                         {% include "partials/Create_survey/Questions/Section_Header.html" %}
                     {% endif %}
                 {% endwith %}

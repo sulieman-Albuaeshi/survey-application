@@ -17,6 +17,8 @@ from django.views import View
 from django.views.generic import CreateView, UpdateView, DeleteView, DetailView
 from django.shortcuts import redirect
 from django.urls import reverse
+from django.contrib import messages
+from django.utils.translation import gettext as _
 from .utility import normalize_formset_indexes, get_dashboard_surveys, get_survey_export_data,organize_survey_sections, get_question_analytics, get_correlation_table, get_survey_data_by_sections
 from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required
@@ -235,15 +237,32 @@ def delete_survey_confirm(request, uuid):
     """
     Renders a confirmation modal for survey deletion.
     """
-    survey = get_object_or_404(Survey, uuid=uuid)
+    survey = get_object_or_404(Survey, uuid=uuid, created_by=request.user)
     context = {'survey': survey}
     return render(request, 'partials/Dashboard/delete_modal.html', context)
 
+@require_POST
 @login_required
 def DeleteSurvey(request, uuid):
-    item = get_object_or_404(Survey, uuid=uuid)
-    item.delete()
-    return redirect('/Dashboard')
+    survey = get_object_or_404(Survey, uuid=uuid, created_by=request.user)
+    try:
+        title = survey.title
+        with transaction.atomic():
+            # Manual cascade deletion to avoid SQLite Foreign Key constraints issues
+            Answer.objects.filter(response__survey=survey).delete()
+            survey.responses.all().delete()
+            
+            # Use iteration for polymorphic models to ensure correct deletion order
+            for question in survey.questions.all():
+                question.delete()
+            
+            survey.delete()
+            
+        messages.success(request, _('Survey "%s" was successfully deleted.') % title)
+    except Exception as e:
+        messages.error(request, _('An error occurred while deleting the survey: %s') % str(e))
+    
+    return redirect('Dashboard')
 
 @login_required
 def Index(request, page_number=1):
@@ -713,6 +732,11 @@ def survey_Start_View(request, uuid):
         login_url = reverse('respondent_login')
         next_url = request.path
         return redirect(f"{login_url}?next={next_url}")
+        
+    # Increment view count
+    survey.view_count += 1
+    survey.save()
+    
     questions = survey.questions.all().order_by('position')
     
     context = {

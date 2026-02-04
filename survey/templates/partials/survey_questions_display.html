@@ -71,31 +71,48 @@
 
             <!-- 1. MULTI-CHOICE -->
             {% if q.NAME == multi_choice_question %}
-            <div class="flex flex-col gap-3"
-                {% if q.allow_multiple and q.required or q.allow_multiple and q.the_minimum_number_of_options_to_be_selected > 1 %} data-required-checkbox-group{% endif %}
-                {% if q.allow_multiple %}data-min-required="{{ q.the_minimum_number_of_options_to_be_selected }}"{% endif %}>
-                {% for option in q.options|shuffle_if:q.randomize_options %}
-                <label class="group relative flex items-center p-4 rounded-xl border border-slate-200 bg-slate-50/50 cursor-pointer transition-all duration-200 
-                            hover:border-primary hover:bg-white hover:shadow-md hover:shadow-primary/5
-                            has-[:checked]:border-primary has-[:checked]:bg-primary/5 has-[:checked]:shadow-md">
-                    {% if q.allow_multiple %}
-                        <input type="checkbox" name="question_{{ q.position }}" value="{{ option }}" class="peer toggle checkbox-primary checkbox-sm border-slate-300 rounded-md">
-                    {% else %}
-                        <input type="radio" name="question_{{ q.position }}" value="{{ option }}" class="peer radio radio-primary radio-sm border-slate-300" {% if q.required %}required{% endif %}>
-                    {% endif %}
-                    <span class="ml-4 text-base font-medium text-slate-600 transition-colors group-hover:text-slate-900 peer-checked:text-primary-focus peer-checked:font-bold">
-                        {{ option }}
-                    </span>
-                </label>
-                {% endfor %}
-            </div>
+            <div x-data="{
+                    checkedCount: 0,
+                    minRequired: {{ q.the_minimum_number_of_options_to_be_selected|default:1 }},
+                    dirty: false,
+                    updateCount() {
+                        this.checkedCount = $el.querySelectorAll('input[type=checkbox]:checked').length;
+                    }
+                }"
+                x-init="updateCount()">
+                
+                <div>
+                    <div class="flex flex-col gap-3"
+                        @change="dirty = true; updateCount()"
+                        {% if q.allow_multiple and q.required %} data-required-checkbox-group{% endif %}
+                        {% if q.allow_multiple %}data-min-required="{{ q.the_minimum_number_of_options_to_be_selected }}"{% endif %}>
+                        {% for option in q.options|shuffle_if:q.randomize_options %}
+                        <label class="group relative flex items-center p-4 rounded-xl border border-slate-200 bg-slate-50/50 cursor-pointer transition-all duration-200 
+                                    hover:border-primary hover:bg-white hover:shadow-md hover:shadow-primary/5
+                                    has-[:checked]:border-primary has-[:checked]:bg-primary/5 has-[:checked]:shadow-md">
+                            {% if q.allow_multiple %}
+                                <input type="checkbox" :name="checkedCount >= minRequired ? 'question_{{ q.position }}' : ''" value="{{ option }}" class="peer toggle checkbox-primary checkbox-sm border-slate-300 rounded-md">
+                            {% else %}
+                                <input type="radio" name="question_{{ q.position }}" value="{{ option }}" class="peer radio radio-primary radio-sm border-slate-300" {% if q.required %}required{% endif %}>
+                            {% endif %}
+                            <span class="ml-4 text-base font-medium text-slate-600 transition-colors group-hover:text-slate-900 peer-checked:text-primary-focus peer-checked:font-bold">
+                                {{ option }}
+                            </span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
             
-            <p class="checkbox-group-error text-sm text-info hidden mt-2">
-                <span class="flex items-center gap-2">
-                    <i class="fa-solid fa-circle-exclamation"></i>
-                    {% trans "Please select at least" %} {{ q.the_minimum_number_of_options_to_be_selected }} {% trans "option(s)." %}
-                </span>
-            </p>
+                <p class="checkbox-group-error text-sm text-info mt-2"
+                    x-show="checkedCount < minRequired && (checkedCount > 0 || ({{ q.required|yesno:'true,false' }} && dirty))"
+                    x-transition
+                    style="display: none;">
+                    <span class="flex items-center gap-2">
+                        <i class="fa-solid fa-circle-exclamation"></i>
+                        {% trans "Please select at least" %} {{ q.the_minimum_number_of_options_to_be_selected }} {% trans "option(s)." %}
+                    </span>
+                </p>
+            </div>
 
             <!-- 2. LIKERT -->
             {% elif q.NAME == likert_question %}
@@ -188,9 +205,13 @@
                     {% endfor %}
                  ])">
                 
-                <!-- Hidden inputs for submission (only ranked items) -->
-                <template x-for="option in ranked" :key="option">
-                    <input type="hidden" name="question_{{ q.position }}" :value="option">
+                <!-- Hidden inputs for submission (only ranked items, and ONLY if all items are ranked) -->
+                <template x-if="available.length === 0">
+                    <div>
+                        <template x-for="option in ranked" :key="option">
+                            <input type="hidden" name="question_{{ q.position }}" :value="option">
+                        </template>
+                    </div>
                 </template>
 
                 <!-- Validation Input: Required if question is required and not all items ranked -->
