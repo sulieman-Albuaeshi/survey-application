@@ -52,11 +52,13 @@ INSTALLED_APPS = [
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
-        'EMAIL_AUTHENTICATED': True,
         'SCOPE': [
             'profile',
             'email',
         ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        }
     }
 }
 
@@ -173,5 +175,9 @@ SOCIALACCOUNT_LOGIN_ON_GET = True
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 
-SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
+SOCIALACCOUNT_EMAIL_AUTHENTICATION = True
+SOCIALACCOUNT_AUTO_SIGNUP = True
+SOCIALACCOUNT_EMAIL_VERIFICATION = "none"
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True
 

@@ -804,7 +804,6 @@ def survey_submit(request, uuid):
                 respondent = request.user if request.user.is_authenticated else None
                 response = Response.objects.create(survey=survey, respondent=respondent)
 
-                section_index = 1
                 for question in survey.questions.all():   
                     if isinstance(question, SectionHeader):
                         continue  # Skip SectionHeader questions
@@ -812,7 +811,7 @@ def survey_submit(request, uuid):
                     base_key = f'question_{question.position}'
                     values = request.POST.getlist(base_key)
                     
-                    if isinstance(question, MatrixQuestion):
+                    if question.NAME in  ['Matrix Question', "سؤال مصفوفة"]:
                         answer_data = {}
                         for i, row_label in enumerate(question.rows, start=1):
                             old_key = f'{row_label}_row{i}'
@@ -823,7 +822,7 @@ def survey_submit(request, uuid):
                                 answer_data[row_label] = ""  # some default value
 
 
-                    elif isinstance(question, RankQuestion):
+                    elif question.NAME in ['Rank Question', "سؤال ترتيب"]:
                         if values:
                             # Save as dict where key is the rank (1-based)
                             answer_data = {val: str(i) for i, val in enumerate(values[::-1], start=1)}
@@ -847,8 +846,7 @@ def survey_submit(request, uuid):
                         Answer.objects.create(
                             response=response,
                             question=question,
-                            answer_data=answer_data,
-                            section=section_index
+                            answer_data=answer_data
                         )
         
         except Exception as e:

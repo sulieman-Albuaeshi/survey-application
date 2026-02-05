@@ -152,20 +152,6 @@ class LikertQuestionForm(BaseQuestionForm):
             'options': forms.HiddenInput(), # This will be handled by JS
         }
 
-    def save(self, commit=True):
-        """
-        Override the save method to set scale_max based on the number of options.
-        """
-        # First, get the model instance but don't save it to the DB yet.
-        instance = super().save(commit=False)
-
-        # Add custom logic: set scale_max to the number of options.
-        instance.scale_max = len(self.cleaned_data.get('options', []))
-
-        if commit:
-            instance.save()
-        return instance
-
     def clean(self):
         cleaned_data = super().clean()
         options = cleaned_data.get('options')

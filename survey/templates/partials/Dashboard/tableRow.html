@@ -3,11 +3,15 @@
     context = {'survey': survey}
 {% endcomment %}
 <tr class="bg-white hover:bg-gray-50 border-b border-gray-100" id="survey-row-{{ survey.uuid }}">
-    <td class="px-8 py-4 font-medium text-gray-900">
-        {{ survey.title }}
+    <td class="px-8 py-4 rtl:text-right font-medium text-gray-900 max-w-[200px]">
+        <div class="truncate" title="{{ survey.title }}">
+             {{ survey.title }}
+        </div>
     </td>
-    <td class="px-8 py-4 text-gray-600 line-clamp-2">
-        {{ survey.description }}
+    <td class="px-8 py-4 rtl:text-right text-gray-600 max-w-[300px]">
+        <div class="line-clamp-2 text-ellipsis overflow-hidden" title="{{ survey.description }}">
+            {{ survey.description }}
+        </div>
     </td>
     <td class="px-8 py-4 text-center">
         <span id="survey-table-status-{{ survey.uuid }}" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider {{ survey.status_badge_class }} ">{{ survey.get_state_display }}</span>

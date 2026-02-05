@@ -103,7 +103,7 @@
       <div class="mt-6 text-center text-sm">
         {% if is_respondent %}
             <span class="text-base-content/70">{% trans "Don't have an account?" %}</span>
-            <a href="{% url 'respondent_signup' %}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}" class="link link-primary font-semibold ml-1">{% trans "Sign up" %}</a>
+            <a href="{% url 'respondent_signup' %}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}" class="link link-primary font-semibold ml-1">{% trans "Sign Up" %}</a>
         {% else %}
             <div class="divider"></div>
             <a href="{% url 'account_signup' %}" class="btn btn-outline btn-sm w-full">{% trans "Create New Surveyor Account" %}</a>

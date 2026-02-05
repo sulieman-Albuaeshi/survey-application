@@ -71,8 +71,6 @@ class Survey(models.Model):
         """Calculate average response time (placeholder)"""
         return "N/A"
     
-
-
 class Question(PolymorphicModel):
     survey = models.ForeignKey(Survey, on_delete=models.CASCADE, related_name='questions', verbose_name=_("Survey"))
     label = models.TextField(verbose_name=_("Label"))
@@ -93,7 +91,6 @@ class Question(PolymorphicModel):
             if hasattr(subclass, 'NAME'):
                 names.append(subclass.NAME)
         return names
-
 
 class MultiChoiceQuestion(Question):
     options = models.JSONField(default=list, verbose_name=_("Options"))
@@ -134,10 +131,8 @@ class MultiChoiceQuestion(Question):
         else: 
             return ['1' if val == option else '0' for option in self.options]
 
-
 class LikertQuestion(Question):
     options = models.JSONField(default=list, verbose_name=_("Options"))
-    scale_max = models.IntegerField(default=5, verbose_name=_("Scale Max"))
     NAME = _("Likert Question")
 
     def get_all_scores(self):
@@ -384,6 +379,7 @@ class MatrixQuestion(Question):
                     selected_col = val.get(row_label) or val.get(key_legacy) or '0'
                 row.append("1" if (selected_col == col) else "0")
         return row       
+
 class TextQuestion(Question):
     is_long_answer = models.BooleanField(default=False, verbose_name=_("Is Long Answer"))
     min_length = models.IntegerField(null=True, blank=True, verbose_name=_("Minimum Length"))
@@ -395,7 +391,6 @@ class TextQuestion(Question):
         # 1 if answered, 0 if not (simple completion metric)
         return answer_data if answer_data else "N/A"
 
-
 class SectionHeader(Question):
     """A page title / separator used to split a survey into sections."""
 
@@ -405,7 +400,6 @@ class SectionHeader(Question):
         # Section headers do not collect answers.
         return ""
 
-    
 class RatingQuestion(Question):
     range_min = models.IntegerField(default=1, verbose_name=_("Range Min"))
     range_max = models.IntegerField(default=5, verbose_name=_("Range Max"))
@@ -615,12 +609,10 @@ class Response(models.Model):
     def __str__(self):
         return f"Response to {self.survey.title} at {self.created_at}"
 
-
 class Answer(models.Model):
     response = models.ForeignKey(Response, on_delete=models.CASCADE, related_name='answers')
     question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='answers')
     answer_data = models.JSONField(null=True, blank=True)
-    section = models.IntegerField()
     
     def __str__(self):
         return f"Answer for {self.question.label[:30]}: {self.answer_data}"

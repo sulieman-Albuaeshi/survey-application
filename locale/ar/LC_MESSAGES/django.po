@@ -1245,3 +1245,51 @@ msgstr "انقر على الخيارات أدناه لإضافتها هنا با
 #: .\survey\templates\partials\survey_questions_display.html:273
 msgid "Available Options"
 msgstr "الخيارات المتاحة"
+
+#: .\templates\account\signup.html:26
+msgid "Create Account"
+msgstr "إنشاء حساب"
+
+#: .\templates\account\signup.html:33
+msgid "Join to participate in surveys"
+msgstr "انضم للمشاركة في الاستطلاعات"
+
+#: .\templates\account\signup.html:35
+msgid "Start creating your own surveys today"
+msgstr "ابدأ في إنشاء استبياناتك الخاصة اليوم"
+
+#: .\templates\account\signup.html:104
+msgid "Already have an account?"
+msgstr "هل لديك حساب بالفعل؟"
+
+#: .\templates\account\signup.html:99
+msgid "Sign up with Google"
+msgstr "التسجيل باستخدام جوجل"
+
+#: .\templates\account\login.html:26
+msgid "Welcome Back"
+msgstr "مرحبًا بعودتك"
+
+#: .\templates\account\login.html:33
+msgid "Login to continue to the survey"
+msgstr "تسجيل الدخول للمتابعة إلى الاستبيان"
+
+#: .\templates\account\login.html:35
+msgid "Manage your surveys and responses"
+msgstr "إدارة استبياناتك وردودك"
+
+#: .\templates\account\login.html:69
+msgid "Forgot password?"
+msgstr "هل نسيت كلمة المرور؟"
+
+#: .\templates\account\login.html:98
+msgid "Continue with Google"
+msgstr "المتابعة باستخدام جوجل"
+
+#: .\templates\account\login.html:104
+msgid "Don't have an account?"
+msgstr "ليس لديك حساب؟"
+
+#: .\templates\account\login.html:109
+msgid "Create New Surveyor Account"
+msgstr "إنشاء حساب جديد"
