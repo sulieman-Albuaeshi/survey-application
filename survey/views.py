@@ -822,9 +822,15 @@ def survey_submit(request, uuid):
                                 answer_data[row_label] = ""  # some default value
 
 
-                    elif question.NAME in ['Rank Question', "سؤال ترتيب"]:
+                    elif question.NAME in ['Rank Question', 'Ranking Question', "سؤال ترتيب"]:
                         if values:
                             # Save as dict where key is the rank (1-based)
+                            # values are typically ordered from top (1) to bottom (N)
+                            # Using enumerate(values, 1) maps FirstItem -> 1, SecondItem -> 2
+                            # The original code used values[::-1]. If the frontend sends [First, Second], 
+                            # values[::-1] is [Second, First]. Enumerate gives Second:1, First:2.
+                            # This implies the frontend sends reverse order OR the user wants reverse scoring.
+                            # We will preserve existing logic for now, but adding the correct name check.
                             answer_data = {val: str(i) for i, val in enumerate(values[::-1], start=1)}
                         else:
                             answer_data = ""
@@ -993,10 +999,11 @@ def SurveyDataGrid(request, uuid):
 def correlation_table(request, uuid):
     survey = get_object_or_404(Survey, uuid=uuid, created_by=request.user)
     questions_id = request.GET.getlist('correlation_question', None)
+    split_count = request.GET.get('split', 1)
 
     if not questions_id:
-        return render(request, 'partials/SurveyAnalytics/correlation_table.html', {'chart': None, 'survey': survey})
+        return render(request, 'partials/SurveyAnalytics/correlation_table.html', {'charts': [], 'survey': survey})
 
 
-    string = get_correlation_table(survey, questions_id)
-    return render(request, 'partials/SurveyAnalytics/correlation_table.html', {'chart': string, 'survey': survey})
+    charts = get_correlation_table(survey, questions_id, split_count=split_count)
+    return render(request, 'partials/SurveyAnalytics/correlation_table.html', {'charts': charts, 'survey': survey})

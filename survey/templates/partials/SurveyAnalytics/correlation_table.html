@@ -1,5 +1,5 @@
 {% load i18n %}
-<div id="correlation-analysis" class="card bg-white shadow-lg border border-gray-200 mt-8 break-inside-avoid">
+<div id="correlation-analysis" class="card bg-white shadow-lg border border-gray-200 mt-8 break-inside-avoid-page">
     <div class="card-body">
         <div class="flex items-center justify-between mb-6">
             <div class="flex items-center gap-4">
@@ -13,27 +13,53 @@
                     <p class="text-sm text-gray-500">{% trans "Visualizing relationships between question responses" %}</p>
                 </div>
             </div>
+            
             <!-- Update Button -->
-            <button class="btn btn-primary btn-sm print:hidden group"
-                    hx-get="{% url 'correlation_table' survey.uuid %}"  
-                    hx-include="input[name='correlation_question']" 
-                    hx-target="#correlation-analysis" 
-                    hx-select="#correlation-analysis"
-                    hx-swap="outerHTML"
-                    hx-disabled-elt="this">
-                <span class="loading loading-spinner loading-xs hidden group-[.htmx-request]:inline-block"></span>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 group-[.htmx-request]:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                </svg>
-                {% trans "Generate Correlation" %}
-            </button>
+            <div class="flex items-center gap-2">
+                <div class="join">
+                    <button class="join-item btn btn-sm {% if not request.GET.split or request.GET.split == '1' %}btn-active{% endif %}"
+                            hx-get="{% url 'correlation_table' survey.uuid %}?split=1"
+                            hx-include="input[name='correlation_question']"
+                            hx-target="#correlation-analysis"
+                            hx-swap="outerHTML"
+                            title="{% trans 'View Full Chart' %}">
+                        {% trans "Full View" %}
+                    </button>
+                    <button class="join-item btn btn-sm {% if request.GET.split == '2' %}btn-active{% endif %}"
+                            hx-get="{% url 'correlation_table' survey.uuid %}?split=2"
+                            hx-include="input[name='correlation_question']"
+                            hx-target="#correlation-analysis"
+                            hx-swap="outerHTML"
+                            title="{% trans 'Split into 4 Quarters' %}">
+                        {% trans "Split View (4 Quarters)" %}
+                    </button>
+                </div>
+
+                <button class="btn btn-primary btn-sm print:hidden group"
+                        hx-get="{% url 'correlation_table' survey.uuid %}"
+                        hx-include="input[name='correlation_question']"
+                        hx-target="#correlation-analysis"
+                        hx-select="#correlation-analysis"
+                        hx-swap="outerHTML"
+                        hx-disabled-elt="this">
+                    <span class="loading loading-spinner loading-xs hidden group-[.htmx-request]:inline-block"></span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 group-[.htmx-request]:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    {% trans "Generate Correlation" %}
+                </button>
+            </div>
         </div>
 
-        <div class="bg-gray-50/50 rounded-2xl p-6 border border-gray-100 flex flex-col items-center">
-            {% if chart %}
-                <img src="data:image/png;base64,{{ chart }}" 
-                     alt="Correlation Heatmap" 
-                     class="max-w-full h-auto rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300">
+        <div class="bg-gray-50/50 rounded-2xl p-6 border border-gray-100 flex flex-col items-center gap-8 print:block">
+            {% if charts %}
+                {% for chart in charts %}
+                    <div class="break-inside-avoid print:break-after-page mb-8 last:mb-0">
+                        <img src="data:image/png;base64,{{ chart }}" 
+                             alt="Correlation Heatmap Part {{ forloop.counter }}" 
+                             class="max-w-full h-auto rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300" />
+                    </div>
+                {% endfor %}
             {% else %}
                 <div class="flex flex-col items-center justify-center py-12 text-center">
                     <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
@@ -42,12 +68,14 @@
                         </svg>
                     </div>
                     <p class="text-gray-500 font-medium text-lg mb-2">{% trans "Build Your Correlation Matrix" %}</p>
-                    <p class="text-sm text-gray-400 mb-6 max-w-md">{% trans "Select \"Compare\" on at least 2 questions above, then click the button below to visualize their statistical relationship." %}</p>
-                    
+                    <p class="text-sm text-gray-400 mb-6 max-w-md">
+                        {% trans "Select \"Compare\" on at least 2 questions above, then click the button below to visualize their statistical relationship." %}
+                    </p>
+
                     <button class="btn btn-primary print:hidden group"
-                            hx-get="{% url 'correlation_table' survey.uuid %}" 
-                            hx-include="input[name='correlation_question']" 
-                            hx-target="#correlation-analysis" 
+                            hx-get="{% url 'correlation_table' survey.uuid %}"
+                            hx-include="input[name='correlation_question']"
+                            hx-target="#correlation-analysis"
                             hx-select="#correlation-analysis"
                             hx-swap="outerHTML"
                             hx-disabled-elt="this">
@@ -57,7 +85,9 @@
                         </svg>
                         {% trans "Generate Correlation" %}
                     </button>
-                    <p class="text-xs text-gray-300 mt-4 italic">{% trans "Requires sufficient numerical data in responses" %}</p>
+                    <p class="text-xs text-gray-300 mt-4 italic">
+                        {% trans "Requires sufficient numerical data in responses" %}
+                    </p>
                 </div>
             {% endif %}
         </div>

@@ -1,5 +1,4 @@
 from django.http import QueryDict
-
 from survey.models import Survey
 from django.core.paginator import Paginator
 from django.db.models import Q, Count
@@ -12,6 +11,16 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import io
 import urllib, base64
+import numpy as np
+import arabic_reshaper
+from bidi.algorithm import get_display
+
+def fix_ar(text):
+    if not text:
+        return ""
+    reshaped_text = arabic_reshaper.reshape(str(text))
+    bidi_text = get_display(reshaped_text)
+    return bidi_text
 
 def normalize_formset_indexes( data: QueryDict, prefix: str):
     """
@@ -401,13 +410,12 @@ def get_question_analytics(question):
         
     return data
 
-def get_correlation_table(survey, questions_id: list = None):
+def get_correlation_table(survey, questions_id: list = None, split_count: int = 1):
     head, rows, _ = get_survey_export_data(survey, format_type='numeric', questions_id=questions_id)
 
     # If not enough rows or columns, we can't do correlation
     if not rows or len(head) < 2:
         return None
-
 
     # head is [Col1, Col2, ...]
     # rows is [[val1, val2...], [val1, val2...]]
@@ -419,72 +427,118 @@ def get_correlation_table(survey, questions_id: list = None):
     df_clean = df_clean.apply(pd.to_numeric, errors='coerce')
     df_clean = df_clean.dropna(axis=1, how='all') # Drop empty cols
     df_clean = df_clean.fillna(0)
-    
+
     # Need at least 2 columns with variance for correlation
-    if df_clean.shape[1] < 2:
+    num_total_vars = df_clean.shape[1]
+    if num_total_vars < 2:
         return None
-
-    # ---------------------------------------------------------
-    # 2. CALCULATE CORRELATION
-    # ---------------------------------------------------------
+    
+    # 1. Calculate Full Correlation Matrix
     correlation_matrix = df_clean.corr().fillna(0)
-    
-    if correlation_matrix.empty:
-        return None
 
-    # ---------------------------------------------------------
-    # 3. DYNAMIC PLOTTING CONFIGURATION
-    # ---------------------------------------------------------
-    num_vars = len(correlation_matrix.columns)
-    
-    # Define settings based on dataset size
-    # Reduced figsize to increase relative font visibility
-    is_large = num_vars > 12 
-    
-    if is_large:
-        plt.figure(figsize=(16, 14)) # was (25, 20) - making it smaller makes text relatively larger
-        annot_size = 9               # slightly larger font
-        fmt = ".1f"
-        rotation = 90
-        x_label_alignment = 'center'
-    else:
-        plt.figure(figsize=(10, 8))  # was (12, 10)
-        annot_size = 11              # larger font
-        fmt = ".2f"
-        rotation = 45
-        x_label_alignment = 'right'
+    # Process Arabic labels
+    new_labels = [fix_ar(col) for col in correlation_matrix.columns]
+    correlation_matrix.columns = new_labels
+    correlation_matrix.index = new_labels
 
-    sns.set_context("paper", font_scale=1.2) # Scale up all fonts
-    
+    # Validate split_count
     try:
-        heatmap = sns.heatmap(
-            correlation_matrix, 
-            annot=True, 
-            fmt=fmt, 
-            cmap='YlGnBu', 
-            linewidths=0.5, 
-            linecolor='white',
-            cbar=True,
-            annot_kws={"size": annot_size}
-        )
+        split_count = int(split_count)
+    except (ValueError, TypeError):
+        split_count = 1
         
-        plt.title('Survey Correlation Matrix', fontsize=16, pad=20)
-        
-        # Adjust labels
-        plt.xticks(rotation=rotation, fontsize=10, ha=x_label_alignment)
-        plt.yticks(rotation=0, fontsize=10)
-        plt.tight_layout()
+    if split_count < 1: split_count = 1
+    if split_count > 4: split_count = 4 # Max limit
+    
+    # Ensure splits have at least 2 variables (if possible)
+    if split_count > 1 and (num_total_vars // split_count) < 2:
+         split_count = 1 # Fallback to no split if resulting chunks are too small
 
-        # ---------------------------------------------------------
-        # 4. SAVE TO BUFFER (Base64)
-        # ---------------------------------------------------------
-        buffer = io.BytesIO()
-        plt.savefig(buffer, format='png', bbox_inches='tight')
-        buffer.seek(0)
-        string = base64.b64encode(buffer.read()).decode('utf-8')
-        
-    finally:
-        # Clear memory
-        plt.close()
+    charts = []
+    
+    # Calculate chunk size
+    # Grid Tiling Strategy: Determine block size
+    chunk_size = -(-num_total_vars // split_count) # Ceiling division
 
-        return string
+    # Nested Loops for Grid Tiling
+    for row_start in range(0, num_total_vars, chunk_size):
+        row_end = min(row_start + chunk_size, num_total_vars)
+        
+        for col_start in range(0, num_total_vars, chunk_size):
+            col_end = min(col_start + chunk_size, num_total_vars)
+
+            # Slice the correlation matrix which corresponds to:
+            # Rows: questions[row_start:row_end]
+            # Cols: questions[col_start:col_end]
+            sub_matrix = correlation_matrix.iloc[row_start:row_end, col_start:col_end]
+            
+            if sub_matrix.empty:
+                continue
+
+            # ---------------------------------------------------------
+            # PLOTTING
+            # ---------------------------------------------------------
+            n_rows, n_cols = sub_matrix.shape
+            
+            # Logic for sizing based on view type
+            if split_count == 1:
+                # Full View: compact & organized sizes to prevent "zoomed out" look
+                if n_cols > 25:
+                     figsize = (20, 18)
+                     annot_size = 7
+                elif n_cols > 15:
+                     figsize = (16, 14) 
+                     annot_size = 8
+                else:
+                     figsize = (11, 9)
+                     annot_size = 10
+                
+                sns.set_context("paper", font_scale=1.0)
+            else:
+                # Split View (Tiles): Zoomed in detailing
+                cell_size = 0.8
+                figsize = (max(10, n_cols * cell_size), max(8, n_rows * cell_size))
+                annot_size = 9
+                sns.set_context("paper", font_scale=1.1)
+
+            plt.figure(figsize=figsize)
+            fmt = ".2f"
+            
+            try:
+                ax = sns.heatmap(
+                    sub_matrix, 
+                    annot=True, 
+                    fmt=fmt, 
+                    cmap='YlGnBu', 
+                    linewidths=0.5, 
+                    linecolor='white',
+                    cbar=True,
+                    annot_kws={"size": annot_size}
+                )
+                
+                # Move X-Axis Labels to Top
+                ax.xaxis.set_ticks_position('top')
+                ax.xaxis.set_label_position('top')
+                
+                # Title with Range
+                range_title = f"{fix_ar('Features')} {row_start + 1}-{row_end} {fix_ar('vs')} {col_start + 1}-{col_end}"
+                plt.title(range_title, fontsize=16, pad=40)
+                
+                # Rotate top labels for readability
+                plt.xticks(rotation=45, fontsize=10, ha='left')
+                plt.yticks(rotation=0, fontsize=10)
+                plt.tight_layout()
+        
+                # ---------------------------------------------------------
+                # SAVE TO BUFFER (Base64)
+                # ---------------------------------------------------------
+                buffer = io.BytesIO()
+                plt.savefig(buffer, format='png', bbox_inches='tight')
+                buffer.seek(0)
+                string = base64.b64encode(buffer.read()).decode('utf-8')
+                charts.append(string)
+                
+            finally:
+                plt.close()
+
+    return charts
