@@ -17,20 +17,24 @@
             <!-- Update Button -->
             <div class="flex items-center gap-2">
                 <div class="join">
-                    <button class="join-item btn btn-sm {% if not request.GET.split or request.GET.split == '1' %}btn-active{% endif %}"
+                    <button class="join-item btn btn-sm {% if not request.GET.split or request.GET.split == '1' %}btn-active{% endif %} group"
                             hx-get="{% url 'correlation_table' survey.uuid %}?split=1"
                             hx-include="input[name='correlation_question']"
                             hx-target="#correlation-analysis"
                             hx-swap="outerHTML"
-                            title="{% trans 'View Full Chart' %}">
+                            title="{% trans 'View Full Chart' %}"
+                            hx-disabled-elt="this">
+                        <span class="loading loading-spinner loading-xs hidden group-[.htmx-request]:inline-block"></span>
                         {% trans "Full View" %}
                     </button>
-                    <button class="join-item btn btn-sm {% if request.GET.split == '2' %}btn-active{% endif %}"
+                    <button class="join-item btn btn-sm {% if request.GET.split == '2' %}btn-active{% endif %} group"
                             hx-get="{% url 'correlation_table' survey.uuid %}?split=2"
                             hx-include="input[name='correlation_question']"
                             hx-target="#correlation-analysis"
                             hx-swap="outerHTML"
-                            title="{% trans 'Split into 4 Quarters' %}">
+                            title="{% trans 'Split into 4 Quarters' %}"
+                            hx-disabled-elt="this">
+                        <span class="loading loading-spinner loading-xs hidden group-[.htmx-request]:inline-block"></span>
                         {% trans "Split View (4 Quarters)" %}
                     </button>
                 </div>

@@ -1187,6 +1187,14 @@ msgstr "تصوير العلاقات بين ردود الأسئلة"
 msgid "Generate Correlation"
 msgstr "توليد الارتباط"
 
+#: .\survey\templates\partials\SurveyAnalytics\correlation_table.html:28
+msgid "Full View"
+msgstr "عرض كامل"
+
+#: .\survey\templates\partials\SurveyAnalytics\correlation_table.html:38
+msgid "Split View (4 Quarters)"
+msgstr "عرض مقسم (4 أرباع)"
+
 #: .\survey\templates\partials\SurveyAnalytics\correlation_table.html:43
 msgid "Build Your Correlation Matrix"
 msgstr "بناء مصفوفة الارتباط الخاصة بك"

@@ -491,7 +491,7 @@ class RatingQuestion(Question):
     def get_numeric_answer(self, answer_data):
         """Returns the rating value directly."""
         if answer_data is None or answer_data == "":
-            return "NaN"
+            return "N/A"
         return str(answer_data)
 
     def get_average_rating(self):
@@ -548,7 +548,7 @@ class RankQuestion(Question):
         This treats the #1 ranked item as the 'selected' value.
         """
         if not answer_data or isinstance(answer_data, list) or len(answer_data) == 0:
-            return ["NaN" for _ in self.options]
+            return ["N/A" for _ in self.options]
         
         row = []
         try:

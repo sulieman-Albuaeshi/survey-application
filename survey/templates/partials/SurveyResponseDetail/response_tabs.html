@@ -2,393 +2,389 @@
 <div id="response-tabs-container" class="bg-white sm:rounded-3xl rounded-none shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] border border-gray-100 border-x-0 sm:border-x overflow-hidden">
     <!-- Tabs Header -->
     <div class="p-6 border-b border-gray-100 flex justify-center">
-      <div role="tablist" class="inline-flex items-center p-1.5 bg-gray-100 rounded-full gap-2">
-        <a
-          hx-get="{% url 'SurveyResponseDetail' survey.uuid %}?view=individual"
-          hx-target="#response-tabs-container"
-          hx-swap="outerHTML"
-          hx-push-url="true"
-          class="cursor-pointer inline-flex items-center px-8 py-3 text-sm font-bold rounded-full transition-all duration-300 gap-3 
-          {% if view_mode == 'individual' or not view_mode %}bg-white text-indigo-600 shadow-md transform scale-105{% else %}text-gray-500 hover:text-indigo-600 hover:bg-white hover:shadow-sm{% endif %}"
-        >
-          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-          </svg>
-          {% trans "Individual Responses" %}
-        </a>
-        <a
-          hx-get="{% url 'SurveyResponseDetail' survey.uuid %}?view=overview"
-          hx-target="#response-tabs-container"
-          hx-swap="outerHTML"
-          hx-push-url="true"
-          class="cursor-pointer inline-flex items-center px-8 py-3 text-sm font-bold rounded-full transition-all duration-300 gap-3 
-          {% if view_mode == 'overview' %}bg-white text-indigo-600 shadow-md transform scale-105{% else %}text-gray-500 hover:text-indigo-600 hover:bg-white hover:shadow-sm{% endif %}"
-        >
-          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-          </svg>
-          {% trans "Responses Overview" %}
-        </a>
-      </div>
+        <div role="tablist" class="inline-flex items-center p-1.5 bg-gray-100 rounded-full gap-2">
+            <a
+                hx-get="{% url 'SurveyResponseDetail' survey.uuid %}?view=individual"
+                hx-target="#response-tabs-container"
+                hx-swap="outerHTML"
+                hx-push-url="true"
+                hx-disabled-elt="this"
+                class="cursor-pointer inline-flex items-center px-8 py-3 text-sm font-bold rounded-full transition-all duration-300 gap-3 group
+                {% if view_mode == 'individual' or not view_mode %}bg-white text-indigo-600 shadow-md transform scale-105{% else %}text-gray-500 hover:text-indigo-600 hover:bg-white hover:shadow-sm{% endif %}"
+            >
+                <span class="loading loading-spinner loading-xs hidden group-[.htmx-request]:inline-block"></span>
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                </svg>
+                {% trans "Individual Responses" %}
+            </a>
+            <a
+                hx-get="{% url 'SurveyResponseDetail' survey.uuid %}?view=overview"
+                hx-target="#response-tabs-container"
+                hx-swap="outerHTML"
+                hx-push-url="true"
+                hx-disabled-elt="this"
+                class="cursor-pointer inline-flex items-center px-8 py-3 text-sm font-bold rounded-full transition-all duration-300 gap-3 group
+                {% if view_mode == 'overview' %}bg-white text-indigo-600 shadow-md transform scale-105{% else %}text-gray-500 hover:text-indigo-600 hover:bg-white hover:shadow-sm{% endif %}"
+            >
+                <span class="loading loading-spinner loading-xs hidden group-[.htmx-request]:inline-block"></span>
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                {% trans "Responses Overview" %}
+            </a>
+        </div>
     </div>
 
     <!-- Content -->
     <div>
-      {% if view_mode == 'individual' or not view_mode %}
-        <!-- Individual Responses Content -->
-        <!-- Header Content -->
-        <div class="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-white">
-            <div>
-                <h2 class="text-xl font-bold text-slate-800 tracking-tight">{% trans "Individual Responses" %}</h2>
-                <p class="text-sm text-slate-500 mt-1">{% trans "Detailed list of all submitted responses" %}</p>
+        {% if view_mode == 'individual' or not view_mode %}
+            <!-- Individual Responses Content -->
+            <!-- Header Content -->
+            <div class="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-white">
+                <div>
+                    <h2 class="text-xl font-bold text-slate-800 tracking-tight">{% trans "Individual Responses" %}</h2>
+                    <p class="text-sm text-slate-500 mt-1">{% trans "Detailed list of all submitted responses" %}</p>
+                </div>
             </div>
-        </div>
-        
-        <div class="overflow-x-auto relative min-h-[300px]">
-            <table class="table w-full border-collapse">
-                <thead class="bg-slate-50/80 backdrop-blur-sm border-b border-slate-200 sticky top-0 z-10">
-                    <tr>
-                        <th class="px-6 py-5 text-center text-xs font-extrabold text-slate-500 uppercase tracking-wider group cursor-pointer hover:text-primary transition-colors">
-                            #
-                        </th>
-                        <th class="px-6 py-5 rtl:text-right ltr:text-left text-xs font-extrabold text-slate-500 uppercase tracking-wider">
-                            {% trans "Respondent" %}
-                        </th>
-                        <th class="px-6 py-5 text-center text-xs font-extrabold text-slate-500 uppercase tracking-wider">
-                            {% trans "Submitted At" %}
-                        </th>
-                        <th class="px-6 py-5 text-center text-xs font-extrabold text-slate-500 uppercase tracking-wider">
-                            {% trans "Status" %}
-                        </th>
-                        <th class="px-6 py-5 text-center text-xs font-extrabold text-slate-500 uppercase tracking-wider">
-                            {% trans "Actions" %}
-                        </th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-100 bg-white">
-                     {% for response in responses %}
-                        <tr class="group hover:bg-slate-50 transition-all duration-200 ease-in-out border-l-4 rtl:border-l-0 rtl:border-r-4 ltr:border-l-transparent rtl:border-r-transparent ltr:hover:border-l-primary rtl:hover:border-r-primary hover:shadow-sm relative">
-                          <!-- Index -->
-                          <td class="px-6 py-5 min-w-[180px] whitespace-nowrap text-center text-sm font-bold text-slate-400 group-hover:text-primary transition-colors">
-                            {{ forloop.counter | add:responses.start_index | add:-1 }}
-                          </td>
-                          
-                          <!-- Respondent -->
-                          <td class="px-6 py-5">
-                            <div class="flex items-center gap-4">
-                              {% if response.respondent %}
-                                {% with social=response.respondent.socialaccount_set.first %}
-                                {% if social and social.get_avatar_url %}
-                                   <img src="{{ social.get_avatar_url }}" alt="{{ response.respondent.username }}" class="h-11 w-11 rounded-2xl object-cover shadow-lg shadow-primary/20 ring-2 ring-white group-hover:scale-105 transition-transform duration-300">
-                                {% else %}
-                                <div class="h-11 w-11 rounded-2xl bg-gradient-to-br from-primary to-primary-focus text-white flex items-center justify-center font-bold text-lg shadow-lg shadow-primary/20 ring-2 ring-white group-hover:scale-105 transition-transform duration-300">
-                                    {{ response.respondent.username|slice:":1"|upper }}
-                                </div>
-                                {% endif %}
-                                {% endwith %}
-                                <div class="text-start">
-                                    <p class="font-bold text-slate-800 text-sm mb-0.5">{% firstof response.respondent.get_full_name response.respondent.username %}</p>
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-600">
-                                        {% trans "Member" %}
-                                    </span>
-                                </div>
-                              {% else %}
-                                <div class="h-11 w-11 rounded-2xl bg-slate-200 text-slate-500 flex-shrink-0 flex items-center justify-center shadow-inner ring-2 ring-white">
-                                    <i class="fa-solid fa-user-secret text-lg"></i>
-                                </div>
-                                <div class="text-start">
-                                     <p class="font-bold text-slate-600 text-sm mb-0.5 italic">{% trans "Anonymous" %}</p>
-                                     <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-500">
-                                        {% trans "Guest" %}
-                                    </span>
-                                </div>
-                              {% endif %}
-                            </div>
-                          </td>
-
-                          <!-- Date -->
-                          <td class="px-6 py-5 text-center">
-                            <div class="flex flex-col items-center">
-                                <span class="text-sm font-semibold text-slate-700">
-                                    {{ response.created_at|date:"M d, Y" }}
-                                </span>
-                                <span class="text-xs text-slate-400 font-medium mt-0.5 flex items-center gap-1">
-                                    <i class="fa-regular fa-clock"></i> {{ response.created_at|date:"H:i" }}
-                                </span>
-                            </div>
-                          </td>
-
-                          <!-- Status -->
-                          <td class="px-6 py-5 text-center">
-                            {% if response.completed %}
-                                <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-emerald-100/60 text-emerald-700 border border-emerald-200/50">
-                                    <span class="relative flex h-2 w-2">
-                                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                      <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                                    </span>
-                                    {% trans "Completed" %}
-                                </div>
-                            {% else %}
-                                <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-amber-100/60 text-amber-700 border border-amber-200/50">
-                                     <div class="w-2 h-2 rounded-full bg-amber-500"></div>
-                                    {% trans "Incomplete" %}
-                                </div>
-                            {% endif %}
-                          </td>
-
-                          <!-- Actions -->
-                          <td class="px-6 py-5 text-center">
-                            <button
-                              class="btn btn-sm btn-ghost btn-circle text-slate-400 hover:text-primary hover:bg-primary/10 transition-all duration-200 tooltip ltr:tooltip-left rtl:tooltip-right font-normal"
-                              data-tip="{% trans "View Details" %}"
-                              hx-get="{% url 'GetResponseDetail' response.id %}"
-                              hx-target="#response_detail_modal"
-                              hx-swap="innerHTML"
-                              onclick="response_detail_modal.showModal()"
-                            >
-                                <i class="fa-regular fa-eye text-lg"></i>
-                            </button>
-                          </td>
-                        </tr>
-                        {% empty %}
+            
+            <div class="overflow-x-auto relative min-h-[300px]">
+                <table class="table w-full border-collapse">
+                    <thead class="bg-slate-50/80 backdrop-blur-sm border-b border-slate-200 sticky top-0 z-10">
                         <tr>
-                          <td colspan="5" class="">
-                            <div class="flex flex-col items-center justify-center py-16 px-4 bg-slate-50/50 m-4 rounded-2xl border border-dashed border-slate-300">
-                              <div class="h-20 w-20 bg-slate-100 rounded-full flex items-center justify-center mb-4 text-slate-300">
-                                  <i class="fa-solid fa-clipboard-question text-4xl"></i>
-                              </div>
-                              <p class="text-lg font-bold text-slate-600">{% trans "No responses yet" %}</p>
-                              <p class="text-sm text-slate-400 mt-1 max-w-xs text-center">{% trans "Once people start taking your survey, their responses will appear here." %}</p>
-                            </div>
-                          </td>
+                            <th class="px-6 py-5 text-center text-xs font-extrabold text-slate-500 uppercase tracking-wider group cursor-pointer hover:text-primary transition-colors">
+                                #
+                            </th>
+                            <th class="px-6 py-5 rtl:text-right ltr:text-left text-xs font-extrabold text-slate-500 uppercase tracking-wider">
+                                {% trans "Respondent" %}
+                            </th>
+                            <th class="px-6 py-5 text-center text-xs font-extrabold text-slate-500 uppercase tracking-wider">
+                                {% trans "Submitted At" %}
+                            </th>
+                            <th class="px-6 py-5 text-center text-xs font-extrabold text-slate-500 uppercase tracking-wider">
+                                {% trans "Status" %}
+                            </th>
+                            <th class="px-6 py-5 text-center text-xs font-extrabold text-slate-500 uppercase tracking-wider">
+                                {% trans "Actions" %}
+                            </th>
                         </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 bg-white">
+                        {% for response in responses %}
+                            <tr class="group hover:bg-slate-50 transition-all duration-200 ease-in-out border-l-4 rtl:border-l-0 rtl:border-r-4 ltr:border-l-transparent rtl:border-r-transparent ltr:hover:border-l-primary rtl:hover:border-r-primary hover:shadow-sm relative">
+                                <!-- Index -->
+                                <td class="px-6 py-5 min-w-[180px] whitespace-nowrap text-center text-sm font-bold text-slate-400 group-hover:text-primary transition-colors">
+                                    {{ forloop.counter | add:responses.start_index | add:-1 }}
+                                </td>
+                                
+                                <!-- Respondent -->
+                                <td class="px-6 py-5">
+                                    <div class="flex items-center gap-4">
+                                        {% if response.respondent %}
+                                            {% with social=response.respondent.socialaccount_set.first %}
+                                                {% if social and social.get_avatar_url %}
+                                                    <img src="{{ social.get_avatar_url }}" alt="{{ response.respondent.username }}" class="h-11 w-11 rounded-2xl object-cover shadow-lg shadow-primary/20 ring-2 ring-white group-hover:scale-105 transition-transform duration-300">
+                                                {% else %}
+                                                    <div class="h-11 w-11 rounded-2xl bg-gradient-to-br from-primary to-primary-focus text-white flex items-center justify-center font-bold text-lg shadow-lg shadow-primary/20 ring-2 ring-white group-hover:scale-105 transition-transform duration-300">
+                                                        {{ response.respondent.username|slice:":1"|upper }}
+                                                    </div>
+                                                {% endif %}
+                                            {% endwith %}
+                                            <div class="text-start">
+                                                <p class="font-bold text-slate-800 text-sm mb-0.5">{% firstof response.respondent.get_full_name response.respondent.username %}</p>
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-600">
+                                                    {% trans "Member" %}
+                                                </span>
+                                            </div>
+                                        {% else %}
+                                            <div class="h-11 w-11 rounded-2xl bg-slate-200 text-slate-500 flex-shrink-0 flex items-center justify-center shadow-inner ring-2 ring-white">
+                                                <i class="fa-solid fa-user-secret text-lg"></i>
+                                            </div>
+                                            <div class="text-start">
+                                                <p class="font-bold text-slate-600 text-sm mb-0.5 italic">{% trans "Anonymous" %}</p>
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-500">
+                                                    {% trans "Guest" %}
+                                                </span>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </td>
+
+                                <!-- Date -->
+                                <td class="px-6 py-5 text-center">
+                                    <div class="flex flex-col items-center">
+                                        <span class="text-sm font-semibold text-slate-700">
+                                            {{ response.created_at|date:"M d, Y" }}
+                                        </span>
+                                        <span class="text-xs text-slate-400 font-medium mt-0.5 flex items-center gap-1">
+                                            <i class="fa-regular fa-clock"></i> {{ response.created_at|date:"H:i" }}
+                                        </span>
+                                    </div>
+                                </td>
+
+                                <!-- Status -->
+                                <td class="px-6 py-5 text-center">
+                                    {% if response.completed %}
+                                        <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-emerald-100/60 text-emerald-700 border border-emerald-200/50">
+                                            <span class="relative flex h-2 w-2">
+                                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                                <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                                            </span>
+                                            {% trans "Completed" %}
+                                        </div>
+                                    {% else %}
+                                        <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-amber-100/60 text-amber-700 border border-amber-200/50">
+                                            <div class="w-2 h-2 rounded-full bg-amber-500"></div>
+                                            {% trans "Incomplete" %}
+                                        </div>
+                                    {% endif %}
+                                </td>
+
+                                <!-- Actions -->
+                                <td class="px-6 py-5 text-center">
+                                    <button
+                                        class="btn btn-sm btn-ghost btn-circle text-slate-400 hover:text-primary hover:bg-primary/10 transition-all duration-200 tooltip ltr:tooltip-left rtl:tooltip-right font-normal"
+                                        data-tip="{% trans "View Details" %}"
+                                        hx-get="{% url 'GetResponseDetail' response.id %}"
+                                        hx-target="#response_detail_modal"
+                                        hx-swap="innerHTML"
+                                        onclick="response_detail_modal.showModal()"
+                                    >
+                                        <i class="fa-regular fa-eye text-lg"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="5" class="">
+                                    <div class="flex flex-col items-center justify-center py-16 px-4 bg-slate-50/50 m-4 rounded-2xl border border-dashed border-slate-300">
+                                        <div class="h-20 w-20 bg-slate-100 rounded-full flex items-center justify-center mb-4 text-slate-300">
+                                            <i class="fa-solid fa-clipboard-question text-4xl"></i>
+                                        </div>
+                                        <p class="text-lg font-bold text-slate-600">{% trans "No responses yet" %}</p>
+                                        <p class="text-sm text-slate-400 mt-1 max-w-xs text-center">{% trans "Once people start taking your survey, their responses will appear here." %}</p>
+                                    </div>
+                                </td>
+                            </tr>
                         {% endfor %}
-                </tbody>
-            </table>
-        </div>
+                    </tbody>
+                </table>
+            </div>
 
-        <!-- Pagination Footer for Individual Responses -->
-        <div class="p-4 bg-slate-50/50 border-t border-slate-200">
-            {% if responses.has_other_pages %}
-            <div class="flex flex-col items-center justify-center gap-4 mt-6">
-                <div class="join shadow-sm border border-slate-200 rounded-xl bg-white">
-                    {% if responses.has_previous %}
-                        <button
-                            hx-get="{% url 'SurveyResponseDetail' survey.uuid %}?view=individual&page={{ responses.previous_page_number }}"
-                            hx-target="#response-tabs-container"
-                            hx-swap="outerHTML"
-                            hx-push-url="true"
-                            class="join-item btn btn-sm btn-ghost hover:bg-slate-50 text-slate-600 font-medium px-4 w-12"
-                        >
-                            <i class="fa-solid fa-chevron-left rtl:rotate-180 text-xs"></i>
-                        </button>
-                    {% else %}
-                        <button class="join-item btn btn-sm btn-ghost disabled:bg-transparent disabled:text-slate-300 px-4 w-12" disabled>
-                             <i class="fa-solid fa-chevron-left rtl:rotate-180 text-xs"></i>
-                        </button>
-                    {% endif %}
-                    
-                    {% for num in responses.paginator.page_range %}
-                        {% if responses.number == num %}
-                            <button class="join-item btn btn-sm btn-primary text-white pointer-events-none">{{ num }}</button>
-                        {% elif num > responses.number|add:'-3' and num < responses.number|add:'3' %}
-                            <button
-                                hx-get="{% url 'SurveyResponseDetail' survey.uuid %}?view=individual&page={{ num }}"
-                                hx-target="#response-tabs-container"
-                                hx-swap="outerHTML"
-                                hx-push-url="true"
-                                class="join-item btn btn-sm btn-ghost hover:bg-slate-50 text-slate-600 font-medium"
-                            >
-                                {{ num }}
-                            </button>
-                        {% endif %}
-                    {% endfor %}
-                    
-                    {% if responses.has_next %}
-                        <button
-                            hx-get="{% url 'SurveyResponseDetail' survey.uuid %}?view=individual&page={{ responses.next_page_number }}"
-                            hx-target="#response-tabs-container"
-                            hx-swap="outerHTML"
-                            hx-push-url="true"
-                            class="join-item btn btn-sm btn-ghost hover:bg-slate-50 text-slate-600 font-medium px-4 w-12"
-                        >
-                             <i class="fa-solid fa-chevron-right rtl:rotate-180 text-xs"></i>
-                        </button>
-                    {% else %}
-                        <button class="join-item btn btn-sm btn-ghost disabled:bg-transparent disabled:text-slate-300 px-4 w-12" disabled>
-                            <i class="fa-solid fa-chevron-right rtl:rotate-180 text-xs"></i>
-                        </button>
-                    {% endif %}
-                </div>
-                <div class="text-xs text-slate-400 font-medium">
-                    {% trans "Page" %} {{ responses.number }} {% trans "of" %} {{ responses.paginator.num_pages }}
-                </div>
-            </div>
-            {% endif %}
-        </div>
-        
-      {% elif view_mode == 'overview' %}
-        <!-- Responses Overview Content -->
-        <!-- Header -->
-        <div class="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-white">
-            <div>
-                <h2 class="text-xl font-bold text-slate-800 tracking-tight">{% trans "Responses Overview" %}</h2>
-                 <p class="text-sm text-slate-500 mt-1">{% trans "Matrix view of all given answers" %}</p>
-            </div>
-        </div>
-        
-        <div class="overflow-x-auto relative min-h-[300px]">
-          <table class="table w-full border-collapse">
-            <thead class="bg-slate-50/80 backdrop-blur-sm border-b border-slate-200 sticky top-0 z-10">
-              <tr>
-                <th class="px-6 py-5 text-left text-xs font-extrabold text-slate-500 uppercase tracking-wider">#</th>
-                <th class="px-6 py-5 text-center text-xs font-extrabold text-slate-500 uppercase tracking-wider">
-                  {% trans "Respondent" %}
-                </th>
-                {% for question in questions %}
-                <th
-                  class="px-4 py-5 text-center min-w-[80px]"
-                  title="{{ question.label }}"
-                >
-                  <div class="flex flex-col items-center justify-center group/th cursor-help">
-                    <span class="text-primary/80 font-extrabold text-sm group-hover/th:text-primary transition-colors"
-                      >{% trans "Q" %}{{ forloop.counter }}</span
-                    >
-                    <span class="text-[10px] text-slate-400 font-normal mt-0.5 max-w-[120px] truncate">{{ question.label }}</span>
-                  </div>
-                </th>
-                {% endfor %}
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-100 bg-white">
-              {% for row in table_data %}
-              <tr class="group hover:bg-slate-50 transition-all duration-200 ease-in-out border-l-4 rtl:border-l-0 rtl:border-r-4 ltr:border-l-transparent rtl:border-r-transparent ltr:hover:border-l-primary rtl:hover:border-r-primary hover:shadow-sm">
-                <td
-                  class="px-6 py-4 font-bold text-slate-400 group-hover:text-primary transition-colors text-sm"
-                >
-                  {{ page_obj.start_index|add:forloop.counter0 }}
-                </td>
-                <td class="px-6 py-5 text-center">
-                  <div class="flex items-center gap-4">
-                    {% if row.response.respondent %}
-                      {% with social=row.response.respondent.socialaccount_set.first %}
-                      {% if social and social.get_avatar_url %}
-                        <img src="{{ social.get_avatar_url }}" alt="{{ row.response.respondent.username }}" class="h-11 w-11 rounded-2xl object-cover shadow-lg shadow-primary/20 ring-2 ring-white group-hover:scale-105 transition-transform duration-300">
-                      {% else %}
-                        <div class="h-11 w-11 rounded-2xl bg-gradient-to-br from-primary to-primary-focus text-white flex items-center justify-center font-bold text-lg shadow-lg shadow-primary/20 ring-2 ring-white group-hover:scale-105 transition-transform duration-300">
-                          {{ row.response.respondent.username|slice:":1"|upper }}
+            <!-- Pagination Footer for Individual Responses -->
+            <div class="p-4 bg-slate-50/50 border-t border-slate-200">
+                {% if responses.has_other_pages %}
+                    <div class="flex flex-col items-center justify-center gap-4 mt-6">
+                        <div class="join shadow-sm border border-slate-200 rounded-xl bg-white">
+                            {% if responses.has_previous %}
+                                <button
+                                    hx-get="{% url 'SurveyResponseDetail' survey.uuid %}?view=individual&page={{ responses.previous_page_number }}"
+                                    hx-target="#response-tabs-container"
+                                    hx-swap="outerHTML"
+                                    hx-push-url="true"
+                                    class="join-item btn btn-sm btn-ghost hover:bg-slate-50 text-slate-600 font-medium px-4 w-12"
+                                >
+                                    <i class="fa-solid fa-chevron-left rtl:rotate-180 text-xs"></i>
+                                </button>
+                            {% else %}
+                                <button class="join-item btn btn-sm btn-ghost disabled:bg-transparent disabled:text-slate-300 px-4 w-12" disabled>
+                                    <i class="fa-solid fa-chevron-left rtl:rotate-180 text-xs"></i>
+                                </button>
+                            {% endif %}
+                            
+                            {% for num in responses.paginator.page_range %}
+                                {% if responses.number == num %}
+                                    <button class="join-item btn btn-sm btn-primary text-white pointer-events-none">{{ num }}</button>
+                                {% elif num > responses.number|add:'-3' and num < responses.number|add:'3' %}
+                                    <button
+                                        hx-get="{% url 'SurveyResponseDetail' survey.uuid %}?view=individual&page={{ num }}"
+                                        hx-target="#response-tabs-container"
+                                        hx-swap="outerHTML"
+                                        hx-push-url="true"
+                                        class="join-item btn btn-sm btn-ghost hover:bg-slate-50 text-slate-600 font-medium"
+                                    >
+                                        {{ num }}
+                                    </button>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if responses.has_next %}
+                                <button
+                                    hx-get="{% url 'SurveyResponseDetail' survey.uuid %}?view=individual&page={{ responses.next_page_number }}"
+                                    hx-target="#response-tabs-container"
+                                    hx-swap="outerHTML"
+                                    hx-push-url="true"
+                                    class="join-item btn btn-sm btn-ghost hover:bg-slate-50 text-slate-600 font-medium px-4 w-12"
+                                >
+                                    <i class="fa-solid fa-chevron-right rtl:rotate-180 text-xs"></i>
+                                </button>
+                            {% else %}
+                                <button class="join-item btn btn-sm btn-ghost disabled:bg-transparent disabled:text-slate-300 px-4 w-12" disabled>
+                                    <i class="fa-solid fa-chevron-right rtl:rotate-180 text-xs"></i>
+                                </button>
+                            {% endif %}
                         </div>
-                      {% endif %}
-                      {% endwith %}
-                      <div>
-                          <p class="font-bold text-slate-800 text-sm mb-0.5">{{ row.response.respondent.username }}</p>
-                          <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-600">
-                              {% trans "Member" %}
-                          </span>
-                      </div>
-                    {% else %}
-                      <div class="h-11 w-11 rounded-2xl bg-slate-200 text-slate-500 flex items-center justify-center shadow-inner ring-2 ring-white">
-                          <i class="fa-solid fa-user-secret text-lg"></i>
-                      </div>
-                      <div>
-                           <p class="font-bold text-slate-600 text-sm mb-0.5 italic">{% trans "Anonymous" %}</p>
-                           <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-500">
-                              {% trans "Guest" %}
-                          </span>
-                      </div>
-                    {% endif %}
-                  </div>
-                </td>
-                {% for cell in row.cells %}
-                <td class="p-3 align-top">
-                  {% if cell != "-" %}
-                  <div class="min-w-[140px] max-w-[400px] p-2 rounded-lg text-xs leading-relaxed bg-white border border-slate-200 text-slate-700 shadow-sm whitespace-normal break-words text-left mx-auto">
-                    {{ cell }}
-                  </div>
-                  {% else %}
-                  <div class="text-center py-2">
-                    <span class="text-slate-200 text-lg font-light">-</span>
-                  </div>
-                  {% endif %}
-                </td>
-                {% endfor %}
-              </tr>
-              {% empty %}
-              <tr>
-                <td
-                  colspan="{{ questions.count|add:2 }}" 
-                  class="text-center py-16"
-                >
-                  <div class="flex flex-col items-center justify-center text-slate-400">
-                    <div class="h-16 w-16 bg-slate-50 rounded-full flex items-center justify-center mb-4 text-slate-300">
-                       <i class="fa-solid fa-clipboard-question text-3xl"></i>
+                        <div class="text-xs text-slate-400 font-medium">
+                            {% trans "Page" %} {{ responses.number }} {% trans "of" %} {{ responses.paginator.num_pages }}
+                        </div>
                     </div>
-                    <p class="font-medium text-lg text-slate-600">{% trans "No responses yet" %}</p>
-                     <p class="text-sm text-slate-400">{% trans "Once people start taking your survey, their responses will appear here." %}</p>
-                  </div>
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-
-        <!-- HTMX Pagination for Overview -->
-        <div class="p-4 bg-slate-50/50 border-t border-slate-200">
-            {% if page_obj.has_other_pages %}
-            <div class="flex flex-col items-center justify-center gap-4">
-                <div class="join shadow-sm border border-slate-200 rounded-xl bg-white">
-                    {% if page_obj.has_previous %}
-                        <button
-                            hx-get="{% url 'SurveyResponseDetail' survey.uuid %}?view=overview&page={{ page_obj.previous_page_number }}"
-                            hx-target="#response-tabs-container"
-                            hx-swap="outerHTML"
-                            class="join-item btn btn-sm btn-ghost hover:bg-slate-50 text-slate-600 font-medium px-4 w-12"
-                        >
-                            <i class="fa-solid fa-chevron-left rtl:rotate-180 text-xs"></i>
-                        </button>
-                    {% else %}
-                        <button class="join-item btn btn-sm btn-ghost disabled:bg-transparent disabled:text-slate-300 px-4 w-12" disabled>
-                            <i class="fa-solid fa-chevron-left rtl:rotate-180 text-xs"></i>
-                        </button>
-                    {% endif %}
-                    
-                    {% for num in page_obj.paginator.page_range %}
-                        {% if page_obj.number == num %}
-                            <button class="join-item btn btn-sm btn-primary text-white pointer-events-none">{{ num }}</button>
-                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                            <button
-                                hx-get="{% url 'SurveyResponseDetail' survey.uuid %}?view=overview&page={{ num }}"
-                                hx-target="#response-tabs-container"
-                                hx-swap="outerHTML"
-                                class="join-item btn btn-sm btn-ghost hover:bg-slate-50 text-slate-600 font-medium"
-                            >
-                                {{ num }}
-                            </button>
-                        {% endif %}
-                    {% endfor %}
-                    
-                    {% if page_obj.has_next %}
-                        <button
-                            hx-get="{% url 'SurveyResponseDetail' survey.uuid %}?view=overview&page={{ page_obj.next_page_number }}"
-                            hx-target="#response-tabs-container"
-                            hx-swap="outerHTML"
-                            class="join-item btn btn-sm btn-ghost hover:bg-slate-50 text-slate-600 font-medium px-4 w-12"
-                        >
-                             <i class="fa-solid fa-chevron-right rtl:rotate-180 text-xs"></i>
-                        </button>
-                    {% else %}
-                        <button class="join-item btn btn-sm btn-ghost disabled:bg-transparent disabled:text-slate-300 px-4 w-12" disabled>
-                             <i class="fa-solid fa-chevron-right rtl:rotate-180 text-xs"></i>
-                        </button>
-                    {% endif %}
-                </div>
-                <div class="text-xs text-slate-400 font-medium">
-                   {% trans "Page" %} {{ page_obj.number }} {% trans "of" %} {{ page_obj.paginator.num_pages }}
+                {% endif %}
+            </div>
+            
+        {% elif view_mode == 'overview' %}
+            <!-- Responses Overview Content -->
+            <!-- Header -->
+            <div class="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-white">
+                <div>
+                    <h2 class="text-xl font-bold text-slate-800 tracking-tight">{% trans "Responses Overview" %}</h2>
+                    <p class="text-sm text-slate-500 mt-1">{% trans "Matrix view of all given answers" %}</p>
                 </div>
             </div>
-            {% endif %}
-        </div>
-      {% endif %}
+            
+            <div class="overflow-x-auto relative min-h-[300px]">
+                <table class="table w-full border-collapse">
+                    <thead class="bg-slate-50/80 backdrop-blur-sm border-b border-slate-200 sticky top-0 z-10">
+                        <tr>
+                            <th class="px-6 py-5 text-left text-xs font-extrabold text-slate-500 uppercase tracking-wider">#</th>
+                            <th class="px-6 py-5 text-center text-xs font-extrabold text-slate-500 uppercase tracking-wider">
+                                {% trans "Respondent" %}
+                            </th>
+                            {% for question in questions %}
+                                <th class="px-4 py-5 text-center min-w-[80px]" title="{{ question.label }}">
+                                    <div class="flex flex-col items-center justify-center group/th cursor-help">
+                                        <span class="text-primary/80 font-extrabold text-sm group-hover/th:text-primary transition-colors">
+                                            {% trans "Q" %}{{ forloop.counter }}
+                                        </span>
+                                        <span class="text-[10px] text-slate-400 font-normal mt-0.5 max-w-[120px] truncate">{{ question.label }}</span>
+                                    </div>
+                                </th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 bg-white">
+                        {% for row in table_data %}
+                            <tr class="group hover:bg-slate-50 transition-all duration-200 ease-in-out border-l-4 rtl:border-l-0 rtl:border-r-4 ltr:border-l-transparent rtl:border-r-transparent ltr:hover:border-l-primary rtl:hover:border-r-primary hover:shadow-sm">
+                                <td class="px-6 py-4 font-bold text-slate-400 group-hover:text-primary transition-colors text-sm">
+                                    {{ page_obj.start_index|add:forloop.counter0 }}
+                                </td>
+                                <td class="px-6 py-5 text-center">
+                                    <div class="flex items-center gap-4">
+                                        {% if row.response.respondent %}
+                                            {% with social=row.response.respondent.socialaccount_set.first %}
+                                                {% if social and social.get_avatar_url %}
+                                                    <img src="{{ social.get_avatar_url }}" alt="{{ row.response.respondent.username }}" class="h-11 w-11 rounded-2xl object-cover shadow-lg shadow-primary/20 ring-2 ring-white group-hover:scale-105 transition-transform duration-300">
+                                                {% else %}
+                                                    <div class="h-11 w-11 rounded-2xl bg-gradient-to-br from-primary to-primary-focus text-white flex items-center justify-center font-bold text-lg shadow-lg shadow-primary/20 ring-2 ring-white group-hover:scale-105 transition-transform duration-300">
+                                                        {{ row.response.respondent.username|slice:":1"|upper }}
+                                                    </div>
+                                                {% endif %}
+                                            {% endwith %}
+                                            <div>
+                                                <p class="font-bold text-slate-800 text-sm mb-0.5">{% firstof row.response.respondent.get_full_name row.response.respondent.username %}</p>
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-600">
+                                                    {% trans "Member" %}
+                                                </span>
+                                            </div>
+                                        {% else %}
+                                            <div class="h-11 w-11 rounded-2xl bg-slate-200 text-slate-500 flex items-center justify-center shadow-inner ring-2 ring-white">
+                                                <i class="fa-solid fa-user-secret text-lg"></i>
+                                            </div>
+                                            <div>
+                                                <p class="font-bold text-slate-600 text-sm mb-0.5 italic">{% trans "Anonymous" %}</p>
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-500">
+                                                    {% trans "Guest" %}
+                                                </span>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                {% for cell in row.cells %}
+                                    <td class="p-3 align-top">
+                                        {% if cell != "-" %}
+                                            <div class="min-w-[140px] max-w-[400px] p-2 rounded-lg text-xs leading-relaxed bg-white border border-slate-200 text-slate-700 shadow-sm whitespace-normal break-words text-left mx-auto">
+                                                {{ cell }}
+                                            </div>
+                                        {% else %}
+                                            <div class="text-center py-2">
+                                                <span class="text-slate-200 text-lg font-light">-</span>
+                                            </div>
+                                        {% endif %}
+                                    </td>
+                                {% endfor %}
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="{{ questions.count|add:2 }}" class="text-center py-16">
+                                    <div class="flex flex-col items-center justify-center text-slate-400">
+                                        <div class="h-16 w-16 bg-slate-50 rounded-full flex items-center justify-center mb-4 text-slate-300">
+                                            <i class="fa-solid fa-clipboard-question text-3xl"></i>
+                                        </div>
+                                        <p class="font-medium text-lg text-slate-600">{% trans "No responses yet" %}</p>
+                                        <p class="text-sm text-slate-400">{% trans "Once people start taking your survey, their responses will appear here." %}</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- HTMX Pagination for Overview -->
+            <div class="p-4 bg-slate-50/50 border-t border-slate-200">
+                {% if page_obj.has_other_pages %}
+                    <div class="flex flex-col items-center justify-center gap-4">
+                        <div class="join shadow-sm border border-slate-200 rounded-xl bg-white">
+                            {% if page_obj.has_previous %}
+                                <button
+                                    hx-get="{% url 'SurveyResponseDetail' survey.uuid %}?view=overview&page={{ page_obj.previous_page_number }}"
+                                    hx-target="#response-tabs-container"
+                                    hx-swap="outerHTML"
+                                    class="join-item btn btn-sm btn-ghost hover:bg-slate-50 text-slate-600 font-medium px-4 w-12"
+                                >
+                                    <i class="fa-solid fa-chevron-left rtl:rotate-180 text-xs"></i>
+                                </button>
+                            {% else %}
+                                <button class="join-item btn btn-sm btn-ghost disabled:bg-transparent disabled:text-slate-300 px-4 w-12" disabled>
+                                    <i class="fa-solid fa-chevron-left rtl:rotate-180 text-xs"></i>
+                                </button>
+                            {% endif %}
+                            
+                            {% for num in page_obj.paginator.page_range %}
+                                {% if page_obj.number == num %}
+                                    <button class="join-item btn btn-sm btn-primary text-white pointer-events-none">{{ num }}</button>
+                                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                    <button
+                                        hx-get="{% url 'SurveyResponseDetail' survey.uuid %}?view=overview&page={{ num }}"
+                                        hx-target="#response-tabs-container"
+                                        hx-swap="outerHTML"
+                                        class="join-item btn btn-sm btn-ghost hover:bg-slate-50 text-slate-600 font-medium"
+                                    >
+                                        {{ num }}
+                                    </button>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if page_obj.has_next %}
+                                <button
+                                    hx-get="{% url 'SurveyResponseDetail' survey.uuid %}?view=overview&page={{ page_obj.next_page_number }}"
+                                    hx-target="#response-tabs-container"
+                                    hx-swap="outerHTML"
+                                    class="join-item btn btn-sm btn-ghost hover:bg-slate-50 text-slate-600 font-medium px-4 w-12"
+                                >
+                                    <i class="fa-solid fa-chevron-right rtl:rotate-180 text-xs"></i>
+                                </button>
+                            {% else %}
+                                <button class="join-item btn btn-sm btn-ghost disabled:bg-transparent disabled:text-slate-300 px-4 w-12" disabled>
+                                    <i class="fa-solid fa-chevron-right rtl:rotate-180 text-xs"></i>
+                                </button>
+                            {% endif %}
+                        </div>
+                        <div class="text-xs text-slate-400 font-medium">
+                            {% trans "Page" %} {{ page_obj.number }} {% trans "of" %} {{ page_obj.paginator.num_pages }}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
     </div>
 </div>

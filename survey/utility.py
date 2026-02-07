@@ -241,7 +241,9 @@ def get_survey_data_by_sections(survey, format_type='raw', responses=None):
                     else:
                         row_cells.append(row_data)     
                 else:
-                    if isinstance(val, list):
+                    if val in [None, ""]:
+                        row_cells.append("N/A")
+                    elif isinstance(val, list):
                          row_cells.append(" | ".join([str(v) for v in val]))
                     elif isinstance(val, dict):
                          # Format dicts nicely (e.g. for Matrix or Ranking)
@@ -292,7 +294,9 @@ def get_survey_export_data(survey, format_type='raw', responses=None, questions_
                 else:
                     row.append(row_data)     
             else:
-                if isinstance(val, list):
+                if val in [None, ""]:
+                    row.append("N/A")
+                elif isinstance(val, list):
                      row.append(" | ".join([str(v) for v in val]))
                 elif isinstance(val, dict):
                      # Format dicts nicely (e.g. for Matrix or Ranking)

@@ -30,16 +30,20 @@
                hx-target="#survey-grid-container"
                hx-swap="outerHTML"
                hx-push-url="true"
-               class="cursor-pointer px-5 py-2.5 text-sm font-medium border border-gray-200 rounded-s-lg hover:bg-gray-50 focus:z-10 focus:ring-2 focus:ring-indigo-500 transition-colors
+               hx-disabled-elt="this"
+               class="cursor-pointer px-5 py-2.5 text-sm font-medium border border-gray-200 rounded-s-lg hover:bg-gray-50 focus:z-10 focus:ring-2 focus:ring-indigo-500 transition-colors group
                {% if view_mode == 'flat' %}bg-indigo-50 text-indigo-700 border-indigo-200{% else %}bg-white text-gray-900{% endif %}">
+               <span class="loading loading-spinner loading-xs hidden group-[.htmx-request]:inline-block"></span>
                {% trans "All" %}
             </a>
             <a hx-get="?format={{ format_type }}&view=sections" 
                hx-target="#survey-grid-container"
                hx-swap="outerHTML"
                hx-push-url="true"
-               class="cursor-pointer px-5 py-2.5 text-sm font-medium border-t border-b border-r border-gray-200 rounded-e-lg hover:bg-gray-50 focus:z-10 focus:ring-2 focus:ring-indigo-500 transition-colors
+               hx-disabled-elt="this"
+               class="cursor-pointer px-5 py-2.5 text-sm font-medium border-t border-b border-r border-gray-200 rounded-e-lg hover:bg-gray-50 focus:z-10 focus:ring-2 focus:ring-indigo-500 transition-colors group
                {% if view_mode == 'sections' %}bg-indigo-50 text-indigo-700 border-indigo-200{% else %}bg-white text-gray-900{% endif %}">
+               <span class="loading loading-spinner loading-xs hidden group-[.htmx-request]:inline-block"></span>
                {% trans "By Section" %}
             </a>
         </div>
@@ -51,16 +55,20 @@
                hx-target="#survey-grid-container"
                hx-swap="outerHTML"
                hx-push-url="true"
-               class="cursor-pointer px-5 py-2.5 text-sm font-medium border border-gray-200 rounded-s-lg hover:bg-gray-50 focus:z-10 focus:ring-2 focus:ring-indigo-500 transition-colors
+               hx-disabled-elt="this"
+               class="cursor-pointer px-5 py-2.5 text-sm font-medium border border-gray-200 rounded-s-lg hover:bg-gray-50 focus:z-10 focus:ring-2 focus:ring-indigo-500 transition-colors group
                {% if format_type == 'raw' %}bg-indigo-50 text-indigo-700 border-indigo-200{% else %}bg-white text-gray-900{% endif %}">
+               <span class="loading loading-spinner loading-xs hidden group-[.htmx-request]:inline-block"></span>
                {% trans "Raw Data" %}
             </a>
             <a hx-get="?format=numeric&view={{ view_mode }}" 
                hx-target="#survey-grid-container"
                hx-swap="outerHTML"
                hx-push-url="true"
-               class="cursor-pointer px-5 py-2.5 text-sm font-medium border-t border-b border-r border-gray-200 rounded-e-lg hover:bg-gray-50 focus:z-10 focus:ring-2 focus:ring-indigo-500 transition-colors
+               hx-disabled-elt="this"
+               class="cursor-pointer px-5 py-2.5 text-sm font-medium border-t border-b border-r border-gray-200 rounded-e-lg hover:bg-gray-50 focus:z-10 focus:ring-2 focus:ring-indigo-500 transition-colors group
                {% if format_type == 'numeric' %}bg-indigo-50 text-indigo-700 border-indigo-200{% else %}bg-white text-gray-900{% endif %}">
+               <span class="loading loading-spinner loading-xs hidden group-[.htmx-request]:inline-block"></span>
                {% trans "Numeric Data" %}
             </a>
         </div>
