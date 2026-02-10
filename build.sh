@@ -2,6 +2,10 @@
 # exit on error
 set -o errexit
 
+# Install Node.js dependencies and build CSS
+npm install
+npm run build
+
 pip install -r requirements.txt
 
 # تجميع الملفات الثابتة (CSS/JS)

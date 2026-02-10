@@ -9,6 +9,7 @@
     "daisyui": "^5.1.23"
   },
   "scripts": {
-    "build:css": "npx @tailwindcss/cli -i ./survey/static/survey/input.css -o ./survey/static/survey/output.css  --watch"
+    "build:css": "npx @tailwindcss/cli -i ./survey/static/survey/input.css -o ./survey/static/survey/output.css  --watch",
+    "build": "npx @tailwindcss/cli -i ./survey/static/survey/input.css -o ./survey/static/survey/output.css"
   }
 }
