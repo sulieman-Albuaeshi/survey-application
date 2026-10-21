@@ -17,6 +17,7 @@
 {% endif %}
 
 {% block content %}
+{% get_providers as socialaccount_providers %}
 <div class="min-h-screen bg-base-200 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
   <div class="card w-full max-w-md bg-base-100 shadow-xl">
     <div class="card-body p-8">
@@ -99,7 +100,8 @@
         </div>
       </form>
 
-      
+      {% for provider in socialaccount_providers %}
+      {% if provider.id == "google" %}
       <div class="divider text-base-content/50 text-sm">{% trans "OR" %}</div>
 
       <div class="mb-4 text-center">
@@ -120,6 +122,8 @@
         <span class="normal-case">{% trans "Continue with Google" %}</span>
       </a>
       </div>
+      {% endif %}
+      {% endfor %}
 
       <div class="mt-6 text-center text-sm">
         {% if is_respondent %}

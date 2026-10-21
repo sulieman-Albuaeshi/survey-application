@@ -25,5 +25,3 @@ staticfiles/
 .DS_Store
 Thumbs.db
 .env
-
-survey/management/
